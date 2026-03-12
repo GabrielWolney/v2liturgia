@@ -12,93 +12,69 @@ export default function AnotacoesPage() {
 
   useEffect(() => {
     const mountTimer = setTimeout(() => setIsMounted(true), 0);
-    trackEvent("page_view", { page_name: "anotacoes" });
+    trackEvent("page_view", { page_name: "anotacoes_v2" });
     return () => clearTimeout(mountTimer);
   }, []);
 
-  // Lógica de Auto-Save com feedback visual elegante
   const handleMudancaTexto = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setNotas(e.target.value);
     setSaveStatus("guardando");
     
-    // Simula um pequeno atraso para dar a sensação de "saving..."
     setTimeout(() => {
       setSaveStatus("guardado");
-      
-      // Volta ao estado neutro após 2 segundos
-      setTimeout(() => {
-        setSaveStatus("ocioso");
-      }, 2000);
+      setTimeout(() => setSaveStatus("ocioso"), 2000);
     }, 500);
   };
 
-  // TELA DE CARREGAMENTO (Escudo Anti-Hidratação)
-  if (!isMounted) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-6 animate-pulse">
-        <div className="w-16 h-16 bg-blue-100 rounded-full mb-6 flex items-center justify-center text-blue-500">
-          <span className="material-symbols-rounded text-3xl animate-spin">sync</span>
-        </div>
-      </div>
-    );
-  }
+  if (!isMounted) return <div className="min-h-[100dvh] bg-[#F5F7FA]" />;
 
   return (
-    <div className="max-w-[800px] mx-auto w-full flex flex-col pt-8 md:pt-12 px-4 sm:px-6 md:px-0 animate-fade-in pb-32 h-screen">
+    <div className="min-h-[100dvh] bg-[#F5F7FA] flex flex-col font-sans pb-32 selection:bg-[#2F6BFF]/30">
       
-      {/* HEADER CONTROLS */}
-      <div className="flex items-center justify-between mb-8">
-        <Link href="/menu" className="text-slate-400 hover:text-blue-600 flex items-center gap-1 transition-colors bg-white border border-slate-200 px-4 py-2 rounded-full shadow-sm active:scale-95">
-          <span className="material-symbols-rounded text-[20px]">arrow_back</span>
-          <span className="text-sm font-bold">Voltar</span>
+      <header className="sticky top-0 z-50 bg-[#F5F7FA]/90 backdrop-blur-md border-b border-slate-200/50 px-4 sm:px-6 py-4 flex items-center justify-between max-w-[800px] mx-auto w-full">
+        <Link 
+          href="/jornada"
+          className="text-[#6B6B6B] hover:text-[#1F1F1F] transition-colors flex items-center justify-center w-10 h-10 rounded-full hover:bg-slate-200 active:scale-95 shrink-0"
+        >
+          <span className="material-symbols-rounded text-[26px]">arrow_back</span>
         </Link>
-
-        {/* FEEDBACK DE AUTO-SAVE */}
-        <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-300 ${
-          saveStatus === "guardando" ? "bg-amber-50 text-amber-600 border border-amber-200" :
-          saveStatus === "guardado" ? "bg-emerald-50 text-emerald-600 border border-emerald-200" :
-          "bg-slate-50 text-slate-400 border border-transparent opacity-50"
+        
+        {/* Feedback visual de gravação */}
+        <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-extrabold uppercase tracking-widest transition-all duration-300 ${
+          saveStatus === "guardando" ? "bg-amber-100 text-amber-700" :
+          saveStatus === "guardado" ? "bg-emerald-100 text-emerald-700" :
+          "bg-slate-200/50 text-[#6B6B6B]"
         }`}>
           <span className={`material-symbols-rounded text-[14px] ${saveStatus === "guardando" ? "animate-spin" : ""}`}>
             {saveStatus === "guardando" ? "sync" : "cloud_done"}
           </span>
-          {saveStatus === "guardando" ? "A guardar..." : "Guardado no telemóvel"}
+          {saveStatus === "guardando" ? "A guardar" : "Salvo"}
         </div>
-      </div>
-
-      {/* HEADER DA PÁGINA */}
-      <header className="mb-8 px-2">
-        <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 mb-4">
-          <span className="material-symbols-rounded text-2xl">edit_note</span>
-        </div>
-        <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 font-serif tracking-tight mb-2">
-          Diário Espiritual
-        </h1>
-        <p className="text-slate-500 font-medium text-sm">
-          Anotações de pregações, reflexões e orações.
-        </p>
       </header>
 
-      {/* ÁREA DE ESCRITA (Distraction-Free) */}
-      <div className="flex-1 flex flex-col bg-white rounded-[2.5rem] shadow-soft border border-slate-100 overflow-hidden relative group">
+      <main className="flex-1 w-full max-w-[800px] mx-auto px-5 pt-8 flex flex-col h-full animate-fade-in">
         
-        {/* Marcador lateral estético */}
-        <div className="absolute left-0 top-10 bottom-10 w-1 bg-gradient-to-b from-blue-100 via-blue-200 to-blue-100 rounded-r-full opacity-50"></div>
-
-        <textarea 
-          value={minhasNotas}
-          onChange={handleMudancaTexto}
-          placeholder="Comece a escrever as suas reflexões de hoje..."
-          className="flex-1 w-full bg-transparent p-6 sm:p-10 pl-8 sm:pl-12 resize-none outline-none font-serif text-lg leading-[2] text-slate-700 placeholder:text-slate-300"
-          spellCheck="false"
-        />
-        
-        {/* Contagem de caracteres (Sutil no rodapé) */}
-        <div className="absolute bottom-4 right-6 text-xs font-bold text-slate-300 uppercase tracking-widest bg-white/80 px-2 py-1 rounded-md backdrop-blur-sm pointer-events-none">
-          {minhasNotas.length} caracteres
+        <div className="flex flex-col items-center text-center mb-8">
+          <div className="w-16 h-16 bg-[#2F6BFF]/10 rounded-[1.25rem] flex items-center justify-center text-[#2F6BFF] mb-4 shadow-inner">
+            <span className="material-symbols-rounded text-[32px]">edit_note</span>
+          </div>
+          <h2 className="text-3xl font-extrabold text-[#1F1F1F] tracking-tight mb-1">Meu Diário</h2>
+          <p className="text-[#6B6B6B] font-medium text-sm">Anotações e reflexões espirituais.</p>
         </div>
-      </div>
 
+        <div className="flex-1 flex flex-col bg-white rounded-[2rem] shadow-soft border border-slate-100 overflow-hidden relative group mb-10">
+          {/* Marcador lateral estético */}
+          <div className="absolute left-0 top-10 bottom-10 w-1.5 bg-[#2F6BFF] rounded-r-full opacity-80"></div>
+
+          <textarea 
+            value={minhasNotas}
+            onChange={handleMudancaTexto}
+            placeholder="Comece a escrever as suas reflexões de hoje..."
+            className="flex-1 w-full bg-transparent p-6 sm:p-10 pl-8 sm:pl-10 resize-none outline-none font-serif text-lg leading-[2] text-[#1F1F1F] placeholder:text-slate-300"
+            spellCheck="false"
+          />
+        </div>
+      </main>
     </div>
   );
 }

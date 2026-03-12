@@ -16,18 +16,22 @@ interface ModuloJornada {
   activeShadowClass: string;
 }
 
+// TRILHA COMPLETA COM AMBOS (9 Módulos)
 const modulos: ModuloJornada[] = [
   { id: "palavra", titulo: "Palavra do Dia", icone: "menu_book", href: "/liturgia", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC,0_15px_15px_rgba(0,0,0,0.15)]", activeShadowClass: "active:shadow-[0_0px_0_#1E4BCC] active:translate-y-[10px]" },
-  { id: "confissao", titulo: "Confissão", icone: "clean_hands", href: "/confissao", bgClass: "bg-[#6E3AA5]", shadowClass: "shadow-[0_10px_0_#4A2673,0_15px_15px_rgba(0,0,0,0.15)]", activeShadowClass: "active:shadow-[0_0px_0_#4A2673] active:translate-y-[10px]" },
-  { id: "terco", titulo: "Santo Terço", icone: "cruelty_free", href: "/oracoes", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC,0_15px_15px_rgba(0,0,0,0.15)]", activeShadowClass: "active:shadow-[0_0px_0_#1E4BCC] active:translate-y-[10px]" },
+  { id: "terco", titulo: "Santo Terço", icone: "cruelty_free", href: "/terco", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC,0_15px_15px_rgba(0,0,0,0.15)]", activeShadowClass: "active:shadow-[0_0px_0_#1E4BCC] active:translate-y-[10px]" },
+  { id: "oracoes", titulo: "Orações", icone: "self_improvement", href: "/oracoes", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC,0_15px_15px_rgba(0,0,0,0.15)]", activeShadowClass: "active:shadow-[0_0px_0_#1E4BCC] active:translate-y-[10px]" },
+  { id: "confissao", titulo: "Confissão", icone: "clean_hands", href: "/confissao", bgClass: "bg-[#6E3AA5]", shadowClass: "shadow-[0_10px_0_#4A2673,0_15px_15px_rgba(0,0,0,0.15)]", activeShadowClass: "active:shadow-[0_0px_0_#4A2673] active:translate-y-[10px]" }, // Destaque Roxo
   { id: "biblia", titulo: "Bíblia", icone: "auto_stories", href: "/biblia", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC,0_15px_15px_rgba(0,0,0,0.15)]", activeShadowClass: "active:shadow-[0_0px_0_#1E4BCC] active:translate-y-[10px]" },
+  { id: "mural", titulo: "Mural", icone: "volunteer_activism", href: "/mural", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC,0_15px_15px_rgba(0,0,0,0.15)]", activeShadowClass: "active:shadow-[0_0px_0_#1E4BCC] active:translate-y-[10px]" },
+  { id: "diario", titulo: "Meu Diário", icone: "edit_note", href: "/anotacoes", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC,0_15px_15px_rgba(0,0,0,0.15)]", activeShadowClass: "active:shadow-[0_0px_0_#1E4BCC] active:translate-y-[10px]" },
   { id: "calendario", titulo: "Calendário", icone: "calendar_month", href: "/calendario", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC,0_15px_15px_rgba(0,0,0,0.15)]", activeShadowClass: "active:shadow-[0_0px_0_#1E4BCC] active:translate-y-[10px]" },
   { id: "novenas", titulo: "Novenas", icone: "event", href: "/novenas", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC,0_15px_15px_rgba(0,0,0,0.15)]", activeShadowClass: "active:shadow-[0_0px_0_#1E4BCC] active:translate-y-[10px]" },
 ];
 
 export default function JornadaPage() {
   const [isMounted, setIsMounted] = useState(false);
-  const { leiturasConcluidas } = useUserStore();
+  const { leiturasConcluidas, tercosConcluidos } = useUserStore();
 
   useEffect(() => {
     const mountTimer = setTimeout(() => setIsMounted(true), 0);
@@ -87,24 +91,20 @@ export default function JornadaPage() {
 
   const dataHojeISO = new Date().toLocaleDateString("en-CA");
   const jaLeuPalavra = !!leiturasConcluidas[dataHojeISO];
+  const jaRezouTerco = !!tercosConcluidos[dataHojeISO];
 
   return (
     <div className="min-h-screen bg-[#F5F7FA] bg-[radial-gradient(circle_at_center,_rgba(47,107,255,0.08)_3px,_transparent_3px)] bg-[length:28px_28px] flex flex-col font-sans pb-32 overflow-x-hidden selection:bg-[#2F6BFF]/30">
       
-      {/* HEADER: BOTÃO VOLTAR CLARO, TEXTO VISÍVEL, FOGUINHO E ENGRENAGEM */}
       <header className="flex items-center justify-between p-3 sm:p-5 max-w-[600px] mx-auto w-full bg-white/60 backdrop-blur-xl border-b border-slate-200/60 sticky top-0 z-50 shadow-[0_4px_20px_rgba(0,0,0,0.02)] gap-1">
-        
-        {/* Lado Esquerdo: Botão Voltar + Logo + Nome (Sempre visível) */}
         <div className="flex items-center gap-1 sm:gap-2 overflow-hidden">
           <Link href="/" className="w-9 h-9 flex items-center justify-center text-[#6B6B6B] hover:text-[#2F6BFF] hover:bg-blue-50 transition-colors active:scale-95 rounded-full shrink-0">
             <span className="material-symbols-rounded text-[26px]">arrow_back</span>
           </Link>
           <img src="/icon-192x192.png" alt="Logo" className="w-7 h-7 rounded-md shadow-sm border border-slate-200 shrink-0" />
-          {/* Removido o hidden, ajustado o texto e adicionado truncate para não quebrar linha */}
           <h1 className="text-sm sm:text-lg font-extrabold text-[#1F1F1F] tracking-tight truncate">Liturgia Ágape</h1>
         </div>
         
-        {/* Lado Direito: Foguinho + Engrenagem */}
         <div className="flex items-center gap-1 sm:gap-3 shrink-0">
           <div className="flex items-center gap-1 bg-orange-50 px-2 sm:px-3 py-1.5 rounded-full border border-orange-100 shadow-sm cursor-pointer hover:bg-orange-100 transition-colors">
             <span className="material-symbols-rounded text-orange-500 text-[16px] sm:text-[18px]">local_fire_department</span>
@@ -114,10 +114,8 @@ export default function JornadaPage() {
             <span className="material-symbols-rounded text-[24px] sm:text-[26px]">settings</span>
           </Link>
         </div>
-
       </header>
 
-      {/* CARD TEMPO LITÚRGICO */}
       <div className="px-5 mt-6 mb-10 max-w-[600px] mx-auto w-full">
         <div className="bg-white rounded-[1.5rem] p-6 flex items-center justify-between shadow-soft border border-slate-200">
           <div className="flex flex-col gap-0.5">
@@ -139,10 +137,12 @@ export default function JornadaPage() {
         </div>
       </div>
 
-      {/* A TRILHA */}
       <main className="flex-1 flex flex-col w-[320px] mx-auto pt-2 relative z-0">
         {modulos.map((modulo, index) => {
-          const isConcluido = modulo.id === "palavra" && jaLeuPalavra;
+          // LÓGICA DO SUCESSO: Verifica se a Palavra ou o Terço foram concluídos!
+          const isConcluido = 
+            (modulo.id === "palavra" && jaLeuPalavra) || 
+            (modulo.id === "terco" && jaRezouTerco);
 
           return (
             <div key={modulo.id} className="relative w-full h-[112px] mb-[64px]">
@@ -159,6 +159,7 @@ export default function JornadaPage() {
                 >
                   <div className="absolute inset-0 rounded-[2rem] shadow-[inset_0_5px_12px_rgba(255,255,255,0.3)] pointer-events-none"></div>
 
+                  {/* CHECK VERDE DA VITÓRIA */}
                   {isConcluido && (
                     <div className="absolute -top-3 -right-3 bg-[#10b981] text-white rounded-full w-8 h-8 flex items-center justify-center shadow-md border-4 border-[#F5F7FA] z-20">
                       <span className="material-symbols-rounded text-[18px] font-black">check</span>
@@ -178,19 +179,17 @@ export default function JornadaPage() {
           );
         })}
 
-        {/* --- A LINHA DE CHEGADA ESPIRITUAL --- */}
         <div className="relative w-full flex flex-col items-center z-10 pt-4">
           <div className="w-16 h-16 rounded-full bg-white border-[6px] border-[#F5F7FA] outline outline-4 outline-[#2F6BFF] flex items-center justify-center shadow-lg mb-4">
             <span className="material-symbols-rounded text-[32px] text-[#2F6BFF]">sports_score</span>
           </div>
 
           <div className="bg-white/90 backdrop-blur-md p-6 rounded-2xl shadow-sm border border-slate-200 text-center w-[280px]">
-            {/* CORREÇÃO DO LINTER: Uso de &quot; em vez de aspas duplas soltas */}
             <p className="font-serif italic text-[#1F1F1F] text-sm leading-relaxed mb-3">
-              &quot;A santidade consiste em fazer as pequenas coisas com grande amor.&quot;
+              &quot;Combati o bom combate, terminei a corrida, guardei a fé.&quot;
             </p>
             <p className="font-bold text-[#2F6BFF] text-[10px] uppercase tracking-widest">
-              — Santa Teresinha do Menino Jesus
+              — São Paulo (2 Tm 4,7)
             </p>
           </div>
         </div>

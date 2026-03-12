@@ -4,61 +4,87 @@ import bibliaJson from "@/data/biblia.json";
 import { BibliaData, LivroBiblia } from "@/types/biblia";
 
 const bibliaData = bibliaJson as unknown as BibliaData;
-const removerAcentos = (str: string) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+// O Normalizador Supremo que resolve os problemas da V1!
+const normalizarLivro = (str: string) => {
+  let s = str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+  
+  // Limpa prefixos
+  s = s.replace(/\bsao\s+/g, ""); 
+  
+  // Converte Numeração Romana para Arábica (Apenas no início)
+  s = s.replace(/^i\s+/, "1 ");
+  s = s.replace(/^ii\s+/, "2 ");
+  s = s.replace(/^iii\s+/, "3 ");
+  
+  // Converte Ordinais e Extenso
+  s = s.replace(/^1a\s+/, "1 ");
+  s = s.replace(/^2a\s+/, "2 ");
+  s = s.replace(/^3a\s+/, "3 ");
+  s = s.replace(/^primeira\s+/, "1 ");
+  s = s.replace(/^segunda\s+/, "2 ");
+  s = s.replace(/^terceira\s+/, "3 ");
+  
+  // Caso particular
+  if (s === "cantico dos canticos") s = "canticos";
+  
+  return s.trim();
+};
 
 export default async function CapitulosPage({ params }: { params: Promise<{ livro: string }> }) {
   const { livro: slug } = await params;
 
   const bookInfo = [...bibliaCatolica.novo, ...bibliaCatolica.antigo].find(b => b.slug === slug);
 
-  if (!bookInfo) return <div className="p-8 text-center text-slate-500 mt-20">Livro não encontrado.</div>;
+  if (!bookInfo) return <div className="p-8 text-center text-[#6B6B6B] mt-20 font-bold">Livro não encontrado.</div>;
 
   const todosLivros = [...(bibliaData.antigoTestamento || []), ...(bibliaData.novoTestamento || [])];
-  const slugLimpo = slug.replace(/-/g, " ");
-  const nomeLimpo = removerAcentos(bookInfo.nome);
+  
+  // Normalizamos tudo para o mesmo padrão (ex: "i-sao-joao" -> "1 joao")
+  const slugLimpo = normalizarLivro(slug.replace(/-/g, " "));
+  const nomeLimpo = normalizarLivro(bookInfo.nome);
 
   const livroEncontrado = todosLivros.find((l: LivroBiblia) => {
-    const nomeJson = removerAcentos(l.nome);
-    return nomeJson === slugLimpo || nomeJson === nomeLimpo || nomeJson.includes(slugLimpo);
+    const nomeJson = normalizarLivro(l.nome);
+    // Tenta correspondência exata primeiro, e depois parcial
+    return nomeJson === slugLimpo || nomeJson === nomeLimpo || nomeJson.includes(slugLimpo) || nomeJson.includes(nomeLimpo);
   });
 
-  if (!livroEncontrado) return <div className="p-8 text-center text-slate-500 mt-20">Dados não encontrados na base.</div>;
+  if (!livroEncontrado) return <div className="p-8 text-center text-[#6B6B6B] mt-20 font-bold">Erro de sincronização. Dados não encontrados na base.</div>;
 
   const quantidadeCapitulos = livroEncontrado.capitulos.length;
   const capitulos = Array.from({ length: quantidadeCapitulos }, (_, i) => i + 1);
 
   return (
-    <div className="max-w-[800px] mx-auto w-full flex flex-col pt-8 md:pt-12 px-4 sm:px-6 md:px-0 animate-fade-in pb-32">
+    <div className="min-h-[100dvh] bg-[#F5F7FA] flex flex-col font-sans pb-32 selection:bg-[#2F6BFF]/30">
       
-      <header className="mb-12 text-center relative flex flex-col items-center">
-        <Link href="/biblia" className="absolute left-0 top-0 text-slate-400 hover:text-blue-600 flex items-center gap-1 transition-colors bg-white border border-slate-200 px-3 py-1.5 rounded-full shadow-sm active:scale-95">
-          <span className="material-symbols-rounded text-[20px]">arrow_back</span>
-          <span className="hidden sm:inline text-sm font-bold">Voltar</span>
+      <header className="sticky top-0 z-50 bg-[#F5F7FA]/90 backdrop-blur-md border-b border-slate-200/50 px-4 sm:px-6 py-4 flex items-center justify-between max-w-[800px] mx-auto w-full">
+        <Link 
+          href="/biblia"
+          className="text-[#6B6B6B] hover:text-[#1F1F1F] transition-colors flex items-center justify-center w-10 h-10 rounded-full hover:bg-slate-200 active:scale-95 shrink-0"
+        >
+          <span className="material-symbols-rounded text-[26px]">arrow_back</span>
         </Link>
-        
-        <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 mb-3 mt-10 sm:mt-0">
-          <span className="material-symbols-rounded text-2xl">import_contacts</span>
+        <div className="flex flex-col items-center">
+          <h1 className="font-extrabold text-[#1F1F1F] text-lg tracking-tight">{bookInfo.nome}</h1>
+          <p className="text-[#6B6B6B] text-[10px] font-bold uppercase tracking-widest">{quantidadeCapitulos} Capítulos</p>
         </div>
-        <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 font-serif tracking-tight">
-          {bookInfo.nome}
-        </h1>
-        <p className="text-slate-500 font-bold text-sm mt-2 tracking-widest uppercase">
-          {quantidadeCapitulos} Capítulos
-        </p>
+        <div className="w-10 h-10"></div>
       </header>
 
-      <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-8 lg:grid-cols-10 gap-3">
-        {capitulos.map((cap) => (
-          <Link
-            key={cap}
-            href={`/biblia/${slug}/${cap}`}
-            className="aspect-square flex items-center justify-center rounded-2xl bg-white border border-slate-200 text-slate-700 text-lg font-bold hover:bg-blue-600 hover:text-white hover:border-blue-600 shadow-sm hover:shadow-md transition-all active:scale-90"
-          >
-            {cap}
-          </Link>
-        ))}
-      </div>
-
+      <main className="flex-1 w-full max-w-[800px] mx-auto px-5 pt-8 animate-fade-in">
+        <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-8 lg:grid-cols-10 gap-3">
+          {capitulos.map((cap) => (
+            <Link
+              key={cap}
+              href={`/biblia/${slug}/${cap}`}
+              className="aspect-square flex items-center justify-center rounded-2xl bg-white border-2 border-slate-100 text-[#1F1F1F] text-lg font-extrabold hover:bg-[#2F6BFF] hover:text-white hover:border-[#2F6BFF] shadow-sm hover:shadow-[0_4px_0_#1E4BCC] hover:-translate-y-1 transition-all active:translate-y-0 active:shadow-none"
+            >
+              {cap}
+            </Link>
+          ))}
+        </div>
+      </main>
     </div>
   );
 }

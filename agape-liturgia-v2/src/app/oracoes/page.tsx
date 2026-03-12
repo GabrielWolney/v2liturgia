@@ -1,13 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { dbOracoes } from "@/lib/prayers-data";
-import { obterMisterioDoDia } from "@/lib/date-utils";
 import { trackEvent } from "@/lib/analytics";
 
 export default function OracoesPage() {
-  // ESCUDO ANTI-HIDRATAÇÃO (Crucial porque o dia da semana muda de dispositivo para dispositivo)
   const [isMounted, setIsMounted] = useState(false);
   const listaOracoes = Object.values(dbOracoes);
 
@@ -17,93 +15,52 @@ export default function OracoesPage() {
     return () => clearTimeout(mountTimer);
   }, []);
 
-  // TELA DE CARREGAMENTO
-  if (!isMounted) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-6 animate-pulse">
-        <div className="w-16 h-16 bg-blue-100 rounded-full mb-6 flex items-center justify-center text-blue-500">
-          <span className="material-symbols-rounded text-3xl animate-spin">sync</span>
-        </div>
-      </div>
-    );
-  }
-
-  const misterioHoje = obterMisterioDoDia(); 
+  if (!isMounted) return <div className="min-h-[100dvh] bg-[#F5F7FA]" />;
 
   return (
-    <div className="max-w-[800px] mx-auto w-full flex flex-col pt-8 md:pt-12 px-4 sm:px-6 md:px-0 animate-fade-in pb-32">
+    <div className="min-h-[100dvh] bg-[#F5F7FA] flex flex-col font-sans pb-32 selection:bg-[#2F6BFF]/30">
       
-      {/* HEADER */}
-      <header className="mb-10 text-center flex flex-col items-center">
-        <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 mb-4">
-          <span className="material-symbols-rounded text-4xl">self_improvement</span>
-        </div>
-        <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 font-serif tracking-tight mb-2">
-          Devocionário
-        </h1>
-        <p className="text-slate-500 font-medium text-sm">
-          A sua vida de oração diária
-        </p>
+      {/* HEADER NAVEGAÇÃO FIXA (CORRIGIDO PARA VOLTAR SEMPRE À JORNADA) */}
+      <header className="sticky top-0 z-50 bg-[#F5F7FA]/90 backdrop-blur-md border-b border-slate-200/50 px-4 sm:px-6 py-4 flex items-center justify-between max-w-[800px] mx-auto w-full">
+        <Link 
+          href="/jornada"
+          className="text-[#6B6B6B] hover:text-[#1F1F1F] transition-colors flex items-center justify-center w-10 h-10 rounded-full hover:bg-slate-200 active:scale-95 shrink-0"
+        >
+          <span className="material-symbols-rounded text-[26px]">arrow_back</span>
+        </Link>
+        <h1 className="font-extrabold text-[#1F1F1F] text-lg tracking-tight">Devocionário</h1>
+        <div className="w-10 h-10"></div>
       </header>
 
-      {/* SANTO TERÇO (DESTAQUE PREMIUM) */}
-      <section className="bg-gradient-to-br from-blue-600 to-indigo-800 rounded-[2rem] p-8 sm:p-10 shadow-lg shadow-blue-900/20 mb-12 text-white relative overflow-hidden">
-        <div className="absolute -right-6 -top-6 text-white/10 pointer-events-none">
-          <span className="material-symbols-rounded text-[160px]">cruelty_free</span>
-        </div>
-        <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-3 opacity-90">
-            <span className="material-symbols-rounded text-lg">calendar_today</span>
-            <span className="text-xs font-bold uppercase tracking-widest">Santo Terço de Hoje</span>
+      <main className="flex-1 w-full max-w-[800px] mx-auto px-5 pt-8 animate-fade-in">
+        <div className="flex flex-col items-center text-center mb-10">
+          <div className="w-20 h-20 bg-[#2F6BFF]/10 rounded-[1.5rem] flex items-center justify-center text-[#2F6BFF] mb-5 shadow-inner">
+            <span className="material-symbols-rounded text-[40px]">self_improvement</span>
           </div>
-          <h2 className="text-3xl md:text-4xl font-extrabold font-serif mb-3 leading-tight">
-            Mistérios {misterioHoje.tipo}
-          </h2>
-          <p className="text-blue-100 font-medium flex items-center gap-2">
-            Foco da meditação: <em className="text-white font-bold not-italic bg-white/20 px-3 py-1 rounded-lg">{misterioHoje.foco}</em>
-          </p>
+          <h2 className="text-3xl font-extrabold text-[#1F1F1F] tracking-tight mb-2">Orações Comuns</h2>
+          <p className="text-[#6B6B6B] font-medium text-sm">A sua base diária de diálogo com Deus.</p>
         </div>
-      </section>
 
-      {/* LISTA DE ORAÇÕES */}
-      <div className="mb-12">
-        <h3 className="font-bold text-lg text-slate-900 mb-5 px-2 flex items-center gap-2">
-          <span className="material-symbols-rounded text-blue-600">menu_book</span>
-          Orações Comuns
-        </h3>
-        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-          {listaOracoes.map((oracao) => (
-            <li key={oracao.id}>
-              <Link 
-                href={`/oracoes/${oracao.id}`} 
-                className="bg-white border border-slate-200 p-5 rounded-2xl flex items-center justify-between hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700 transition-all active:scale-95 group shadow-sm"
-              >
-                <span className="font-bold text-slate-700 group-hover:text-blue-700 transition-colors">
-                  {oracao.titulo}
-                </span>
-                <span className="material-symbols-rounded text-slate-400 group-hover:text-blue-600 transition-transform group-hover:translate-x-1">
-                  chevron_right
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* BANNER PARA AS NOVENAS */}
-      <Link 
-        href="/novenas" 
-        className="bg-slate-900 text-white rounded-[2rem] p-6 md:p-8 flex items-center justify-between shadow-lg hover:bg-slate-800 transition-colors active:scale-95 group"
-      >
-        <div>
-          <h3 className="text-xl font-bold mb-1">Novenas e Devoções</h3>
-          <p className="text-slate-400 text-sm font-medium">Aceder ao calendário litúrgico</p>
+        <div className="mb-10">
+          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {listaOracoes.map((oracao) => (
+              <li key={oracao.id}>
+                <Link 
+                  href={`/oracoes/${oracao.id}`} 
+                  className="bg-white border border-slate-100 p-5 rounded-[1.5rem] flex items-center justify-between hover:border-[#2F6BFF]/30 hover:shadow-md transition-all active:scale-95 group shadow-sm"
+                >
+                  <span className="font-extrabold text-[#1F1F1F] group-hover:text-[#2F6BFF] transition-colors">
+                    {oracao.titulo}
+                  </span>
+                  <span className="material-symbols-rounded text-[#6B6B6B] group-hover:text-[#2F6BFF] transition-transform group-hover:translate-x-1 bg-[#F5F7FA] p-1.5 rounded-full">
+                    chevron_right
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
-        <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-          <span className="material-symbols-rounded text-white">event</span>
-        </div>
-      </Link>
-
+      </main>
     </div>
   );
 }

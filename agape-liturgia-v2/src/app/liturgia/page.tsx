@@ -48,8 +48,8 @@ export default function LiturgiaAulaPage() {
             titulo: 'Salmo', 
             referencia: data.salmo.referencia, 
             texto: data.salmo.texto,
-            // Capturamos o refrão (fazemos um cast (any) por segurança caso a interface não tenha a tipagem estrita ainda)
-            refrao: (data.salmo as any).refrao 
+            // Agora o TypeScript sabe que isto é seguro! Sem 'any'.
+            refrao: data.salmo.refrao 
           });
         }
         if (data.segundaLeitura && typeof data.segundaLeitura !== 'string') {

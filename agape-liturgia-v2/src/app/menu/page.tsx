@@ -3,25 +3,25 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/store/useUserStore";
+import { usePWAInstall } from "@/hooks/usePWAInstall";
 
 export default function ConfigPage() {
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
   
-  // Puxamos tudo do nosso Zustand Store (Reatividade Mágica)
   const { 
     nomeUsuario, setNomeUsuario, 
     modoVisual, setModoVisual,
     tamanhoFonte, setTamanhoFonte 
   } = useUserStore();
 
+  const { isInstallable, installPWA } = usePWAInstall();
+
   useEffect(() => {
-    // Prevenção contra cascading renders do React 19
     const mountTimer = setTimeout(() => setIsMounted(true), 0);
     return () => clearTimeout(mountTimer);
   }, []);
 
-  // Lógica global para injetar as classes de tema no HTML
   useEffect(() => {
     if (!isMounted) return;
     const root = document.documentElement;
@@ -30,6 +30,18 @@ export default function ConfigPage() {
     if (modoVisual === 'escuro') root.classList.add('dark');
     if (modoVisual === 'leitura') root.classList.add('theme-leitura');
   }, [modoVisual, isMounted]);
+
+  // Função Nuclear: Apaga tudo e recarrega o app
+  const handleApagarDados = () => {
+    const confirmacao = window.confirm(
+      "Atenção: Tem a certeza que deseja apagar TODOS os seus dados? \n\nIsto irá remover o seu Diário, Exame de Consciência, Progresso de Novenas e Liturgias lidas. Esta ação não pode ser desfeita."
+    );
+    
+    if (confirmacao) {
+      localStorage.removeItem("agape-storage"); // Remove a base de dados do Zustand
+      window.location.reload(); // Recarrega a página do zero
+    }
+  };
 
   if (!isMounted) return <div className="min-h-screen bg-[#F5F7FA]" />;
 
@@ -50,7 +62,29 @@ export default function ConfigPage() {
 
       <main className="flex-1 px-5 pt-4 max-w-[600px] mx-auto w-full">
         
-        {/* BLOCO 1: NOME DINÂMICO */}
+        {/* BLOCO PWA: INSTALAÇÃO */}
+        {isInstallable && (
+          <section className="mb-8 animate-fade-in">
+            <p className="text-[#6B6B6B] font-bold text-xs uppercase tracking-widest mb-3 pl-2">Aplicativo</p>
+            <div className="bg-gradient-to-br from-[#2F6BFF] to-[#1E4BCC] rounded-[1.5rem] p-5 shadow-md shadow-[#2F6BFF]/20 border border-[#2F6BFF]/50 flex items-center justify-between text-white">
+              <div className="flex items-center gap-4">
+                <span className="material-symbols-rounded text-[32px] bg-white/20 p-2.5 rounded-2xl shadow-inner">get_app</span>
+                <div>
+                  <span className="font-extrabold block text-base mb-0.5">Instalar App</span>
+                  <span className="text-white/80 text-[11px] font-bold uppercase tracking-widest block leading-tight">Experiência rápida<br/>e sem navegador</span>
+                </div>
+              </div>
+              <button 
+                onClick={installPWA}
+                className="bg-white text-[#2F6BFF] px-5 py-3 rounded-xl font-black text-sm active:scale-95 transition-transform shadow-sm"
+              >
+                INSTALAR
+              </button>
+            </div>
+          </section>
+        )}
+
+        {/* BLOCO 1: NOME DO UTILIZADOR */}
         <section className="mb-8">
           <p className="text-[#6B6B6B] font-bold text-xs uppercase tracking-widest mb-3 pl-2">Seu Perfil</p>
           <div className="bg-white rounded-[1.5rem] p-5 shadow-sm border border-slate-100 flex flex-col gap-4">
@@ -62,7 +96,7 @@ export default function ConfigPage() {
                   id="nome"
                   type="text" 
                   value={nomeUsuario}
-                  onChange={(e) => setNomeUsuario(e.target.value)} // Salva no LocalStorage em tempo real!
+                  onChange={(e) => setNomeUsuario(e.target.value)}
                   maxLength={15}
                   className="w-full bg-[#F5F7FA] border-2 border-slate-100 rounded-xl py-3 pl-12 pr-4 text-[#1F1F1F] font-bold focus:outline-none focus:border-[#2F6BFF] focus:bg-white transition-all"
                   placeholder="Seu nome"
@@ -72,7 +106,7 @@ export default function ConfigPage() {
           </div>
         </section>
 
-        {/* BLOCO 2: APARÊNCIA DINÂMICA */}
+        {/* BLOCO 2: APARÊNCIA */}
         <section className="mb-8">
           <p className="text-[#6B6B6B] font-bold text-xs uppercase tracking-widest mb-3 pl-2">Aparência da Leitura</p>
           <div className="bg-white rounded-[1.5rem] shadow-sm border border-slate-100 p-5 flex flex-col gap-6">
@@ -121,6 +155,29 @@ export default function ConfigPage() {
                 </button>
               </div>
             </div>
+
+          </div>
+        </section>
+
+        {/* BLOCO 3: ZONA DE PERIGO (APAGAR DADOS) */}
+        <section className="mb-8">
+          <p className="text-[#6B6B6B] font-bold text-xs uppercase tracking-widest mb-3 pl-2">Privacidade e Dados</p>
+          <div className="bg-white rounded-[1.5rem] shadow-sm border border-slate-100 overflow-hidden">
+            
+            <button 
+              onClick={handleApagarDados}
+              className="w-full flex items-center gap-4 p-4 sm:p-5 active:bg-red-50 transition-colors text-left group"
+            >
+              <div className="w-10 h-10 rounded-xl bg-red-50 text-red-500 flex items-center justify-center shrink-0 group-hover:bg-red-100 transition-colors">
+                <span className="material-symbols-rounded text-[24px]">delete_forever</span>
+              </div>
+              <div>
+                <span className="font-extrabold text-red-500 block text-sm mb-0.5">Apagar Dados Locais</span>
+                <span className="text-[#6B6B6B] text-[11px] font-medium leading-tight block">
+                  Irá apagar permanentemente o seu diário, confissões e progresso.
+                </span>
+              </div>
+            </button>
 
           </div>
         </section>

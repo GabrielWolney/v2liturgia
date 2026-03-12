@@ -13,6 +13,10 @@ interface UserState {
   leiturasConcluidas: Record<string, boolean>;
   marcarLeituraConcluida: (dataIso: string) => void;
 
+  // Santo Terço (NOVO)
+  tercosConcluidos: Record<string, boolean>;
+  marcarTercoConcluido: (dataIso: string) => void;
+
   // Mural de Intercessão
   meusPedidosMural: string[];
   addMeuPedido: (id: string) => void;
@@ -39,16 +43,20 @@ export const useUserStore = create<UserState>()(
     (set) => ({
       nomeUsuario: "Jovem",
       setNomeUsuario: (nome) => set({ nomeUsuario: nome }),
-      
       modoVisual: "claro",
       setModoVisual: (modo) => set({ modoVisual: modo }),
-      
       tamanhoFonte: "padrao",
       setTamanhoFonte: (tamanho) => set({ tamanhoFonte: tamanho }),
       
       leiturasConcluidas: {},
       marcarLeituraConcluida: (dataIso) => set((state) => ({
         leiturasConcluidas: { ...state.leiturasConcluidas, [dataIso]: true }
+      })),
+
+      // Ações do Santo Terço (NOVO)
+      tercosConcluidos: {},
+      marcarTercoConcluido: (dataIso) => set((state) => ({
+        tercosConcluidos: { ...state.tercosConcluidos, [dataIso]: true }
       })),
 
       // Ações do Mural
@@ -69,11 +77,8 @@ export const useUserStore = create<UserState>()(
       exameConsciencia: {},
       togglePecado: (id) => set((state) => {
         const novoExame = { ...state.exameConsciencia };
-        if (novoExame[id]) {
-          delete novoExame[id];
-        } else {
-          novoExame[id] = true;
-        }
+        if (novoExame[id]) delete novoExame[id];
+        else novoExame[id] = true;
         return { exameConsciencia: novoExame };
       }),
       limparExame: () => set({ exameConsciencia: {} }),
@@ -94,8 +99,6 @@ export const useUserStore = create<UserState>()(
         };
       }),
     }),
-    {
-      name: 'agape-storage', // Nome do banco de dados no LocalStorage
-    }
+    { name: 'agape-storage' }
   )
 );

@@ -3,6 +3,7 @@ export interface Leitura {
   referencia: string;
   titulo: string;
   texto: string;
+  refrao?: string; // <-- ADICIONAMOS ISTO AQUI!
 }
 
 export interface LiturgiaDiaria {

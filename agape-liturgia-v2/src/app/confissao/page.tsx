@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useUserStore } from "@/store/useUserStore";
 import { trackEvent } from "@/lib/analytics";
 
@@ -12,9 +14,9 @@ const categoriasPecados = [
       "Cheguei tarde à Missa habitualmente por descaso?",
       "Recebi a Eucaristia em estado de pecado grave (sem confessar antes)?",
       "Omiti algum pecado grave em confissões passadas por vergonha?",
-      "Neguei minha fé ou tive vergonha de me posicionar como católico?",
+      "Neguei a minha fé ou tive vergonha de me posicionar como católico?",
       "Usei o nome de Deus em vão, fiz juramentos falsos ou blasfemei?",
-      "Dediquei tempo diário à oração ou me esqueci de Deus na correria?",
+      "Dediquei tempo diário à oração ou esqueci-me de Deus na correria?",
       "Acreditei em superstições, horóscopos, tarô ou práticas de ocultismo?"
     ]
   },
@@ -22,7 +24,7 @@ const categoriasPecados = [
     titulo: "Amar ao Próximo",
     pecados: [
       "Fui desobediente, insolente ou faltei com o respeito aos meus pais?",
-      "Tratei mal meus irmãos, amigos ou colegas?",
+      "Tratei mal os meus irmãos, amigos ou colegas?",
       "Guardei ódio, rancor ou desejei o mal a alguém?",
       "Fui motivo de escândalo para outros por minhas atitudes ou palavras?",
       "Fiz fofocas, calúnias ou espalhei boatos (mesmo que fossem verdade)?",
@@ -35,13 +37,13 @@ const categoriasPecados = [
     titulo: "Pureza e Temperança",
     pecados: [
       "Consenti em pensamentos ou desejos impuros deliberadamente?",
-      "Assisti pornografia ou busquei conteúdos sensuais/eróticos na internet?",
+      "Assisti a pornografia ou busquei conteúdos sensuais/eróticos na internet?",
       "Cometi atos de impureza comigo mesmo (masturbação)?",
       "Tive relações sexuais fora ou antes do matrimônio?",
       "No namoro, faltei com o respeito ou levei o outro a pecar?",
       "Vesti-me de forma vulgar ou usei minha imagem para provocar desejo alheio?",
       "Fui guloso, bebi demais ou usei drogas?",
-      "Fui vaidoso, soberbo ou me senti superior aos outros?"
+      "Fui vaidoso, soberbo ou senti-me superior aos outros?"
     ]
   },
   {
@@ -49,7 +51,7 @@ const categoriasPecados = [
     pecados: [
       "Fui preguiçoso nos estudos ou no trabalho?",
       "Colei em provas ou apresentei trabalhos que não eram meus?",
-      "Peguei dinheiro ou objetos que não me pertenciam sem permissão?",
+      "Peguei em dinheiro ou objetos que não me pertenciam sem permissão?",
       "Desperdicei dinheiro com coisas fúteis enquanto outros passam necessidade?",
       "Perdi tempo excessivo em redes sociais e jogos, negligenciando meus deveres?",
       "Fui invejoso em relação ao sucesso ou bens dos outros?"
@@ -58,12 +60,13 @@ const categoriasPecados = [
 ];
 
 export default function ConfissaoPage() {
+  const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
   const { exameConsciencia, togglePecado, limparExame } = useUserStore();
 
   useEffect(() => {
     const mountTimer = setTimeout(() => setIsMounted(true), 0);
-    trackEvent("page_view", { page_name: "confissao" });
+    trackEvent("page_view", { page_name: "confissao_v2" });
     return () => clearTimeout(mountTimer);
   }, []);
 
@@ -74,94 +77,65 @@ export default function ConfissaoPage() {
     }
   };
 
-  // TELA DE CARREGAMENTO
   if (!isMounted) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-6 animate-pulse">
-        <div className="w-16 h-16 bg-blue-100 rounded-full mb-6 flex items-center justify-center text-blue-500">
-          <span className="material-symbols-rounded text-3xl animate-spin">sync</span>
-        </div>
-      </div>
-    );
+    return <div className="min-h-[100dvh] bg-[#F5F7FA]" />;
   }
 
   const quantidadePecados = Object.keys(exameConsciencia).length;
 
   return (
-    <div className="max-w-[800px] mx-auto w-full flex flex-col pt-8 md:pt-12 px-4 sm:px-6 md:px-0 animate-fade-in pb-32">
+    <div className="min-h-[100dvh] bg-[#F5F7FA] flex flex-col font-sans pb-32 selection:bg-[#6E3AA5]/30">
       
-      {/* HEADER */}
-      <header className="mb-10 text-center flex flex-col items-center">
-        <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 mb-4">
-          <span className="material-symbols-rounded text-4xl">clean_hands</span>
-        </div>
-        <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 font-serif tracking-tight mb-2">
-          Reconciliação
-        </h1>
-        <p className="text-slate-500 font-medium text-sm font-serif italic">
-          &quot;Coragem, filho, os teus pecados estão perdoados.&quot; (Mt 9, 2)
-        </p>
+      {/* HEADER NAVEGAÇÃO */}
+      <header className="sticky top-0 z-50 bg-[#F5F7FA]/90 backdrop-blur-md border-b border-slate-200/50 px-4 sm:px-6 py-4 flex items-center justify-between max-w-[800px] mx-auto w-full">
+        <button 
+          onClick={() => router.back()}
+          className="text-[#6B6B6B] hover:text-[#1F1F1F] transition-colors flex items-center justify-center w-10 h-10 rounded-full hover:bg-slate-200 active:scale-95 shrink-0"
+        >
+          <span className="material-symbols-rounded text-[26px]">arrow_back</span>
+        </button>
+        <h1 className="font-extrabold text-[#1F1F1F] text-lg tracking-tight">Reconciliação</h1>
+        
+        {quantidadePecados > 0 ? (
+          <button 
+            onClick={handleLimpar} 
+            className="flex items-center gap-1 bg-red-50 text-red-600 px-3 py-1.5 rounded-full text-xs font-bold active:scale-95 transition-transform"
+          >
+            <span className="material-symbols-rounded text-[16px]">delete</span>
+            Limpar
+          </button>
+        ) : (
+          <div className="w-10 h-10"></div> /* Espaçador para manter o título centrado */
+        )}
       </header>
 
-      {/* OS 5 PASSOS */}
-      <section className="bg-white rounded-[2rem] p-6 md:p-8 shadow-soft border border-slate-100 mb-10">
-        <h2 className="font-bold text-lg text-slate-900 mb-6 flex items-center gap-2">
-          <span className="material-symbols-rounded text-blue-600">format_list_numbered</span>
-          Os 5 Passos da Confissão
-        </h2>
-        <ul className="flex flex-col gap-4">
-          {[
-            { n: 1, title: "Exame", desc: "Refletir com sinceridade onde errei contra Deus." },
-            { n: 2, title: "Arrependimento", desc: "Sentir dor sincera no coração pelos pecados." },
-            { n: 3, title: "Propósito", desc: "Decidir firmemente não voltar a pecar." },
-            { n: 4, title: "Confissão", desc: "Dizer os pecados ao padre de forma clara." },
-            { n: 5, title: "Penitência", desc: "Cumprir o ato reparador que o padre indicar." }
-          ].map((passo) => (
-            <li key={passo.n} className="flex items-start gap-4">
-              <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 font-bold flex items-center justify-center shrink-0 text-sm">
-                {passo.n}
-              </div>
-              <p className="text-sm text-slate-700 mt-1">
-                <strong className="text-slate-900">{passo.title}:</strong> {passo.desc}
-              </p>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {/* EXAME DE CONSCIÊNCIA */}
-      <section className="mb-12">
-        <div className="flex items-center justify-between mb-6 px-2">
-          <h2 className="font-bold text-xl text-slate-900 flex items-center gap-2">
-            <span className="material-symbols-rounded text-blue-600">fact_check</span>
+      <main className="flex-1 w-full max-w-[800px] mx-auto px-5 pt-8 animate-fade-in">
+        
+        {/* TÍTULO E ÍCONE ROXO */}
+        <div className="flex flex-col items-center text-center mb-10">
+          <div className="w-20 h-20 bg-[#6E3AA5]/10 rounded-[1.5rem] flex items-center justify-center text-[#6E3AA5] mb-5 shadow-inner">
+            <span className="material-symbols-rounded text-[40px]">clean_hands</span>
+          </div>
+          <h2 className="text-3xl font-extrabold text-[#1F1F1F] tracking-tight mb-2">
             Exame de Consciência
           </h2>
-          {quantidadePecados > 0 && (
-            <button 
-              onClick={handleLimpar} 
-              className="text-xs font-bold text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-full transition-colors flex items-center gap-1 active:scale-95"
-            >
-              <span className="material-symbols-rounded text-[16px]">delete</span>
-              Limpar ({quantidadePecados})
-            </button>
-          )}
+          <p className="text-[#6B6B6B] font-medium text-sm max-w-[300px]">
+            Marque as suas faltas. Tudo fica guardado <strong>apenas neste telemóvel</strong>.
+          </p>
         </div>
-        
-        <p className="text-slate-500 text-sm mb-6 px-2">
-          Marque as suas faltas apenas para ajudar a lembrar na hora da confissão. Tudo fica guardado <strong>apenas no seu dispositivo</strong> em total privacidade.
-        </p>
 
-        <div className="flex flex-col gap-4">
+        {/* LISTA DE PECADOS (ACORDIÃO ESTILO MIMO) */}
+        <div className="flex flex-col gap-4 mb-12">
           {categoriasPecados.map((cat, catIndex) => (
-            <details key={catIndex} className="group bg-white rounded-3xl shadow-soft border border-slate-100 overflow-hidden [&_summary::-webkit-details-marker]:hidden">
-              <summary className="flex items-center justify-between p-6 cursor-pointer font-bold text-slate-900 outline-none hover:bg-slate-50 transition-colors">
-                <span className="text-lg">{cat.titulo}</span>
-                <span className="material-symbols-rounded text-slate-400 group-open:rotate-180 transition-transform duration-300">
+            <details key={catIndex} className="group bg-white rounded-[1.5rem] shadow-soft border border-slate-100 overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+              <summary className="flex items-center justify-between p-5 cursor-pointer font-extrabold text-[#1F1F1F] outline-none hover:bg-slate-50 transition-colors active:bg-slate-100">
+                <span className="text-base">{cat.titulo}</span>
+                <span className="material-symbols-rounded text-[#6B6B6B] group-open:rotate-180 transition-transform duration-300 bg-[#F5F7FA] rounded-full p-1">
                   expand_more
                 </span>
               </summary>
               
-              <div className="p-6 pt-2 border-t border-slate-50 flex flex-col gap-4">
+              <div className="p-5 pt-2 border-t border-slate-50 flex flex-col gap-2 bg-slate-50/50">
                 {cat.pecados.map((pecado, pecIndex) => {
                   const idPecado = `${catIndex}-${pecIndex}`;
                   const isChecked = !!exameConsciencia[idPecado];
@@ -169,7 +143,7 @@ export default function ConfissaoPage() {
                   return (
                     <label 
                       key={pecIndex} 
-                      className="flex items-start gap-4 cursor-pointer group/item hover:bg-slate-50 p-2 -mx-2 rounded-xl transition-colors"
+                      className={`flex items-start gap-4 cursor-pointer group/item p-3 rounded-xl transition-all ${isChecked ? 'bg-white shadow-sm border border-[#6E3AA5]/20' : 'hover:bg-white border border-transparent'}`}
                     >
                       <div className="relative mt-0.5 shrink-0">
                         <input 
@@ -178,20 +152,21 @@ export default function ConfissaoPage() {
                           checked={isChecked}
                           onChange={() => togglePecado(idPecado)}
                         />
+                        {/* Checkbox Roxo Penitencial */}
                         <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${
                           isChecked 
-                            ? 'bg-blue-600 border-blue-600' 
-                            : 'border-slate-300 group-hover/item:border-blue-400 bg-white'
+                            ? 'bg-[#6E3AA5] border-[#6E3AA5] shadow-[0_2px_0_#4A2673]' 
+                            : 'border-slate-300 bg-white group-hover/item:border-[#6E3AA5]/50'
                         }`}>
-                          <span className={`material-symbols-rounded text-white text-[18px] transition-transform ${
+                          <span className={`material-symbols-rounded text-white text-[18px] font-bold transition-transform ${
                             isChecked ? 'scale-100' : 'scale-0'
                           }`}>
                             check
                           </span>
                         </div>
                       </div>
-                      <span className={`text-sm leading-relaxed transition-all duration-200 select-none ${
-                        isChecked ? "line-through text-slate-400" : "text-slate-700"
+                      <span className={`text-sm leading-relaxed transition-colors duration-200 select-none ${
+                        isChecked ? "text-[#6E3AA5] font-semibold" : "text-[#1F1F1F] font-medium"
                       }`}>
                         {pecado}
                       </span>
@@ -202,27 +177,31 @@ export default function ConfissaoPage() {
             </details>
           ))}
         </div>
-      </section>
 
-      {/* ATO DE CONTRIÇÃO */}
-      <section className="bg-gradient-to-br from-indigo-900 to-blue-900 text-white p-8 md:p-10 rounded-[2rem] shadow-xl text-center relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 bottom-0 opacity-10 pointer-events-none flex items-center justify-center">
-          <span className="material-symbols-rounded text-[200px]">water_drop</span>
-        </div>
-        
-        <div className="relative z-10">
-          <h2 className="text-xl font-bold mb-6 tracking-widest uppercase text-blue-200">Ato de Contrição</h2>
-          <p className="text-lg md:text-xl font-serif italic leading-relaxed text-blue-50 mb-8">
-            &quot;Meu Deus, eu me arrependo de todo o coração de vos ter ofendido, porque sois tão bom e amável. Prometo, com a vossa graça, esforçar-me para ser bom e não mais pecar.&quot;
-          </p>
-          <div className="inline-block border border-blue-400/30 bg-blue-800/50 px-6 py-3 rounded-full">
-            <p className="font-bold text-sm tracking-widest text-blue-100">
-              MEU JESUS, MISERICÓRDIA!
+        {/* ATO DE CONTRIÇÃO (CARD ROXO) */}
+        <section className="bg-[#6E3AA5] text-white p-8 rounded-[2rem] shadow-[0_10px_0_#4A2673] text-center relative overflow-hidden mb-8">
+          {/* Decoração de Fundo */}
+          <div className="absolute -top-10 -right-10 w-40 h-40 bg-white rounded-full mix-blend-overlay filter blur-3xl opacity-20 pointer-events-none"></div>
+          
+          <div className="relative z-10">
+            <div className="inline-flex items-center gap-1.5 bg-white/20 px-3 py-1.5 rounded-full mb-6 border border-white/20">
+              <span className="material-symbols-rounded text-[14px]">water_drop</span>
+              <span className="text-xs font-bold uppercase tracking-widest">Ato de Contrição</span>
+            </div>
+            
+            <p className="text-lg font-serif italic leading-relaxed text-white/95 mb-8">
+              &quot;Meu Deus, eu me arrependo de todo o coração de vos ter ofendido, porque sois tão bom e amável. Prometo, com a vossa graça, esforçar-me para ser bom e não mais pecar.&quot;
             </p>
+            
+            <div className="inline-block bg-[#4A2673] px-6 py-3 rounded-[1rem] shadow-inner border border-white/10">
+              <p className="font-extrabold text-[11px] tracking-widest text-white/80">
+                MEU JESUS, MISERICÓRDIA!
+              </p>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
+      </main>
     </div>
   );
 }
