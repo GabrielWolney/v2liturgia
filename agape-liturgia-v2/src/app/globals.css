@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+@theme {
+  /* Mapeamento Mágico do Tailwind V4 */
+  --color-background: var(--bg);
+  --color-card: var(--card-bg);
+  --color-foreground: var(--text);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-light: var(--primary-light);
+
+  --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-lora), ui-serif, Georgia, serif;
+
+  --shadow-soft: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}
+
+@layer base {
+  /* TEMA CLARO (Padrão) */
+  :root {
+    --bg: #f1f5f9;
+    --card-bg: #ffffff;
+    --text: #1e293b;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --primary: #2563eb;
+    --primary-light: #dbeafe;
+  }
+
+  /* TEMA ESCURO */
+  [data-theme="dark"] {
+    --bg: #0f172a;
+    --card-bg: #1e293b;
+    --text: #f8fafc;
+    --muted: #cbd5e1;
+    --border: #334155;
+    --primary: #3b82f6;
+    --primary-light: rgba(37, 99, 235, 0.35);
+  }
+
+  /* TEMA SÉPIA (Modo Leitura Confortável) */
+  [data-theme="sepia"] {
+    --bg: #f4ecd8;
+    --card-bg: #fbf0d9;
+    --text: #5f4b32;
+    --muted: #8c7b65;
+    --border: #e3d3b7;
+    --primary: #b45309;
+    --primary-light: rgba(180, 83, 9, 0.15);
+  }
+
+  * {
+    border-color: var(--border);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    transition-property: color, background-color, border-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+  }
+
+  /* Ocultar barra de rolagem mas manter funcionalidade */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  * {
+    scrollbar-width: none;
+  }
+}
