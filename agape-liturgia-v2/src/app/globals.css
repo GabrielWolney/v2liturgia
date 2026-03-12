@@ -73,3 +73,33 @@
     scrollbar-width: none;
   }
 }
+
+@layer components {
+  .bg-adaptive { background-color: var(--bg); }
+  .text-adaptive { color: var(--text); }
+  .card-adaptive { 
+    background-color: var(--card-bg); 
+    border-color: var(--border);
+  }
+}
+@layer components {
+  .text-readable {
+    /* Usa o tamanho da fonte que você já está injetando no <html> via ThemeProvider */
+    font-size: 1rem; 
+    line-height: 1.75;
+  }
+  
+  /* Quando o <html> tiver a classe text-lg, o rem aumenta automaticamente */
+  .text-lg .text-readable {
+    font-size: 1.25rem;
+  }
+}
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float {
+  animation: float 5s ease-in-out infinite;
+}

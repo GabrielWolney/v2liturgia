@@ -23,7 +23,7 @@ export function LeituraBloco({ tipo, referencia, texto, isDestaque = false }: Le
       
       {/* dangerouslySetInnerHTML é usado no React para injetar nosso HTML seguro (os <sup> dos versículos) */}
       <div 
-        className="font-serif text-lg leading-[1.85] text-foreground text-justify"
+        className="font-serif text-readable leading-[1.85] text-foreground text-justify"
         dangerouslySetInnerHTML={{ __html: htmlFormatado }}
       />
     </section>

@@ -25,7 +25,7 @@ export function Sidebar() {
           <span className="material-symbols-rounded">dove</span>
         </div>
         <div>
-          <h1 className="font-extrabold text-xl text-foreground tracking-tight leading-none">App Ágape</h1>
+          <h1 className="font-extrabold text-readable text-foreground tracking-tight leading-none">App Ágape</h1>
           <p className="text-[10px] font-bold text-muted uppercase tracking-widest mt-1">Grupo de Jovens</p>
         </div>
       </div>

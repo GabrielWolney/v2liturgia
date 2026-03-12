@@ -7,57 +7,46 @@ import { useUserStore } from "@/store/useUserStore";
 import { trackEvent } from "@/lib/analytics";
 
 const misteriosRosario: Record<string, string[]> = {
-  "Gozosos": [
-    "A Anunciação do Arcanjo São Gabriel a Nossa Senhora.",
-    "A Visitação de Nossa Senhora à sua prima Santa Isabel.",
-    "O Nascimento do Menino Jesus em Belém.",
-    "A Apresentação do Menino Jesus no Templo e a Purificação de Maria.",
-    "A Perda e o Encontro do Menino Jesus no Templo."
-  ],
-  "Luminosos": [
-    "O Batismo de Jesus no rio Jordão.",
-    "O primeiro milagre de Jesus nas Bodas de Caná.",
-    "O Anúncio do Reino de Deus e o convite à conversão.",
-    "A Transfiguração de Jesus no monte Tabor.",
-    "A Instituição da Eucaristia na Última Ceia."
-  ],
-  "Dolorosos": [
-    "A Agonia de Jesus no Horto das Oliveiras.",
-    "A Flagelação de Jesus atado à coluna.",
-    "A Coroação de espinhos de Jesus.",
-    "Jesus carrega a pesada Cruz até o monte Calvário.",
-    "A Crucifixão e Morte de Jesus."
-  ],
-  "Gloriosos": [
-    "A Ressurreição de Jesus.",
-    "A Ascensão de Jesus ao Céu.",
-    "A descida do Espírito Santo sobre Nossa Senhora e os Apóstolos.",
-    "A Assunção de Nossa Senhora ao Céu.",
-    "A Coroação de Nossa Senhora como Rainha do Céu e da Terra."
-  ]
+  "Gozosos": ["A Anunciação do Anjo a Nossa Senhora", "A Visitação de Nossa Senhora a Santa Isabel", "O Nascimento de Jesus em Belém", "A Apresentação do Menino Jesus no Templo", "A Perda e o Encontro de Jesus no Templo"],
+  "Luminosos": ["O Batismo de Jesus no Jordão", "A Auto-revelação de Jesus nas Bodas de Caná", "O Anúncio do Reino de Deus e o convite à conversão", "A Transfiguração de Jesus no Monte Tabor", "A Instituição da Eucaristia"],
+  "Dolorosos": ["A Agonia de Jesus no Horto das Oliveiras", "A Flagelação de Jesus atado à coluna", "A Coroação de espinhos de Nosso Senhor", "Jesus carrega a pesada Cruz para o Calvário", "A Crucifixão e Morte de Nosso Senhor"],
+  "Gloriosos": ["A Ressurreição de Nosso Senhor Jesus Cristo", "A Ascensão de Jesus ao Céu", "A descida do Espírito Santo sobre os Apóstolos", "A Assunção de Nossa Senhora ao Céu", "A Coroação de Nossa Senhora como Rainha do Céu e da Terra"]
 };
 
 export default function SantoTercoPage() {
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
-  const [isFinished, setIsFinished] = useState(false); // Estado da Tela de Sucesso
-  const { marcarTercoConcluido } = useUserStore();
+  const [isFinished, setIsFinished] = useState(false);
+  
+  const { marcarTercoConcluido, modoVisual, tamanhoFonte } = useUserStore();
 
   useEffect(() => {
     const mountTimer = setTimeout(() => setIsMounted(true), 0);
-    trackEvent("page_view", { page_name: "santo_terco" });
+    trackEvent("page_view", { page_name: "santo_terco_tematizado" });
     return () => clearTimeout(mountTimer);
   }, []);
 
-  if (!isMounted) return <div className="min-h-[100dvh] bg-[#F5F7FA]" />;
+  if (!isMounted) return <div className="min-h-[100dvh] bg-background" />;
 
   const misterioHoje = obterMisterioDoDia();
   const listaMisterios = misteriosRosario[misterioHoje.tipo] || misteriosRosario["Gloriosos"];
 
-  let bannerColor = "from-[#2F6BFF] to-[#1E4BCC]";
-  if (misterioHoje.tipo === "Dolorosos") bannerColor = "from-[#6E3AA5] to-[#4A2673]";
-  if (misterioHoje.tipo === "Gloriosos") bannerColor = "from-amber-400 to-amber-600";
-  if (misterioHoje.tipo === "Luminosos") bannerColor = "from-emerald-400 to-emerald-600";
+  // --- CLASSES DO TEMA ---
+  const isDark = modoVisual === 'escuro';
+  const isSepia = modoVisual === 'leitura';
+
+  const wrapperClass = isDark ? "bg-slate-950" : isSepia ? "bg-[#FDF6E3]" : "bg-background";
+  const textMain = isDark ? "text-slate-100" : isSepia ? "text-[#4A3C31]" : "text-foreground";
+  const textMuted = isDark ? "text-slate-400" : isSepia ? "text-[#8C7B65]" : "text-muted";
+  const cardBg = isDark ? "bg-slate-900" : isSepia ? "bg-[#F4ECD8]" : "bg-card";
+  const borderColor = isDark ? "border-slate-800" : isSepia ? "border-[#E8DEC1]" : "border-border";
+  const headerBg = isDark ? "bg-slate-950/90" : isSepia ? "bg-[#FDF6E3]/90" : "bg-background/90";
+  const arrowHover = isDark ? "hover:bg-slate-800 text-slate-400 hover:text-slate-100" : isSepia ? "hover:bg-[#E8DEC1] text-[#8C7B65] hover:text-[#4A3C31]" : "hover:bg-slate-200 text-muted hover:text-foreground";
+
+  // Lógica de Fonte
+  const fontMeditation = tamanhoFonte === 'grande' ? 'text-xl leading-relaxed' : 'text-base leading-relaxed';
+  const fontStandard = tamanhoFonte === 'grande' ? 'text-lg' : 'text-sm';
+  const fontHeader = tamanhoFonte === 'grande' ? 'text-xl' : 'text-lg';
 
   const handleFinish = () => {
     marcarTercoConcluido(getDataIso());
@@ -65,56 +54,39 @@ export default function SantoTercoPage() {
     trackEvent("terco_concluido", { misterio: misterioHoje.tipo });
   };
 
-  // TELA DE SUCESSO IDÊNTICA À LITURGIA
   if (isFinished) {
     return (
-      <div className="h-[100dvh] bg-[#F5F7FA] flex flex-col items-center justify-center p-6 text-center animate-fade-in selection:bg-[#2F6BFF]/30">
-        <div className="w-32 h-32 bg-emerald-100 rounded-[2rem] flex items-center justify-center mb-8 shadow-inner relative">
+      <div className={`h-[100dvh] flex flex-col items-center justify-center p-6 text-center animate-fade-in transition-colors duration-300 ${wrapperClass}`}>
+        <div className={`w-32 h-32 rounded-[2rem] flex items-center justify-center mb-8 shadow-inner relative ${isDark ? 'bg-emerald-900/20' : 'bg-emerald-100'}`}>
           <span className="material-symbols-rounded text-emerald-500 text-[80px]">task_alt</span>
-          <div className="absolute -top-3 -right-3 bg-orange-100 border-2 border-white rounded-full p-2 flex items-center justify-center shadow-md">
-            <span className="material-symbols-rounded text-orange-500 text-[24px]">local_fire_department</span>
-          </div>
         </div>
-
-        <h1 className="text-3xl font-extrabold text-[#1F1F1F] tracking-tight mb-2">Terço Concluído!</h1>
-        <p className="text-[#6B6B6B] font-medium mb-12">A sua coroa de orações foi entregue a Nossa Senhora.</p>
-
-        <button 
-          onClick={() => router.push('/jornada')}
-          className="w-full max-w-[400px] bg-[#2F6BFF] text-white font-bold text-lg py-5 rounded-[1.5rem] shadow-[0_8px_0_#1E4BCC] active:shadow-[0_0px_0_#1E4BCC] active:translate-y-[8px] transition-all hover:brightness-105"
-        >
+        <h1 className={`text-3xl font-extrabold tracking-tight mb-2 ${textMain}`}>Terço Concluído!</h1>
+        <p className={`font-medium mb-12 ${textMuted}`}>A sua coroa de orações foi entregue a Nossa Senhora.</p>
+        <button onClick={() => router.push('/jornada')} className="w-full max-w-[400px] bg-[#2F6BFF] text-white font-bold py-5 rounded-[1.5rem] shadow-[0_8px_0_#1E4BCC] active:translate-y-[8px] active:shadow-none transition-all hover:brightness-105">
           VOLTAR À JORNADA
         </button>
       </div>
     );
   }
 
-  // TELA NORMAL DE ORAÇÃO
   return (
-    <div className="min-h-[100dvh] bg-[#F5F7FA] flex flex-col font-sans pb-32 selection:bg-[#2F6BFF]/30">
+    <div className={`min-h-[100dvh] flex flex-col font-sans pb-32 transition-colors duration-300 selection:bg-[#2F6BFF]/30 ${wrapperClass}`}>
       
-      <header className="sticky top-0 z-50 bg-[#F5F7FA]/90 backdrop-blur-md border-b border-slate-200/50 px-4 sm:px-6 py-4 flex items-center justify-between max-w-[800px] mx-auto w-full">
-        <button 
-          onClick={() => router.back()}
-          className="text-[#6B6B6B] hover:text-[#1F1F1F] transition-colors flex items-center justify-center w-10 h-10 rounded-full hover:bg-slate-200 active:scale-95 shrink-0"
-        >
+      <header className={`sticky top-0 z-50 backdrop-blur-md border-b px-4 sm:px-6 py-4 flex items-center justify-between max-w-[800px] mx-auto w-full transition-colors duration-300 ${headerBg} ${borderColor}`}>
+        <button onClick={() => router.back()} className={`flex items-center justify-center w-10 h-10 rounded-full active:scale-95 shrink-0 transition-colors ${arrowHover}`}>
           <span className="material-symbols-rounded text-[26px]">arrow_back</span>
         </button>
-        <h1 className="font-extrabold text-[#1F1F1F] text-lg tracking-tight">Santo Terço</h1>
+        <h1 className={`font-extrabold tracking-tight ${textMain} ${fontHeader}`}>Santo Terço</h1>
         <div className="w-10 h-10"></div>
       </header>
 
       <main className="flex-1 w-full max-w-[800px] mx-auto px-5 pt-6 animate-fade-in">
         
-        <section className={`bg-gradient-to-br ${bannerColor} rounded-[2rem] p-8 shadow-lg mb-8 text-white relative overflow-hidden`}>
+        <section className="bg-gradient-to-br from-[#2F6BFF] to-[#1E4BCC] rounded-[2rem] p-8 shadow-lg mb-8 text-white relative overflow-hidden">
           <div className="absolute -right-4 -top-4 text-white/10 pointer-events-none">
             <span className="material-symbols-rounded text-[140px]">cruelty_free</span>
           </div>
           <div className="relative z-10">
-            <div className="inline-flex items-center gap-1.5 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full mb-4 border border-white/30">
-              <span className="material-symbols-rounded text-[14px]">today</span>
-              <span className="text-[10px] font-extrabold uppercase tracking-widest">Mistérios de Hoje</span>
-            </div>
             <h2 className="text-3xl md:text-4xl font-extrabold font-serif mb-2 leading-tight drop-shadow-md">
               {misterioHoje.tipo}
             </h2>
@@ -125,55 +97,40 @@ export default function SantoTercoPage() {
         </section>
 
         <div className="mb-10">
-          <h3 className="font-bold text-sm text-[#6B6B6B] uppercase tracking-widest mb-4 pl-2">Orações Iniciais</h3>
-          <div className="bg-white rounded-[1.5rem] p-6 shadow-soft border border-slate-100 flex flex-col gap-6">
+          <h3 className={`font-bold text-sm uppercase tracking-widest mb-4 pl-2 ${textMuted}`}>Orações Iniciais</h3>
+          <div className={`rounded-[1.5rem] p-6 shadow-soft border flex flex-col gap-6 transition-colors duration-300 ${cardBg} ${borderColor}`}>
             <div>
-              <h4 className="font-bold text-[#1F1F1F] mb-1">1. Sinal da Cruz</h4>
-              <p className="text-sm text-[#6B6B6B] font-serif leading-relaxed">Em nome do Pai, e do Filho, e do Espírito Santo. Amém.</p>
+              <h4 className={`font-bold mb-1 ${textMain} ${fontStandard}`}>1. Sinal da Cruz</h4>
+              <p className={`font-serif ${fontStandard} ${textMuted}`}>Em nome do Pai, e do Filho, e do Espírito Santo. Amém.</p>
             </div>
             <div>
-              <h4 className="font-bold text-[#1F1F1F] mb-1">2. Oferecimento</h4>
-              <p className="text-sm text-[#6B6B6B] font-serif leading-relaxed">Divino Jesus, nós Vos oferecemos este terço que vamos rezar, meditando nos mistérios da nossa Redenção...</p>
-            </div>
-            <div>
-              <h4 className="font-bold text-[#1F1F1F] mb-1">3. Credo</h4>
-              <p className="text-sm text-[#6B6B6B] font-serif leading-relaxed italic">Na cruz do terço, reza-se o Creio em Deus Pai...</p>
-            </div>
-            <div>
-              <h4 className="font-bold text-[#1F1F1F] mb-1">4. Pai Nosso e três Ave-Marias</h4>
-              <p className="text-sm text-[#6B6B6B] font-serif leading-relaxed">1 Pai Nosso, 3 Ave-Marias e 1 Glória ao Pai.</p>
+              <h4 className={`font-bold mb-1 ${textMain} ${fontStandard}`}>2. Oferecimento</h4>
+              <p className={`font-serif ${fontStandard} ${textMuted}`}>Divino Jesus, nós Vos oferecemos este terço que vamos rezar, meditando nos mistérios da nossa Redenção...</p>
             </div>
           </div>
         </div>
 
         <div className="mb-10">
-          <h3 className="font-bold text-sm text-[#6B6B6B] uppercase tracking-widest mb-4 pl-2">Contemplação</h3>
+          <h3 className={`font-bold text-sm uppercase tracking-widest mb-4 pl-2 ${textMuted}`}>Contemplação</h3>
           <div className="flex flex-col gap-3">
             {listaMisterios.map((mist, idx) => (
-              <details key={idx} className="group bg-white rounded-[1.5rem] shadow-soft border border-slate-100 overflow-hidden [&_summary::-webkit-details-marker]:hidden">
-                <summary className="flex items-center justify-between p-5 cursor-pointer outline-none hover:bg-slate-50 transition-colors active:bg-slate-100">
+              <details key={idx} className={`group rounded-[1.5rem] shadow-soft border overflow-hidden [&_summary::-webkit-details-marker]:hidden transition-colors duration-300 ${cardBg} ${borderColor}`}>
+                <summary className={`flex items-center justify-between p-5 cursor-pointer outline-none transition-colors ${isDark ? 'hover:bg-slate-800' : isSepia ? 'hover:bg-[#E8DEC1]/50' : 'hover:bg-background'}`}>
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-[#2F6BFF]/10 text-[#2F6BFF] font-black flex items-center justify-center text-sm shrink-0">
-                      {idx + 1}
-                    </div>
-                    <span className="font-extrabold text-[#1F1F1F] text-sm sm:text-base pr-4">{idx + 1}º Mistério</span>
+                    <div className="w-8 h-8 rounded-full bg-[#2F6BFF]/10 text-[#2F6BFF] font-black flex items-center justify-center text-sm shrink-0">{idx + 1}</div>
+                    <span className={`font-extrabold pr-4 ${textMain} ${fontHeader}`}>{idx + 1}º Mistério</span>
                   </div>
-                  <span className="material-symbols-rounded text-[#6B6B6B] group-open:rotate-180 transition-transform duration-300 bg-[#F5F7FA] rounded-full p-1 shrink-0">
-                    expand_more
-                  </span>
+                  <span className={`material-symbols-rounded group-open:rotate-180 transition-transform duration-300 rounded-full p-1 shrink-0 ${isDark ? 'bg-slate-800 text-slate-400' : isSepia ? 'bg-[#E8DEC1] text-[#8C7B65]' : 'bg-background text-muted'}`}>expand_more</span>
                 </summary>
                 
-                <div className="p-5 pt-2 border-t border-slate-50 bg-slate-50/50">
-                  <p className="font-serif text-[#1F1F1F] font-semibold text-lg leading-relaxed mb-4 text-center">
+                <div className={`p-5 pt-2 border-t ${borderColor} ${isDark ? 'bg-slate-950/50' : isSepia ? 'bg-[#E8DEC1]/20' : 'bg-background/50'}`}>
+                  <p className={`font-serif font-semibold mb-4 text-center ${fontMeditation} ${textMain}`}>
                     {mist}
                   </p>
-                  <div className="flex flex-col gap-2 text-sm text-[#6B6B6B] bg-white p-4 rounded-xl border border-slate-100">
-                    <p className="flex justify-between border-b border-slate-50 pb-2"><span>1x</span> <span className="font-bold">Pai Nosso</span></p>
-                    <p className="flex justify-between border-b border-slate-50 pb-2"><span>10x</span> <span className="font-bold">Ave-Marias</span></p>
+                  <div className={`flex flex-col gap-2 p-4 rounded-xl border ${borderColor} ${fontStandard} ${textMuted} ${isDark ? 'bg-slate-950' : 'bg-background'}`}>
+                    <p className={`flex justify-between border-b pb-2 ${borderColor}`}><span>1x</span> <span className="font-bold">Pai Nosso</span></p>
+                    <p className={`flex justify-between border-b pb-2 ${borderColor}`}><span>10x</span> <span className="font-bold">Ave-Marias</span></p>
                     <p className="flex justify-between pb-1"><span>1x</span> <span className="font-bold">Glória ao Pai</span></p>
-                  </div>
-                  <div className="mt-4 text-center text-xs font-bold text-[#6B6B6B] uppercase tracking-widest italic">
-                    &quot;Ó meu Jesus, perdoai-nos...&quot;
                   </div>
                 </div>
               </details>
@@ -181,25 +138,9 @@ export default function SantoTercoPage() {
           </div>
         </div>
 
-        <div className="mb-10">
-          <h3 className="font-bold text-sm text-[#6B6B6B] uppercase tracking-widest mb-4 pl-2">Finalização</h3>
-          <div className="bg-white rounded-[1.5rem] p-6 shadow-soft border border-slate-100 flex flex-col gap-6 text-center">
-            <span className="material-symbols-rounded text-rose-500 text-[40px] mb-2">favorite</span>
-            <h4 className="font-extrabold text-[#1F1F1F] text-xl font-serif">Agradecimento</h4>
-            <p className="text-sm text-[#6B6B6B] font-serif leading-relaxed italic">
-              Infinitas graças Vos damos, Soberana Rainha...
-            </p>
-            <div className="h-px w-16 bg-slate-200 mx-auto my-2"></div>
-            <h4 className="font-extrabold text-[#1F1F1F] text-lg font-serif">Salve Rainha</h4>
-            <p className="text-sm text-[#6B6B6B] font-serif leading-relaxed">
-              Salve, Rainha, Mãe de misericórdia, vida, doçura e esperança nossa...
-            </p>
-          </div>
-        </div>
-
         <button 
-          onClick={handleFinish}
-          className="w-full bg-[#2F6BFF] text-white font-bold text-lg py-5 rounded-[1.5rem] shadow-[0_8px_0_#1E4BCC] active:shadow-[0_0px_0_#1E4BCC] active:translate-y-[8px] transition-all hover:brightness-105 flex items-center justify-center gap-2"
+          onClick={handleFinish} 
+          className={`w-full bg-[#2F6BFF] text-white font-bold py-5 rounded-[1.5rem] shadow-[0_8px_0_#1E4BCC] active:translate-y-[8px] active:shadow-none transition-all flex items-center justify-center gap-2 hover:brightness-105 ${fontHeader}`}
         >
           <span className="material-symbols-rounded">task_alt</span>
           CONCLUÍ O TERÇO

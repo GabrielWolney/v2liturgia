@@ -1,21 +1,31 @@
 "use client";
 
 import { useEffect } from "react";
-import { useThemeStore } from "@/store/useThemeStore";
+import { useUserStore } from "@/store/useUserStore";
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const { theme, fontSize } = useThemeStore();
+  const { modoVisual, tamanhoFonte } = useUserStore();
 
   useEffect(() => {
-    // 1. Aplica o Tema (Cores)
-    document.documentElement.setAttribute("data-theme", theme);
+    const root = document.documentElement;
     
-    // 2. Aplica o Tamanho da Fonte globalmente
-    // Removemos as antigas para não acumular
-    document.documentElement.classList.remove('text-sm', 'text-base', 'text-lg', 'text-xl');
-    // Adicionamos a fonte selecionada
-    document.documentElement.classList.add(fontSize);
-  }, [theme, fontSize]);
+    // 1. Aplica o Tema (Cores)
+    if (modoVisual === 'escuro') {
+      root.setAttribute("data-theme", "dark");
+    } else if (modoVisual === 'leitura') {
+      root.setAttribute("data-theme", "sepia");
+    } else {
+      root.removeAttribute("data-theme");
+    }
+    
+    // 2. Aplica o Tamanho da Fonte Global
+    root.classList.remove('text-sm', 'text-base', 'text-readable', 'text-readable');
+    if (tamanhoFonte === 'grande') {
+      root.classList.add('text-readable');
+    } else {
+      root.classList.add('text-base');
+    }
+  }, [modoVisual, tamanhoFonte]);
 
   return <>{children}</>;
 }

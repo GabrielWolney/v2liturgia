@@ -30,7 +30,7 @@ export default function RootLayout({
       <head>
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,0,0&display=optional" rel="stylesheet" />
       </head>
-      <body className={`${montserrat.variable} ${lora.variable} font-sans antialiased selection:bg-[#2F6BFF]/30 selection:text-[#2F6BFF] bg-[#F5F7FA]`}>
+      <body className={`${montserrat.variable} ${lora.variable} font-sans antialiased selection:bg-[#2F6BFF]/30 selection:text-[#2F6BFF] bg-background`}>
         <ThemeProvider>
           
           {/* Layout 100% Limpo, sem Sidebar ou BottomNav */}

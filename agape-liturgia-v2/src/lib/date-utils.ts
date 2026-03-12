@@ -58,3 +58,58 @@ export function getNovenaStatus(inicioStr: string, fimStr: string): 'agora' | 'b
   if (hoje < dataInicio) return 'breve';
   return 'fim';
 }
+
+// REGRA: Motor de Progresso do Tempo Litúrgico
+export function calcularProgressoTempo(tituloLiturgia: string) {
+  const titulo = (tituloLiturgia || "").toLowerCase();
+  let nome = "Tempo Comum";
+  let totalDias = 238; // ~34 semanas
+  
+  if (titulo.includes("quaresma")) { nome = "Quaresma"; totalDias = 40; }
+  else if (titulo.includes("páscoa") || titulo.includes("pascoa")) { nome = "Páscoa"; totalDias = 50; }
+  else if (titulo.includes("advento")) { nome = "Advento"; totalDias = 28; }
+  else if (titulo.includes("natal")) { nome = "Natal"; totalDias = 15; }
+
+  // Extrair o número da semana (ex: "3ª Semana" -> 3)
+  const semanaMatch = titulo.match(/(\d+)[ªa]/);
+  const semana = semanaMatch ? parseInt(semanaMatch[1]) : 1;
+
+  // Extrair o dia da semana
+  let diaSemana = 1; // Domingo é o dia 1 da semana litúrgica
+  if (titulo.includes("segunda")) diaSemana = 2;
+  if (titulo.includes("terça") || titulo.includes("terca")) diaSemana = 3;
+  if (titulo.includes("quarta")) diaSemana = 4;
+  if (titulo.includes("quinta")) diaSemana = 5;
+  if (titulo.includes("sexta")) diaSemana = 6;
+  if (titulo.includes("sábado") || titulo.includes("sabado")) diaSemana = 7;
+
+  // Cálculo do dia atual
+  let diaAtual = ((semana - 1) * 7) + diaSemana;
+  
+  // Ajuste para a Quaresma (que começa na Quarta-feira de Cinzas)
+  if (nome === "Quaresma") diaAtual += 3;
+
+  // Prevenção de bugs
+  if (diaAtual > totalDias) diaAtual = totalDias;
+  if (diaAtual < 1) diaAtual = 1;
+
+  // Matemática para o Círculo SVG (Perímetro = 2 * PI * Raio 42 = ~263.89)
+  const dasharray = 263.89;
+  const progresso = diaAtual / totalDias;
+  const dashoffset = dasharray - (dasharray * progresso);
+
+  return { nome, diaAtual, totalDias, dasharray, dashoffset };
+}
+export function getImagemPorCor(cor: string): string {
+  const c = cor.toLowerCase();
+  // Mapeia a cor para o arquivo correspondente na pasta public/liturgia
+  const mapaImagens: Record<string, string> = {
+    verde: "/liturgia/verde.png",
+    roxo: "/liturgia/roxo.png",
+    vermelho: "/liturgia/vermelho.png",
+    rosa: "/liturgia/rosa.png",
+    branco: "/liturgia/branco.png",
+  };
+
+  return mapaImagens[c] || "/liturgia/verde.png"; // Fallback para verde
+}
