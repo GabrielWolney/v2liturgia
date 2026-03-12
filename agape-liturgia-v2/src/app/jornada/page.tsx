@@ -33,20 +33,22 @@ const modulos: ModuloJornada[] = [
 export default function JornadaPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [liturgia, setLiturgia] = useState<LiturgiaDiaria | null>(null);
-  const { leiturasConcluidas, tercosConcluidos, modoVisual, tamanhoFonte } = useUserStore();
+  
+  const { leiturasConcluidas, tercosConcluidos, modoVisual, tamanhoFonte, streak, verificarStreak } = useUserStore();
 
   useEffect(() => {
     const mountTimer = setTimeout(() => setIsMounted(true), 0);
+    verificarStreak();
     getLiturgiaDoDia().then(setLiturgia);
     trackEvent("page_view", { page_name: "jornada_v2_fiel" });
     return () => clearTimeout(mountTimer);
-  }, []);
+  }, [verificarStreak]);
 
   if (!isMounted) return <div className="min-h-screen bg-background" />;
 
   // --- CLASSES DINÂMICAS PARA TEMAS ---
-  const isDark = modoVisual === 'escuro';
-  const isSepia = modoVisual === 'leitura';
+  const isDark = modoVisual === "escuro";
+  const isSepia = modoVisual === "leitura";
 
   const wrapperClass = isDark ? "bg-slate-950" : isSepia ? "bg-[#FDF6E3]" : "bg-background";
   const textMain = isDark ? "text-slate-100" : isSepia ? "text-[#4A3C31]" : "text-foreground";
@@ -58,15 +60,14 @@ export default function JornadaPage() {
   const flagBorderColor = isDark ? "#020617" : isSepia ? "#FDF6E3" : "#F5F7FA";
   const arrowHover = isDark ? "hover:bg-slate-800 text-slate-400 hover:text-slate-100" : isSepia ? "hover:bg-[#E8DEC1] text-[#8C7B65] hover:text-[#4A3C31]" : "hover:bg-slate-200 text-muted hover:text-foreground";
 
-  // Lógica de Fonte
-  const fontClass = tamanhoFonte === 'grande' ? 'text-lg' : 'text-sm';
-  const fontLabel = tamanhoFonte === 'grande' ? 'text-[12px]' : 'text-[10px]';
+  const fontClass = tamanhoFonte === "grande" ? "text-lg" : "text-sm";
+  const fontLabel = tamanhoFonte === "grande" ? "text-[12px]" : "text-[10px]";
 
   const getButtonPositionClass = (index: number) => {
     const mod = index % 4;
-    if (mod === 1) return "right-0"; 
-    if (mod === 3) return "left-0";  
-    return "left-1/2 -translate-x-1/2"; 
+    if (mod === 1) return "right-0";
+    if (mod === 3) return "left-0";
+    return "left-1/2 -translate-x-1/2";
   };
 
   const renderConnector = (index: number) => {
@@ -74,7 +75,7 @@ export default function JornadaPage() {
     let svgPath = "";
     if (index === modulos.length - 1) {
       if (mod === 0 || mod === 2) svgPath = "M 160 0 L 160 176";
-      else if (mod === 1) svgPath = "M 264 0 L 264 64 A 24 24 0 0 1 240 88 L 184 88 A 24 24 0 0 0 160 112 L 160 176"; 
+      else if (mod === 1) svgPath = "M 264 0 L 264 64 A 24 24 0 0 1 240 88 L 184 88 A 24 24 0 0 0 160 112 L 160 176";
       else if (mod === 3) svgPath = "M 56 0 L 56 64 A 24 24 0 0 0 80 88 L 136 88 A 24 24 0 0 1 160 112 L 160 176";
       return (
         <div className="absolute top-[56px] left-1/2 w-[320px] h-[176px] -translate-x-1/2 -z-10 pointer-events-none overflow-visible">
@@ -107,18 +108,27 @@ export default function JornadaPage() {
   return (
     <div className={`min-h-screen flex flex-col font-sans pb-32 transition-colors duration-300 ${wrapperClass} bg-[radial-gradient(circle_at_center,_rgba(47,107,255,0.08)_3px,_transparent_3px)] bg-[length:28px_28px]`}>
       <header className={`flex items-center justify-between p-3 sm:p-5 max-w-[600px] mx-auto w-full backdrop-blur-xl border-b sticky top-0 z-50 transition-colors ${headerBg} ${borderColor}`}>
-        <div className="flex items-center gap-1 sm:gap-2">
+        <div className="flex items-center gap-3">
           <Link href="/" className={`w-9 h-9 flex items-center justify-center rounded-full transition-colors ${arrowHover}`}>
             <span className="material-symbols-rounded text-[26px]">arrow_back</span>
           </Link>
-          <img src="/icon-192x192.png" className={`w-7 h-7 rounded-md border ${borderColor}`} alt="Logo" />
-          <h1 className={`font-extrabold tracking-tight truncate ${textMain} ${fontClass}`}>Liturgia Ágape</h1>
+          <div className="flex items-center gap-3">
+            <img src="/icon-192x192.png" className={`w-11 h-11 rounded-xl border-2 shadow-sm ${borderColor}`} alt="Logo" />
+            <div className="flex flex-col">
+              <span className="font-black text-lg tracking-tight text-[#2F6BFF] leading-none">Liturgia</span>
+              <span className={`text-[9px] font-black uppercase tracking-wider ${textMuted}`}>Ágape de jovens</span>
+            </div>
+          </div>
         </div>
         <div className="flex items-center gap-1 sm:gap-3">
-          <div className={`flex items-center gap-1 px-3 py-1.5 rounded-full border ${isDark ? 'bg-orange-950/30 border-orange-900/50' : 'bg-orange-50 border-orange-100'}`}>
+          {/* FOGUINHO AQUI COMO LINK CLICÁVEL */}
+          <Link 
+            href="/progresso" 
+            className={`flex items-center gap-1 px-3 py-1.5 rounded-full border shadow-sm transition-colors active:scale-95 ${isDark ? "bg-orange-950/30 border-orange-900/50 hover:bg-orange-900/40" : "bg-orange-50 border-orange-100 hover:bg-orange-100"} ${streak > 0 ? '' : 'opacity-50 grayscale'}`}
+          >
             <span className="material-symbols-rounded text-orange-500 text-[18px]">local_fire_department</span>
-            <span className="text-orange-500 font-extrabold text-sm">12</span>
-          </div>
+            <span className="text-orange-500 font-extrabold text-sm">{streak}</span>
+          </Link>
           <Link href="/menu" className={`w-9 h-9 flex items-center justify-center rounded-full transition-colors ${arrowHover}`}>
             <span className="material-symbols-rounded text-[26px]">settings</span>
           </Link>

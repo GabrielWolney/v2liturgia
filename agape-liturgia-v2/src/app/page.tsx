@@ -16,7 +16,7 @@ export default function PortalInicialPage() {
   const [saudacaoTempo, setSaudacaoTempo] = useState("Olá");
   const [dataAtual, setDataAtual] = useState("");
   
-  const { nomeUsuario, modoVisual, tamanhoFonte } = useUserStore();
+  const { nomeUsuario, modoVisual, tamanhoFonte, streak, verificarStreak } = useUserStore();
   const { isInstallable, installPWA } = usePWAInstall();
 
   useEffect(() => {
@@ -33,11 +33,12 @@ export default function PortalInicialPage() {
       setDataAtual(rawDate.charAt(0).toUpperCase() + rawDate.slice(1));
     }, 0);
 
+    verificarStreak(); // Verifica a ofensiva ao abrir o app
     getLiturgiaDoDia().then(res => setLiturgia(res));
     trackEvent("page_view", { page_name: "portal_v2_premium" });
 
     return () => clearTimeout(mountTimer);
-  }, []);
+  }, [verificarStreak]);
 
   if (!isMounted || !liturgia) return <div className="h-[100dvh] bg-background transition-colors duration-300" />;
 
@@ -85,27 +86,48 @@ export default function PortalInicialPage() {
     }
   };
 
+  const getBadgeTextColor = (cor: string) => {
+    switch(cor) {
+      case 'verde': return 'text-emerald-700 dark:text-emerald-400';
+      case 'roxo': return 'text-purple-700 dark:text-purple-400';
+      case 'vermelho': return 'text-red-700 dark:text-red-400';
+      case 'rosa': return 'text-pink-700 dark:text-pink-400';
+      default: return 'text-amber-700 dark:text-amber-400'; 
+    }
+  };
+
   const bannerGradient = getBannerGradient(corDia);
   const dotColorClass = getDotColor(corDia);
+  const badgeTextColor = getBadgeTextColor(corDia);
 
   return (
     <div className={`min-h-[100dvh] flex flex-col font-sans relative overflow-hidden pb-10 transition-colors duration-300 ${wrapperClass} ${radialGradient} bg-[length:24px_24px]`}>
       
       {/* HEADER */}
       <header className="relative z-10 flex items-center justify-between p-6 md:pt-10 max-w-[600px] mx-auto w-full shrink-0">
-        <div className="flex items-center gap-3">
-          <img src="/icon-192x192.png" alt="Logo Ágape" className={`w-10 h-10 rounded-xl shadow-sm border ${borderColor}`} />
-          <span className={`font-extrabold text-lg tracking-tight ${textMain}`}>Liturgia Ágape</span>
+        <div className="flex items-center gap-4">
+          <img 
+            src="/icon-192x192.png" 
+            alt="Logo Ágape" 
+            className={`w-16 h-16 rounded-2xl shadow-md border-2 transition-transform hover:rotate-3 ${borderColor}`} 
+          />
+          <div className="flex flex-col justify-center">
+            <span className="font-black text-2xl tracking-tighter text-[#2F6BFF] leading-none drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.1)]">
+              Liturgia
+            </span>
+            <span className={`text-[11px] font-black uppercase tracking-widest mt-1 opacity-90 ${textMuted}`}>
+              Ágape de jovens
+            </span>
+          </div>
         </div>
-        <div className={`flex items-center gap-1 px-3 py-1.5 rounded-full border shadow-sm transition-colors ${isDark ? 'bg-orange-950/30 border-orange-900/50' : 'bg-orange-50 border-orange-100'}`}>
+        <Link href="/progresso" className={`flex items-center gap-1 px-3 py-1.5 rounded-full border shadow-sm transition-colors active:scale-95 ${isDark ? 'bg-orange-950/30 border-orange-900/50 hover:bg-orange-900/40' : 'bg-orange-50 border-orange-100 hover:bg-orange-100'} ${streak > 0 ? '' : 'opacity-50 grayscale'}`}>
           <span className="material-symbols-rounded text-orange-500 text-[18px]">local_fire_department</span>
-          <span className="text-orange-500 font-extrabold text-sm">12</span>
-        </div>
+          <span className="text-orange-500 font-extrabold text-sm">{streak}</span>
+        </Link>
       </header>
 
       <main className="relative z-10 flex-1 flex flex-col px-6 max-w-[600px] mx-auto w-full justify-center">
         
-        {/* BANNER DE INSTALAÇÃO PWA */}
         {isInstallable && (
           <div className="mb-6 animate-fade-in">
             <div className="bg-gradient-to-r from-[#2F6BFF] to-[#1E4BCC] rounded-[1.5rem] p-4 flex items-center justify-between shadow-lg shadow-[#2F6BFF]/20 text-white border border-[#2F6BFF]/50">
@@ -149,20 +171,19 @@ export default function PortalInicialPage() {
                 alt={liturgia.liturgia}
                 width={165}
                 height={220}
+                style={{ height: 'auto' }}
                 className="object-contain drop-shadow-[0_15px_15px_rgba(0,0,0,0.4)]"
                 priority
               />
             </div>
 
-            {/* Marca d'água no fundo */}
             <span className="absolute -bottom-6 -right-6 material-symbols-rounded text-white/15 text-[150px] rotate-12 pointer-events-none z-0">
               {corDia === 'verde' ? 'eco' : corDia === 'roxo' ? 'church' : 'local_fire_department'}
             </span>
 
-            {/* Badge da Cor */}
-            <div className={`absolute top-4 left-4 ${cardBg}/90 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-2 border ${borderColor} shadow-sm z-20`}>
+            <div className={`absolute top-4 left-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-2 border ${borderColor} shadow-sm z-20`}>
               <div className={`w-2.5 h-2.5 rounded-full ${dotColorClass} shadow-inner`}></div>
-              <span className={`text-[10px] font-black uppercase tracking-tighter ${textMain}`}>
+              <span className={`text-[10px] font-black uppercase tracking-tighter ${badgeTextColor}`}>
                 {corDia === 'branco' ? 'Festivo' : corDia}
               </span>
             </div>

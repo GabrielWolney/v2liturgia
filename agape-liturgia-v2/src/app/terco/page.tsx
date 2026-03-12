@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { obterMisterioDoDia, getDataIso } from "@/lib/date-utils";
 import { useUserStore } from "@/store/useUserStore";
 import { trackEvent } from "@/lib/analytics";
+import { atualizarContador } from "@/services/db-home"; // <--- NOVO IMPORT
 
 const misteriosRosario: Record<string, string[]> = {
   "Gozosos": ["A Anunciação do Anjo a Nossa Senhora", "A Visitação de Nossa Senhora a Santa Isabel", "O Nascimento de Jesus em Belém", "A Apresentação do Menino Jesus no Templo", "A Perda e o Encontro de Jesus no Templo"],
@@ -18,7 +19,8 @@ export default function SantoTercoPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
   
-  const { marcarTercoConcluido, modoVisual, tamanhoFonte } = useUserStore();
+  // EXTRAÍDOS OS ESTADOS NECESSÁRIOS
+  const { marcarTercoConcluido, modoVisual, tamanhoFonte, registrarAtividade, tercosConcluidos } = useUserStore();
 
   useEffect(() => {
     const mountTimer = setTimeout(() => setIsMounted(true), 0);
@@ -30,6 +32,21 @@ export default function SantoTercoPage() {
 
   const misterioHoje = obterMisterioDoDia();
   const listaMisterios = misteriosRosario[misterioHoje.tipo] || misteriosRosario["Gloriosos"];
+
+  const handleFinish = () => {
+    // --- LÓGICA DO FOGUINHO E FIREBASE ---
+    const dataHoje = getDataIso();
+    
+    // Só soma +1 na Igreja se for o primeiro terço rezado no dia
+    if (!tercosConcluidos[dataHoje]) {
+      atualizarContador(dataHoje, 'terco', true);
+    }
+
+    marcarTercoConcluido(dataHoje);
+    registrarAtividade(); // <--- Sobe o Foguinho
+    setIsFinished(true);
+    trackEvent("terco_concluido", { misterio: misterioHoje.tipo });
+  };
 
   // --- CLASSES DO TEMA ---
   const isDark = modoVisual === 'escuro';
@@ -47,12 +64,6 @@ export default function SantoTercoPage() {
   const fontMeditation = tamanhoFonte === 'grande' ? 'text-xl leading-relaxed' : 'text-base leading-relaxed';
   const fontStandard = tamanhoFonte === 'grande' ? 'text-lg' : 'text-sm';
   const fontHeader = tamanhoFonte === 'grande' ? 'text-xl' : 'text-lg';
-
-  const handleFinish = () => {
-    marcarTercoConcluido(getDataIso());
-    setIsFinished(true);
-    trackEvent("terco_concluido", { misterio: misterioHoje.tipo });
-  };
 
   if (isFinished) {
     return (

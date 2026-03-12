@@ -8,6 +8,7 @@ import { LiturgiaDiaria } from "@/types/liturgia";
 import { useUserStore } from "@/store/useUserStore";
 import { getDataIso } from "@/lib/date-utils";
 import { trackEvent } from "@/lib/analytics";
+import { atualizarContador } from "@/services/db-home"; // <--- NOVO IMPORT
 
 type Step = {
   id: string;
@@ -26,7 +27,8 @@ export default function LiturgiaAulaPage() {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
 
-  const { marcarLeituraConcluida, modoVisual, tamanhoFonte } = useUserStore();
+  // EXTRAÍDOS OS ESTADOS NECESSÁRIOS
+  const { marcarLeituraConcluida, modoVisual, tamanhoFonte, registrarAtividade, leiturasConcluidas } = useUserStore();
 
   useEffect(() => {
     const mountTimer = setTimeout(() => setIsMounted(true), 0);
@@ -66,7 +68,16 @@ export default function LiturgiaAulaPage() {
       setCurrentStepIndex(prev => prev + 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
-      marcarLeituraConcluida(getDataIso());
+      // --- LÓGICA DO FOGUINHO E FIREBASE ---
+      const dataHoje = getDataIso();
+      
+      // Só soma +1 na Igreja se for a primeira vez do dia!
+      if (!leiturasConcluidas[dataHoje]) {
+        atualizarContador(dataHoje, 'leitura', true);
+      }
+
+      marcarLeituraConcluida(dataHoje);
+      registrarAtividade(); // <--- Sobe o Foguinho
       setIsFinished(true);
       trackEvent("liturgia_concluida");
     }
@@ -85,7 +96,6 @@ export default function LiturgiaAulaPage() {
   const borderColor = isDark ? "border-slate-800" : isSepia ? "border-[#E8DEC1]" : "border-border";
   const headerBg = isDark ? "bg-slate-950/95" : isSepia ? "bg-[#FDF6E3]/95" : "bg-background/95";
   
-  // Gradiente do rodapé precisa vir da cor do fundo do tema
   const footerGradient = isDark 
     ? "from-slate-950" 
     : isSepia 
@@ -94,7 +104,6 @@ export default function LiturgiaAulaPage() {
 
   const fontReading = tamanhoFonte === 'grande' ? 'text-xl leading-[2.1]' : 'text-base leading-[1.8]';
 
-  // 1. TELA DE CARREGAMENTO TEMATIZADA
   if (steps.length === 0) {
     return (
       <div className={`h-[100dvh] flex flex-col items-center justify-center transition-colors ${wrapperClass}`}>
@@ -106,7 +115,6 @@ export default function LiturgiaAulaPage() {
     );
   }
 
-  // 2. TELA DE SUCESSO TEMATIZADA
   if (isFinished) {
     return (
       <div className={`h-[100dvh] flex flex-col items-center justify-center p-6 text-center animate-fade-in transition-colors ${wrapperClass}`}>
@@ -182,11 +190,11 @@ export default function LiturgiaAulaPage() {
         )}
 
         <article 
-  className={`font-serif ${textMain} ${fontReading} text-left ${ // <--- MUDADO PARA text-left
-    currentStep.titulo === 'Evangelho' ? `p-6 md:p-8 rounded-3xl shadow-sm border ${cardBg} ${borderColor}` : ''
-  } ${currentStep.titulo === 'Salmo' ? 'text-center italic' : ''}`}
-  dangerouslySetInnerHTML={{ __html: textoFormatado }}
-/>
+          className={`font-serif ${textMain} ${fontReading} text-left ${ 
+            currentStep.titulo === 'Evangelho' ? `p-6 md:p-8 rounded-3xl shadow-sm border ${cardBg} ${borderColor}` : ''
+          } ${currentStep.titulo === 'Salmo' ? 'text-center italic' : ''}`}
+          dangerouslySetInnerHTML={{ __html: textoFormatado }}
+        />
       </main>
 
       <footer className={`fixed bottom-0 left-0 w-full bg-gradient-to-t ${footerGradient} from-70% to-transparent pt-12 pb-6 px-5 z-50`}>

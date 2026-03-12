@@ -9,11 +9,17 @@ interface UserState {
   tamanhoFonte: "padrao" | "grande";
   setTamanhoFonte: (tamanho: "padrao" | "grande") => void;
   
+  // --- FOGUINHO (STREAK) ---
+  streak: number;
+  ultimaAtividade: string | null;
+  registrarAtividade: () => void;
+  verificarStreak: () => void;
+
   // Liturgia Diária
   leiturasConcluidas: Record<string, boolean>;
   marcarLeituraConcluida: (dataIso: string) => void;
 
-  // Santo Terço (NOVO)
+  // Santo Terço
   tercosConcluidos: Record<string, boolean>;
   marcarTercoConcluido: (dataIso: string) => void;
 
@@ -40,7 +46,7 @@ interface UserState {
 
 export const useUserStore = create<UserState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       nomeUsuario: "Jovem",
       setNomeUsuario: (nome) => set({ nomeUsuario: nome }),
       modoVisual: "claro",
@@ -48,18 +54,58 @@ export const useUserStore = create<UserState>()(
       tamanhoFonte: "padrao",
       setTamanhoFonte: (tamanho) => set({ tamanhoFonte: tamanho }),
       
+      // --- LÓGICA DO FOGUINHO ---
+      streak: 0,
+      ultimaAtividade: null,
+      
+      registrarAtividade: () => set((state) => {
+        const hojeObj = new Date();
+        const hojeIso = hojeObj.toLocaleDateString("en-CA");
+        
+        // Se já fez algo hoje, não soma de novo. Mantém igual.
+        if (state.ultimaAtividade === hojeIso) return {};
+
+        const ontemObj = new Date();
+        ontemObj.setDate(ontemObj.getDate() - 1);
+        const ontemIso = ontemObj.toLocaleDateString("en-CA");
+
+        // Se a última atividade foi ontem, a ofensiva cresce!
+        if (state.ultimaAtividade === ontemIso) {
+          return { streak: state.streak + 1, ultimaAtividade: hojeIso };
+        } 
+        // Se ficou dias sem vir, o foguinho recomeça no 1
+        else {
+          return { streak: 1, ultimaAtividade: hojeIso };
+        }
+      }),
+
+      verificarStreak: () => set((state) => {
+        if (!state.ultimaAtividade) return {};
+        
+        const hojeObj = new Date();
+        const hojeIso = hojeObj.toLocaleDateString("en-CA");
+        const ontemObj = new Date();
+        ontemObj.setDate(ontemObj.getDate() - 1);
+        const ontemIso = ontemObj.toLocaleDateString("en-CA");
+
+        // Se a última atividade não foi nem hoje nem ontem, o foguinho apagou (perdeu a ofensiva)
+        if (state.ultimaAtividade !== hojeIso && state.ultimaAtividade !== ontemIso) {
+          return { streak: 0 };
+        }
+        return {};
+      }),
+
+      // --- OUTRAS AÇÕES ---
       leiturasConcluidas: {},
       marcarLeituraConcluida: (dataIso) => set((state) => ({
         leiturasConcluidas: { ...state.leiturasConcluidas, [dataIso]: true }
       })),
 
-      // Ações do Santo Terço (NOVO)
       tercosConcluidos: {},
       marcarTercoConcluido: (dataIso) => set((state) => ({
         tercosConcluidos: { ...state.tercosConcluidos, [dataIso]: true }
       })),
 
-      // Ações do Mural
       meusPedidosMural: [],
       addMeuPedido: (id) => set((state) => ({ meusPedidosMural: [...state.meusPedidosMural, id] })),
       removeMeuPedido: (id) => set((state) => ({ meusPedidosMural: state.meusPedidosMural.filter(pId => pId !== id) })),
@@ -73,7 +119,6 @@ export const useUserStore = create<UserState>()(
         };
       }),
 
-      // Ações da Confissão
       exameConsciencia: {},
       togglePecado: (id) => set((state) => {
         const novoExame = { ...state.exameConsciencia };
@@ -83,11 +128,9 @@ export const useUserStore = create<UserState>()(
       }),
       limparExame: () => set({ exameConsciencia: {} }),
 
-      // Ações do Diário
       minhasNotas: "",
       setNotas: (notas) => set({ minhasNotas: notas }),
 
-      // Ações das Novenas
       novenasProgresso: {},
       toggleDiaNovena: (slug, dia) => set((state) => {
         const progresso = state.novenasProgresso[slug] || [];

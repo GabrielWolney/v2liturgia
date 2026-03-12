@@ -15,7 +15,7 @@ export default function NovenaLeituraPage({ params }: { params: Promise<{ slug: 
   const db = novenasJson as unknown as NovenasData;
   const novena = db.detalhes[slug];
 
-  const { novenasProgresso, toggleDiaNovena, modoVisual, tamanhoFonte } = useUserStore();
+  const { novenasProgresso, toggleDiaNovena, modoVisual, tamanhoFonte, registrarAtividade } = useUserStore();
   const progresso = novenasProgresso[slug] || [];
   const [diaSelecionado, setDiaSelecionado] = useState<number | null>(null);
 
@@ -91,7 +91,13 @@ export default function NovenaLeituraPage({ params }: { params: Promise<{ slug: 
                 <p className="text-[#2F6BFF] font-bold uppercase tracking-widest text-sm mt-1">{diaSelecionado + 1}º Dia</p>
               </div>
               
-              <button onClick={() => toggleDiaNovena(slug, diaSelecionado)} className={`flex items-center gap-2 px-5 py-3 rounded-full font-bold text-sm transition-all active:scale-95 shrink-0 ${progresso.includes(diaSelecionado) ? "bg-emerald-500/20 text-emerald-600" : "bg-[#2F6BFF] text-white shadow-md shadow-[#2F6BFF]/20"}`}>
+              <button 
+                onClick={() => {
+                  toggleDiaNovena(slug, diaSelecionado);
+                  registrarAtividade(); // <--- FOGUINHO AQUI
+                }} 
+                className={`flex items-center gap-2 px-5 py-3 rounded-full font-bold text-sm transition-all active:scale-95 shrink-0 ${progresso.includes(diaSelecionado) ? "bg-emerald-500/20 text-emerald-600" : "bg-[#2F6BFF] text-white shadow-md shadow-[#2F6BFF]/20"}`}
+              >
                 <span className="material-symbols-rounded text-[20px]">{progresso.includes(diaSelecionado) ? "check_circle" : "task_alt"}</span>
                 {progresso.includes(diaSelecionado) ? "Dia Concluído" : "Marcar como Concluído"}
               </button>

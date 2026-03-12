@@ -18,15 +18,15 @@ export function subscribeToAvisos(callback: (avisos: Aviso[]) => void) {
   });
 }
 
-// 2. Ouvir Contador de Liturgia
-export function subscribeToContador(dataIso: string, callback: (total: number) => void) {
-  return onSnapshot(doc(db, "estatisticas", `leituras_${dataIso}`), (docSnap) => {
+// 2. Ouvir Contador de Comunidade (Liturgia ou Terço)
+export function subscribeToContador(dataIso: string, tipo: 'leitura' | 'terco', callback: (total: number) => void) {
+  return onSnapshot(doc(db, "estatisticas", `${tipo}_${dataIso}`), (docSnap) => {
     callback(docSnap.exists() ? docSnap.data().contador || 0 : 0);
   });
 }
 
-// 3. Atualizar Contador de Liturgia
-export async function atualizarContador(dataIso: string, somar: boolean) {
-  const docRef = doc(db, "estatisticas", `leituras_${dataIso}`);
+// 3. Atualizar Contador de Comunidade
+export async function atualizarContador(dataIso: string, tipo: 'leitura' | 'terco', somar: boolean) {
+  const docRef = doc(db, "estatisticas", `${tipo}_${dataIso}`);
   await setDoc(docRef, { contador: increment(somar ? 1 : -1), ultimaAtualizacao: new Date() }, { merge: true });
 }
