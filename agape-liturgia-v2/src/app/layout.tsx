@@ -12,7 +12,8 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
+    // ISTO FAZ A BARRA DE STATUS FICAR INVISÍVEL NO IOS (Passa por cima)
+    statusBarStyle: "black-translucent", 
     title: "Ágape",
   },
 };
@@ -23,9 +24,10 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  // ESTA É A PALAVRA MÁGICA PARA IGNORAR O NOTCH E OCUPAR 100% DO ECRÃ:
+  viewportFit: "cover", 
 };
 
-// O NEXT.JS EXIGE O "export default" NESTA LINHA:
 export default function RootLayout({
   children,
 }: Readonly<{

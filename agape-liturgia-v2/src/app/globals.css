@@ -1,7 +1,6 @@
 @import "tailwindcss";
 
 @theme {
-  /* Mapeamento Mágico do Tailwind V4 */
   --color-background: var(--bg);
   --color-card: var(--card-bg);
   --color-foreground: var(--text);
@@ -17,7 +16,6 @@
 }
 
 @layer base {
-  /* TEMA CLARO (Padrão) */
   :root {
     --bg: #f1f5f9;
     --card-bg: #ffffff;
@@ -28,7 +26,6 @@
     --primary-light: #dbeafe;
   }
 
-  /* TEMA ESCURO */
   [data-theme="dark"] {
     --bg: #0f172a;
     --card-bg: #1e293b;
@@ -39,7 +36,6 @@
     --primary-light: rgba(37, 99, 235, 0.35);
   }
 
-  /* TEMA SÉPIA (Modo Leitura Confortável) */
   [data-theme="sepia"] {
     --bg: #f4ecd8;
     --card-bg: #fbf0d9;
@@ -65,12 +61,29 @@
     transition-duration: 300ms;
   }
 
-  /* Ocultar barra de rolagem mas manter funcionalidade */
   ::-webkit-scrollbar {
     display: none;
   }
   * {
     scrollbar-width: none;
+  }
+
+  /* ================================================================= */
+  /* MÁGICA DO PWA NATIVO: Zonas de Segurança (Notch e Barra Inferior) */
+  /* ================================================================= */
+  
+  @supports (padding-top: env(safe-area-inset-top)) {
+    /* Puxa todos os cabeçalhos para baixo da câmara automaticamente */
+    header {
+      padding-top: calc(env(safe-area-inset-top) + 1rem) !important;
+    }
+  }
+
+  @supports (padding-bottom: env(safe-area-inset-bottom)) {
+    /* Puxa todos os rodapés (ex: Botão "Concluir" da Liturgia) para cima do "Home Bar" do iPhone */
+    footer {
+      padding-bottom: calc(env(safe-area-inset-bottom) + 1.5rem) !important;
+    }
   }
 }
 
@@ -81,19 +94,17 @@
     background-color: var(--card-bg); 
     border-color: var(--border);
   }
-}
-@layer components {
+  
   .text-readable {
-    /* Usa o tamanho da fonte que você já está injetando no <html> via ThemeProvider */
     font-size: 1rem; 
     line-height: 1.75;
   }
   
-  /* Quando o <html> tiver a classe text-lg, o rem aumenta automaticamente */
   .text-lg .text-readable {
     font-size: 1.25rem;
   }
 }
+
 @keyframes float {
   0% { transform: translateY(0px); }
   50% { transform: translateY(-5px); }

@@ -8,6 +8,10 @@ import { getLiturgiaDoDia } from "@/services/api-liturgia";
 import { getCorLiturgica, calcularProgressoTempo } from "@/lib/date-utils";
 import { LiturgiaDiaria } from "@/types/liturgia";
 
+interface AgapeWindow extends Window {
+  __IS_MOUNTED__?: boolean;
+}
+
 interface ModuloJornada {
   id: string;
   titulo: string;
@@ -18,37 +22,45 @@ interface ModuloJornada {
   activeShadowClass: string;
 }
 
-// AGORA COM 10 MÓDULOS NA TRILHA (ZIG-ZAG PERFEITO)
 const modulos: ModuloJornada[] = [
   { id: "palavra", titulo: "Leitura do Dia", icone: "menu_book", href: "/liturgia", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC]", activeShadowClass: "active:shadow-none active:translate-y-[10px]" },
   { id: "terco", titulo: "Santo Terço", icone: "cruelty_free", href: "/terco", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC]", activeShadowClass: "active:shadow-none active:translate-y-[10px]" },
   { id: "confissao", titulo: "Confissão", icone: "clean_hands", href: "/confissao", bgClass: "bg-[#6E3AA5]", shadowClass: "shadow-[0_10px_0_#4A2673]", activeShadowClass: "active:shadow-none active:translate-y-[10px]" },
-  { id: "propositos", titulo: "Propósitos", icone: "flag", href: "/propositos", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC]", activeShadowClass: "active:shadow-none active:translate-y-[10px]" }, // <--- O NOVO MÓDULO AQUI!
+  { id: "propositos", titulo: "Propósitos", icone: "flag", href: "/propositos", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC]", activeShadowClass: "active:shadow-none active:translate-y-[10px]" },
   { id: "biblia", titulo: "Bíblia", icone: "auto_stories", href: "/biblia", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC]", activeShadowClass: "active:shadow-none active:translate-y-[10px]" },
   { id: "mural", titulo: "Mural de Intercessão", icone: "volunteer_activism", href: "/mural", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC]", activeShadowClass: "active:shadow-none active:translate-y-[10px]" },
   { id: "novenas", titulo: "Novenas", icone: "event", href: "/novenas", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC]", activeShadowClass: "active:shadow-none active:translate-y-[10px]" },
- { id: "oracoes", titulo: "Orações", icone: "self_improvement", href: "/oracoes", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC]", activeShadowClass: "active:shadow-none active:translate-y-[10px]" },
+  { id: "oracoes", titulo: "Orações", icone: "self_improvement", href: "/oracoes", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC]", activeShadowClass: "active:shadow-none active:translate-y-[10px]" },
   { id: "diario", titulo: "Meu Diário espiritual", icone: "edit_note", href: "/anotacoes", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC]", activeShadowClass: "active:shadow-none active:translate-y-[10px]" },
   { id: "calendario", titulo: "Calendário", icone: "calendar_month", href: "/calendario", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC]", activeShadowClass: "active:shadow-none active:translate-y-[10px]" },
 ];
 
 export default function JornadaPage() {
-  const [isMounted, setIsMounted] = useState(false);
+  const [isMounted, setIsMounted] = useState(() => {
+    if (typeof window !== 'undefined') return (window as AgapeWindow).__IS_MOUNTED__ || false;
+    return false;
+  });
+  
   const [liturgia, setLiturgia] = useState<LiturgiaDiaria | null>(null);
   
   const { leiturasConcluidas, tercosConcluidos, modoVisual, tamanhoFonte, streak, verificarStreak } = useUserStore();
 
   useEffect(() => {
-    const mountTimer = setTimeout(() => setIsMounted(true), 0);
+    const mountTimer = setTimeout(() => {
+      const win = window as AgapeWindow;
+      win.__IS_MOUNTED__ = true;
+      setIsMounted(true);
+    }, 0);
+    
     verificarStreak();
     getLiturgiaDoDia().then(setLiturgia);
     trackEvent("page_view", { page_name: "jornada_v2_fiel" });
+    
     return () => clearTimeout(mountTimer);
   }, [verificarStreak]);
 
-  if (!isMounted) return <div className="min-h-screen bg-background" />;
+  if (!isMounted) return <div className="min-h-screen bg-background transition-colors duration-300" />;
 
-  // --- CLASSES DINÂMICAS PARA TEMAS ---
   const isDark = modoVisual === "escuro";
   const isSepia = modoVisual === "leitura";
 
@@ -100,15 +112,23 @@ export default function JornadaPage() {
     );
   };
 
+  // --- LÓGICA DE DADOS ---
   const dataHojeISO = new Date().toLocaleDateString("en-CA");
   const jaLeuPalavra = !!leiturasConcluidas[dataHojeISO];
   const jaRezouTerco = !!tercosConcluidos[dataHojeISO];
-  const tempoInfo = calcularProgressoTempo(liturgia?.liturgia || "Tempo Comum");
-  const corDia = liturgia ? getCorLiturgica(liturgia.liturgia, liturgia.cor) : "verde";
-  const hexColor = corDia === "roxo" ? "#6E3AA5" : corDia === "vermelho" ? "#EF4444" : corDia === "rosa" ? "#F472B6" : corDia === "branco" ? "#F59E0B" : "#10B981";
+
+  let tempoInfo = null;
+  let hexColor = "#10B981"; // Fallback de cor
+
+  if (liturgia) {
+    tempoInfo = calcularProgressoTempo(liturgia.liturgia);
+    const corDia = getCorLiturgica(liturgia.liturgia, liturgia.cor);
+    hexColor = corDia === "roxo" ? "#6E3AA5" : corDia === "vermelho" ? "#EF4444" : corDia === "rosa" ? "#F472B6" : corDia === "branco" ? "#F59E0B" : "#10B981";
+  }
 
   return (
     <div className={`min-h-screen flex flex-col font-sans pb-32 transition-colors duration-300 ${wrapperClass} bg-[radial-gradient(circle_at_center,_rgba(47,107,255,0.08)_3px,_transparent_3px)] bg-[length:28px_28px]`}>
+      
       <header className={`flex items-center justify-between p-3 sm:p-5 max-w-[600px] mx-auto w-full backdrop-blur-xl border-b sticky top-0 z-50 transition-colors ${headerBg} ${borderColor}`}>
         <div className="flex items-center gap-3">
           <Link href="/" className={`w-9 h-9 flex items-center justify-center rounded-full transition-colors ${arrowHover}`}>
@@ -123,11 +143,7 @@ export default function JornadaPage() {
           </div>
         </div>
         <div className="flex items-center gap-1 sm:gap-3">
-          {/* FOGUINHO AQUI COMO LINK CLICÁVEL */}
-          <Link 
-            href="/progresso" 
-            className={`flex items-center gap-1 px-3 py-1.5 rounded-full border shadow-sm transition-colors active:scale-95 ${isDark ? "bg-orange-950/30 border-orange-900/50 hover:bg-orange-900/40" : "bg-orange-50 border-orange-100 hover:bg-orange-100"} ${streak > 0 ? '' : 'opacity-50 grayscale'}`}
-          >
+          <Link href="/progresso" className={`flex items-center gap-1 px-3 py-1.5 rounded-full border shadow-sm transition-colors active:scale-95 ${isDark ? "bg-orange-950/30 border-orange-900/50 hover:bg-orange-900/40" : "bg-orange-50 border-orange-100 hover:bg-orange-100"} ${streak > 0 ? '' : 'opacity-50 grayscale'}`}>
             <span className="material-symbols-rounded text-orange-500 text-[18px]">local_fire_department</span>
             <span className="text-orange-500 font-extrabold text-sm">{streak}</span>
           </Link>
@@ -137,23 +153,36 @@ export default function JornadaPage() {
         </div>
       </header>
 
+      {/* ÁREA DO TEMPO LITÚRGICO (COM SKELETON LOADER INTELIGENTE) */}
       <div className="px-5 mt-6 mb-10 max-w-[600px] mx-auto w-full">
-        <div className={`rounded-[1.5rem] p-6 flex items-center justify-between shadow-soft border transition-colors ${cardBg} ${borderColor}`}>
-          <div>
-            <h2 className={`font-bold flex items-center gap-2 ${textMain} ${fontClass}`}>Tempo Litúrgico</h2>
-            <p className={`text-[#2F6BFF] font-extrabold ${fontClass}`}>{tempoInfo.nome}</p>
+        {!liturgia || !tempoInfo ? (
+          // O ESQUELETO (O que aparece enquanto a internet carrega)
+          <div className={`rounded-[1.5rem] p-6 flex items-center justify-between shadow-soft border transition-colors duration-300 ${cardBg} ${borderColor} animate-pulse`}>
+            <div className="flex flex-col gap-2">
+              <div className={`h-4 w-28 rounded-full ${isDark ? 'bg-slate-800' : isSepia ? 'bg-[#E8DEC1]' : 'bg-slate-200'}`}></div>
+              <div className={`h-6 w-36 rounded-full ${isDark ? 'bg-slate-800' : isSepia ? 'bg-[#E8DEC1]' : 'bg-slate-200'}`}></div>
+            </div>
+            <div className={`w-[75px] h-[75px] rounded-full border-[10px] ${isDark ? 'border-slate-800' : isSepia ? 'border-[#E8DEC1]' : 'border-slate-200'}`}></div>
           </div>
-          <div className="relative w-[75px] h-[75px]">
-            <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-              <circle cx="50" cy="50" r="42" stroke={ringBgColor} strokeWidth="10" fill="none" />
-              <circle cx="50" cy="50" r="42" stroke={hexColor} strokeWidth="10" fill="none" strokeLinecap="round" strokeDasharray={tempoInfo.dasharray} strokeDashoffset={tempoInfo.dashoffset} className="transition-all duration-1000" />
-            </svg>
-            <div className={`absolute inset-0 flex flex-col items-center justify-center ${textMain}`}>
-              <span className="text-sm font-black">{tempoInfo.diaAtual}</span>
-              <span className="text-[10px] opacity-60">/{tempoInfo.totalDias}</span>
+        ) : (
+          // O CONTEÚDO REAL (Carrega suavemente quando os dados chegam)
+          <div className={`rounded-[1.5rem] p-6 flex items-center justify-between shadow-soft border transition-colors duration-300 ${cardBg} ${borderColor} animate-fade-in`}>
+            <div>
+              <h2 className={`font-bold flex items-center gap-2 ${textMain} ${fontClass}`}>Tempo Litúrgico</h2>
+              <p className={`text-[#2F6BFF] font-extrabold ${fontClass}`}>{tempoInfo.nome}</p>
+            </div>
+            <div className="relative w-[75px] h-[75px]">
+              <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="42" stroke={ringBgColor} strokeWidth="10" fill="none" />
+                <circle cx="50" cy="50" r="42" stroke={hexColor} strokeWidth="10" fill="none" strokeLinecap="round" strokeDasharray={tempoInfo.dasharray} strokeDashoffset={tempoInfo.dashoffset} className="transition-all duration-1000" />
+              </svg>
+              <div className={`absolute inset-0 flex flex-col items-center justify-center ${textMain}`}>
+                <span className="text-sm font-black">{tempoInfo.diaAtual}</span>
+                <span className="text-[10px] opacity-60">/{tempoInfo.totalDias}</span>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       <main className="flex-1 flex flex-col w-[320px] mx-auto pt-2 relative z-0">
