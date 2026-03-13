@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Montserrat, Lora } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
+import { ScrollToTop } from "@/components/ui/ScrollToTop"; // <--- 1. FALTAVA ESTA IMPORTAÇÃO AQUI!
 
 const montserrat = Montserrat({ subsets: ["latin"], variable: '--font-montserrat' });
 const lora = Lora({ subsets: ["latin"], variable: '--font-lora' });
@@ -46,6 +47,10 @@ export default function RootLayout({
           <main className="min-h-[100dvh] w-full max-w-full">
             {children}
           </main>
+          
+          {/* 2. FALTAVA A TAG DO BOTÃO AQUI! */}
+          <ScrollToTop />
+
         </ThemeProvider>
       </body>
     </html>

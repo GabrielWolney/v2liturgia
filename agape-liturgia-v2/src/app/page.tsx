@@ -15,6 +15,25 @@ interface AgapeWindow extends Window {
   __IS_MOUNTED__?: boolean;
 }
 
+const formatarNomeLiturgia = (texto: string) => {
+  if (!texto) return "";
+  let formatado = texto
+    .replace(/2[aª]\s*-?\s*feira/gi, "Segunda-feira")
+    .replace(/3[aª]\s*-?\s*feira/gi, "Terça-feira")
+    .replace(/4[aª]\s*-?\s*feira/gi, "Quarta-feira")
+    .replace(/5[aª]\s*-?\s*feira/gi, "Quinta-feira")
+    .replace(/6[aª]\s*-?\s*feira/gi, "Sexta-feira");
+
+  formatado = formatado
+    .replace(/2[aª]\s+(da|do|de)\b/gi, "Segunda-feira $1")
+    .replace(/3[aª]\s+(da|do|de)\b/gi, "Terça-feira $1")
+    .replace(/4[aª]\s+(da|do|de)\b/gi, "Quarta-feira $1")
+    .replace(/5[aª]\s+(da|do|de)\b/gi, "Quinta-feira $1")
+    .replace(/6[aª]\s+(da|do|de)\b/gi, "Sexta-feira $1");
+
+  return formatado;
+};
+
 export default function PortalInicialPage() {
   const [isMounted, setIsMounted] = useState(() => {
     if (typeof window !== 'undefined') return (window as AgapeWindow).__IS_MOUNTED__ || false;
@@ -26,7 +45,8 @@ export default function PortalInicialPage() {
   const [dataAtual, setDataAtual] = useState("");
   const [avisoAtual, setAvisoAtual] = useState<Aviso | null>(null);
   
-  const { nomeUsuario, modoVisual, tamanhoFonte, streak, verificarStreak, avisosLidos, marcarAvisoLido } = useUserStore();
+  // EXTRAÍDO O ultimaAtividade AQUI
+  const { nomeUsuario, modoVisual, tamanhoFonte, streak, ultimaAtividade, verificarStreak, avisosLidos, marcarAvisoLido } = useUserStore();
   const { isInstallable, installPWA } = usePWAInstall();
 
   const avisosLidosRef = useRef(avisosLidos);
@@ -90,7 +110,6 @@ export default function PortalInicialPage() {
   const corDia = liturgia ? getCorLiturgica(liturgia.liturgia, liturgia.cor) : "verde";
   const imagemLiturgica = getImagemPorCor(corDia);
 
-  // --- FUNÇÕES AUXILIARES DE ESTILO ---
   const getBannerGradient = (cor: string) => {
     switch(cor) {
       case 'verde': return 'from-emerald-400 to-emerald-600';
@@ -121,6 +140,14 @@ export default function PortalInicialPage() {
     }
   };
 
+  // --- LÓGICA DO FOGUINHO ESTILO TIKTOK ---
+  const dataHojeISO = new Date().toLocaleDateString("en-CA");
+  const isFoguinhoAcesoHoje = ultimaAtividade === dataHojeISO;
+  
+  const foguinhoClass = isFoguinhoAcesoHoje
+    ? isDark ? 'bg-orange-950/30 border-orange-900/50 text-orange-500' : 'bg-orange-50 border-orange-100 text-orange-500'
+    : isDark ? 'bg-slate-800/50 border-slate-700 text-slate-500 grayscale opacity-80' : 'bg-slate-100 border-slate-200 text-slate-400 grayscale opacity-80';
+
   return (
     <div className={`min-h-[100dvh] flex flex-col font-sans relative overflow-hidden pb-10 transition-colors duration-300 ${wrapperClass} ${radialGradient} bg-[length:24px_24px]`}>
       
@@ -147,9 +174,9 @@ export default function PortalInicialPage() {
             <span className={`text-[11px] font-black uppercase tracking-widest mt-1 opacity-90 ${textMuted}`}>Ágape de jovens</span>
           </div>
         </div>
-        <Link href="/progresso" className={`flex items-center gap-1 px-3 py-1.5 rounded-full border shadow-sm transition-colors active:scale-95 ${isDark ? 'bg-orange-950/30 border-orange-900/50' : 'bg-orange-50 border-orange-100'} ${streak > 0 ? '' : 'opacity-50 grayscale'}`}>
-          <span className="material-symbols-rounded text-orange-500 text-[18px]">local_fire_department</span>
-          <span className="text-orange-500 font-extrabold text-sm">{streak}</span>
+        <Link href="/progresso" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border shadow-sm transition-colors active:scale-95 ${foguinhoClass}`}>
+          <span className="material-symbols-rounded text-[18px]">local_fire_department</span>
+          <span className="font-extrabold text-sm">{streak}</span>
         </Link>
       </header>
 
@@ -192,7 +219,6 @@ export default function PortalInicialPage() {
                 <Image src={imagemLiturgica} alt="Liturgia" width={165} height={220} style={{ height: 'auto' }} className="object-contain drop-shadow-[0_15px_15px_rgba(0,0,0,0.4)]" priority />
               </div>
               
-              {/* PÍLULA RECUPERADA COM PONTO E TEXTO CORRETO */}
               <div className={`absolute top-4 left-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-2 border ${borderColor} shadow-sm z-20`}>
                 <div className={`w-2 h-2 rounded-full ${getDotColor(corDia)} shadow-inner`}></div>
                 <span className={`text-[10px] font-black uppercase tracking-tighter ${getBadgeTextColor(corDia)}`}>
@@ -203,7 +229,11 @@ export default function PortalInicialPage() {
 
             <div className="px-2 pb-2">
               <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${textMuted}`}>Tempo Litúrgico</p>
-              <h2 className={`font-extrabold leading-tight mb-6 ${textMain} ${tamanhoFonte === 'grande' ? 'text-3xl sm:text-4xl' : 'text-2xl sm:text-3xl'}`}>{liturgia.liturgia}</h2>
+              
+              <h2 className={`font-extrabold leading-tight mb-6 ${textMain} ${tamanhoFonte === 'grande' ? 'text-3xl sm:text-4xl' : 'text-2xl sm:text-3xl'}`}>
+                {formatarNomeLiturgia(liturgia.liturgia)}
+              </h2>
+              
               <div className={`pt-4 border-t flex items-center justify-between group ${borderColor}`}>
                 <div>
                   <p className={`text-[10px] font-bold uppercase tracking-widest mb-0.5 ${textMuted}`}>Santo do Dia</p>

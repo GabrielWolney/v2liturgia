@@ -43,7 +43,7 @@ export default function JornadaPage() {
   
   const [liturgia, setLiturgia] = useState<LiturgiaDiaria | null>(null);
   
-  const { leiturasConcluidas, tercosConcluidos, modoVisual, tamanhoFonte, streak, verificarStreak } = useUserStore();
+  const { leiturasConcluidas, tercosConcluidos, modoVisual, tamanhoFonte, streak, ultimaAtividade, verificarStreak } = useUserStore();
 
   useEffect(() => {
     const mountTimer = setTimeout(() => {
@@ -69,7 +69,10 @@ export default function JornadaPage() {
   const textMuted = isDark ? "text-slate-400" : isSepia ? "text-[#8C7B65]" : "text-muted";
   const cardBg = isDark ? "bg-slate-900" : isSepia ? "bg-[#F4ECD8]" : "bg-card";
   const borderColor = isDark ? "border-slate-800" : isSepia ? "border-[#E8DEC1]" : "border-border";
-  const headerBg = isDark ? "bg-slate-950/80" : isSepia ? "bg-[#FDF6E3]/80" : "bg-card/60";
+  
+  // MUDANÇA AQUI: Opacidade subiu para 95% para não deixar o fundo de pontinhos estragar a leitura do Notch
+  const headerBg = isDark ? "bg-slate-950/95" : isSepia ? "bg-[#FDF6E3]/95" : "bg-background/95";
+  
   const ringBgColor = isDark ? "#1e293b" : isSepia ? "#e2d1b1" : "#F1F5F9";
   const flagBorderColor = isDark ? "#020617" : isSepia ? "#FDF6E3" : "#F5F7FA";
   const arrowHover = isDark ? "hover:bg-slate-800 text-slate-400 hover:text-slate-100" : isSepia ? "hover:bg-[#E8DEC1] text-[#8C7B65] hover:text-[#4A3C31]" : "hover:bg-slate-200 text-muted hover:text-foreground";
@@ -112,13 +115,18 @@ export default function JornadaPage() {
     );
   };
 
-  // --- LÓGICA DE DADOS ---
   const dataHojeISO = new Date().toLocaleDateString("en-CA");
+  const isFoguinhoAcesoHoje = ultimaAtividade === dataHojeISO;
+  
+  const foguinhoClass = isFoguinhoAcesoHoje
+    ? isDark ? 'bg-orange-950/30 border-orange-900/50 text-orange-500' : 'bg-orange-50 border-orange-100 text-orange-500'
+    : isDark ? 'bg-slate-800/50 border-slate-700 text-slate-500 grayscale opacity-80' : 'bg-slate-100 border-slate-200 text-slate-400 grayscale opacity-80';
+
   const jaLeuPalavra = !!leiturasConcluidas[dataHojeISO];
   const jaRezouTerco = !!tercosConcluidos[dataHojeISO];
 
   let tempoInfo = null;
-  let hexColor = "#10B981"; // Fallback de cor
+  let hexColor = "#10B981";
 
   if (liturgia) {
     tempoInfo = calcularProgressoTempo(liturgia.liturgia);
@@ -129,7 +137,8 @@ export default function JornadaPage() {
   return (
     <div className={`min-h-screen flex flex-col font-sans pb-32 transition-colors duration-300 ${wrapperClass} bg-[radial-gradient(circle_at_center,_rgba(47,107,255,0.08)_3px,_transparent_3px)] bg-[length:28px_28px]`}>
       
-      <header className={`flex items-center justify-between p-3 sm:p-5 max-w-[600px] mx-auto w-full backdrop-blur-xl border-b sticky top-0 z-50 transition-colors ${headerBg} ${borderColor}`}>
+      {/* MUDANÇA AQUI: Adicionado px-4 sm:px-6 py-4 para ficar igual à aba das Orações */}
+      <header className={`sticky top-0 z-50 backdrop-blur-md border-b px-4 sm:px-6 py-4 flex items-center justify-between max-w-[600px] mx-auto w-full transition-colors duration-300 ${headerBg} ${borderColor}`}>
         <div className="flex items-center gap-3">
           <Link href="/" className={`w-9 h-9 flex items-center justify-center rounded-full transition-colors ${arrowHover}`}>
             <span className="material-symbols-rounded text-[26px]">arrow_back</span>
@@ -143,9 +152,9 @@ export default function JornadaPage() {
           </div>
         </div>
         <div className="flex items-center gap-1 sm:gap-3">
-          <Link href="/progresso" className={`flex items-center gap-1 px-3 py-1.5 rounded-full border shadow-sm transition-colors active:scale-95 ${isDark ? "bg-orange-950/30 border-orange-900/50 hover:bg-orange-900/40" : "bg-orange-50 border-orange-100 hover:bg-orange-100"} ${streak > 0 ? '' : 'opacity-50 grayscale'}`}>
-            <span className="material-symbols-rounded text-orange-500 text-[18px]">local_fire_department</span>
-            <span className="text-orange-500 font-extrabold text-sm">{streak}</span>
+          <Link href="/progresso" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border shadow-sm transition-colors active:scale-95 ${foguinhoClass}`}>
+            <span className="material-symbols-rounded text-[18px]">local_fire_department</span>
+            <span className="font-extrabold text-sm">{streak}</span>
           </Link>
           <Link href="/menu" className={`w-9 h-9 flex items-center justify-center rounded-full transition-colors ${arrowHover}`}>
             <span className="material-symbols-rounded text-[26px]">settings</span>
@@ -153,10 +162,8 @@ export default function JornadaPage() {
         </div>
       </header>
 
-      {/* ÁREA DO TEMPO LITÚRGICO (COM SKELETON LOADER INTELIGENTE) */}
       <div className="px-5 mt-6 mb-10 max-w-[600px] mx-auto w-full">
         {!liturgia || !tempoInfo ? (
-          // O ESQUELETO (O que aparece enquanto a internet carrega)
           <div className={`rounded-[1.5rem] p-6 flex items-center justify-between shadow-soft border transition-colors duration-300 ${cardBg} ${borderColor} animate-pulse`}>
             <div className="flex flex-col gap-2">
               <div className={`h-4 w-28 rounded-full ${isDark ? 'bg-slate-800' : isSepia ? 'bg-[#E8DEC1]' : 'bg-slate-200'}`}></div>
@@ -165,7 +172,6 @@ export default function JornadaPage() {
             <div className={`w-[75px] h-[75px] rounded-full border-[10px] ${isDark ? 'border-slate-800' : isSepia ? 'border-[#E8DEC1]' : 'border-slate-200'}`}></div>
           </div>
         ) : (
-          // O CONTEÚDO REAL (Carrega suavemente quando os dados chegam)
           <div className={`rounded-[1.5rem] p-6 flex items-center justify-between shadow-soft border transition-colors duration-300 ${cardBg} ${borderColor} animate-fade-in`}>
             <div>
               <h2 className={`font-bold flex items-center gap-2 ${textMain} ${fontClass}`}>Tempo Litúrgico</h2>

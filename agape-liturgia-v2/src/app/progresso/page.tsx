@@ -14,7 +14,7 @@ export default function ProgressoPage() {
   const [leiturasComunidade, setLeiturasComunidade] = useState(0);
   const [tercosComunidade, setTercosComunidade] = useState(0);
   
-  const { modoVisual, tamanhoFonte, streak, leiturasConcluidas, tercosConcluidos } = useUserStore();
+  const { modoVisual, tamanhoFonte, streak, ultimaAtividade, leiturasConcluidas, tercosConcluidos } = useUserStore();
 
   useEffect(() => {
     const timer = setTimeout(() => setIsMounted(true), 0);
@@ -64,6 +64,18 @@ export default function ProgressoPage() {
 
   const fontClass = tamanhoFonte === 'grande' ? 'text-lg' : 'text-base';
 
+  // --- LÓGICA DO FOGUINHO TIKTOK ---
+  const dataHojeISO = new Date().toLocaleDateString("en-CA");
+  const isFoguinhoAcesoHoje = ultimaAtividade === dataHojeISO;
+
+  const fireBg = isFoguinhoAcesoHoje 
+    ? 'bg-orange-500/10' 
+    : isDark ? 'bg-slate-800' : 'bg-slate-200 grayscale';
+
+  const fireIconColor = isFoguinhoAcesoHoje
+    ? 'text-orange-500 drop-shadow-[0_0_15px_rgba(249,115,22,0.4)]'
+    : 'text-slate-400';
+
   return (
     <div className={`min-h-[100dvh] flex flex-col font-sans pb-32 transition-colors duration-300 selection:bg-primary/30 ${wrapperClass}`}>
       
@@ -79,17 +91,23 @@ export default function ProgressoPage() {
         
         {/* O FOGUINHO (OFENSIVA) */}
         <section className={`flex flex-col items-center justify-center p-8 rounded-[2rem] shadow-soft border mb-6 transition-colors duration-300 ${cardBg} ${borderColor}`}>
-          <div className={`relative flex items-center justify-center w-24 h-24 rounded-full mb-4 ${streak > 0 ? 'bg-orange-500/10' : 'bg-slate-500/10 grayscale opacity-50'}`}>
-            <span className={`material-symbols-rounded text-[56px] ${streak > 0 ? 'text-orange-500 drop-shadow-[0_0_15px_rgba(249,115,22,0.4)]' : 'text-slate-400'}`}>
+          <div className={`relative flex items-center justify-center w-24 h-24 rounded-full mb-4 transition-colors ${fireBg}`}>
+            <span className={`material-symbols-rounded text-[56px] transition-colors ${fireIconColor}`}>
               local_fire_department
             </span>
           </div>
           <h2 className={`font-black text-4xl mb-1 ${textMain}`}>{streak} {streak === 1 ? 'dia' : 'dias'}</h2>
           <p className={`font-bold uppercase tracking-widest text-xs ${textMuted}`}>De Ofensiva Espiritual</p>
           
+          {!isFoguinhoAcesoHoje && streak > 0 && (
+            <p className={`mt-5 text-center text-sm font-bold text-orange-500 animate-pulse bg-orange-500/10 px-4 py-2 rounded-xl`}>
+              A chama de hoje está apagada! Leia a Palavra ou reze o Terço para acender.
+            </p>
+          )}
+
           {streak === 0 && (
-            <p className={`mt-4 text-center text-sm font-medium ${textMuted}`}>
-              Leia a Palavra ou reze o Terço hoje para acender a sua chama!
+            <p className={`mt-5 text-center text-sm font-medium ${textMuted}`}>
+              Leia a Palavra ou reze o Terço hoje para iniciar a sua chama!
             </p>
           )}
         </section>
