@@ -103,6 +103,18 @@
   .text-lg .text-readable {
     font-size: 1.25rem;
   }
+
+  /* ========================================================= */
+  /* MAGIA DA V1: Transforma as Mãos e a Estola em linhas finas */
+  /* ========================================================= */
+  .icone-estola-linear .traco-estola,
+  .icone-oracao-custom path {
+    fill: none !important;
+    stroke: currentColor !important;
+    stroke-width: 35 !important;
+    stroke-linecap: round !important;
+    stroke-linejoin: round !important;
+  }
 }
 
 @keyframes float {
