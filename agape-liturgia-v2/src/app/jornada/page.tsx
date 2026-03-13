@@ -188,7 +188,7 @@ export default function JornadaPage() {
   return (
     <div className={`min-h-screen flex flex-col font-sans pb-32 transition-colors duration-300 ${wrapperClass} bg-[radial-gradient(circle_at_center,_rgba(47,107,255,0.08)_3px,_transparent_3px)] bg-[length:28px_28px]`}>
       
-      <header className={`flex items-center justify-between transition-colors duration-300 ${headerBg} ${borderColor}`}>
+      <header className={`cabecalho-fixo flex items-center justify-between transition-colors duration-300 ${headerBg} ${borderColor}`}>
         <div className="flex items-center gap-3">
           <Link href="/" className={`w-9 h-9 flex items-center justify-center rounded-full transition-colors ${arrowHover}`}>
             <span className="material-symbols-rounded text-[24px]">arrow_back</span>
