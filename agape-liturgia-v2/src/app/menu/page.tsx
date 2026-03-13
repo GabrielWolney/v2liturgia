@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useUserStore } from "@/store/useUserStore";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 
@@ -13,7 +14,6 @@ export default function ConfigPage() {
   const { isInstallable, installPWA } = usePWAInstall();
 
   useEffect(() => {
-    // CORREÇÃO: setTimeout evita o erro de "cascading renders" do ESLint
     const mountTimer = setTimeout(() => setIsMounted(true), 0);
     return () => clearTimeout(mountTimer);
   }, []);
@@ -120,6 +120,7 @@ export default function ConfigPage() {
           </div>
         </section>
 
+        {/* INVERTIDO: APAGAR DADOS VEM PRIMEIRO */}
         <section className="mb-8">
           <p className={`font-bold text-xs uppercase tracking-widest mb-3 pl-2 ${textMuted}`}>Privacidade e Dados</p>
           <div className={`rounded-[1.5rem] shadow-sm border overflow-hidden transition-colors duration-300 ${cardBg} ${borderColor}`}>
@@ -132,6 +133,25 @@ export default function ConfigPage() {
                 <span className={`text-[11px] font-medium leading-tight block ${textMuted}`}>Apaga diário, confissões e progresso.</span>
               </div>
             </button>
+          </div>
+        </section>
+
+        {/* INVERTIDO: ADMIN / COORDENAÇÃO FICA NO FIM */}
+        <section className="mb-8">
+          <p className={`font-bold text-xs uppercase tracking-widest mb-3 pl-2 ${textMuted}`}>Coordenação</p>
+          <div className={`rounded-[1.5rem] shadow-sm border overflow-hidden transition-colors duration-300 ${cardBg} ${borderColor}`}>
+            <Link href="/admin" className="w-full flex items-center justify-between p-4 sm:p-5 hover:brightness-95 transition-colors group">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center shrink-0 group-hover:bg-purple-500/20 transition-colors">
+                  <span className="material-symbols-rounded text-[24px]">admin_panel_settings</span>
+                </div>
+                <div>
+                  <span className={`font-extrabold block text-sm mb-0.5 ${textMain}`}>Painel de Administração</span>
+                  <span className={`text-[11px] font-medium leading-tight block ${textMuted}`}>Avisos e Propósitos</span>
+                </div>
+              </div>
+              <span className={`material-symbols-rounded ${textMuted}`}>chevron_right</span>
+            </Link>
           </div>
         </section>
 

@@ -15,6 +15,10 @@ interface UserState {
   registrarAtividade: () => void;
   verificarStreak: () => void;
 
+  // --- AVISOS (NOVO) ---
+  avisosLidos: string[];
+  marcarAvisoLido: (id: string) => void;
+
   // Liturgia Diária
   leiturasConcluidas: Record<string, boolean>;
   marcarLeituraConcluida: (dataIso: string) => void;
@@ -57,54 +61,39 @@ export const useUserStore = create<UserState>()(
       // --- LÓGICA DO FOGUINHO ---
       streak: 0,
       ultimaAtividade: null,
-      
       registrarAtividade: () => set((state) => {
         const hojeObj = new Date();
         const hojeIso = hojeObj.toLocaleDateString("en-CA");
-        
-        // Se já fez algo hoje, não soma de novo. Mantém igual.
         if (state.ultimaAtividade === hojeIso) return {};
-
         const ontemObj = new Date();
         ontemObj.setDate(ontemObj.getDate() - 1);
         const ontemIso = ontemObj.toLocaleDateString("en-CA");
 
-        // Se a última atividade foi ontem, a ofensiva cresce!
-        if (state.ultimaAtividade === ontemIso) {
-          return { streak: state.streak + 1, ultimaAtividade: hojeIso };
-        } 
-        // Se ficou dias sem vir, o foguinho recomeça no 1
-        else {
-          return { streak: 1, ultimaAtividade: hojeIso };
-        }
+        if (state.ultimaAtividade === ontemIso) return { streak: state.streak + 1, ultimaAtividade: hojeIso };
+        else return { streak: 1, ultimaAtividade: hojeIso };
       }),
-
       verificarStreak: () => set((state) => {
         if (!state.ultimaAtividade) return {};
-        
         const hojeObj = new Date();
         const hojeIso = hojeObj.toLocaleDateString("en-CA");
         const ontemObj = new Date();
         ontemObj.setDate(ontemObj.getDate() - 1);
         const ontemIso = ontemObj.toLocaleDateString("en-CA");
 
-        // Se a última atividade não foi nem hoje nem ontem, o foguinho apagou (perdeu a ofensiva)
-        if (state.ultimaAtividade !== hojeIso && state.ultimaAtividade !== ontemIso) {
-          return { streak: 0 };
-        }
+        if (state.ultimaAtividade !== hojeIso && state.ultimaAtividade !== ontemIso) return { streak: 0 };
         return {};
       }),
 
+      // --- LÓGICA DE AVISOS ---
+      avisosLidos: [],
+      marcarAvisoLido: (id) => set((state) => ({ avisosLidos: [...state.avisosLidos, id] })),
+
       // --- OUTRAS AÇÕES ---
       leiturasConcluidas: {},
-      marcarLeituraConcluida: (dataIso) => set((state) => ({
-        leiturasConcluidas: { ...state.leiturasConcluidas, [dataIso]: true }
-      })),
+      marcarLeituraConcluida: (dataIso) => set((state) => ({ leiturasConcluidas: { ...state.leiturasConcluidas, [dataIso]: true } })),
 
       tercosConcluidos: {},
-      marcarTercoConcluido: (dataIso) => set((state) => ({
-        tercosConcluidos: { ...state.tercosConcluidos, [dataIso]: true }
-      })),
+      marcarTercoConcluido: (dataIso) => set((state) => ({ tercosConcluidos: { ...state.tercosConcluidos, [dataIso]: true } })),
 
       meusPedidosMural: [],
       addMeuPedido: (id) => set((state) => ({ meusPedidosMural: [...state.meusPedidosMural, id] })),
@@ -112,11 +101,7 @@ export const useUserStore = create<UserState>()(
       oracoesFeitas: [],
       toggleOracaoFeita: (id) => set((state) => {
         const jaRezou = state.oracoesFeitas.includes(id);
-        return {
-          oracoesFeitas: jaRezou 
-            ? state.oracoesFeitas.filter(oId => oId !== id)
-            : [...state.oracoesFeitas, id]
-        };
+        return { oracoesFeitas: jaRezou ? state.oracoesFeitas.filter(oId => oId !== id) : [...state.oracoesFeitas, id] };
       }),
 
       exameConsciencia: {},
@@ -134,12 +119,8 @@ export const useUserStore = create<UserState>()(
       novenasProgresso: {},
       toggleDiaNovena: (slug, dia) => set((state) => {
         const progresso = state.novenasProgresso[slug] || [];
-        const novoProgresso = progresso.includes(dia)
-          ? progresso.filter(d => d !== dia)
-          : [...progresso, dia];
-        return {
-          novenasProgresso: { ...state.novenasProgresso, [slug]: novoProgresso }
-        };
+        const novoProgresso = progresso.includes(dia) ? progresso.filter(d => d !== dia) : [...progresso, dia];
+        return { novenasProgresso: { ...state.novenasProgresso, [slug]: novoProgresso } };
       }),
     }),
     { name: 'agape-storage' }

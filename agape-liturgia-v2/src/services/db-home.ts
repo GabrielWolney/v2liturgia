@@ -1,5 +1,6 @@
 import { db } from "@/lib/firebase";
 import { collection, query, where, orderBy, onSnapshot, doc, setDoc, increment } from "firebase/firestore";
+import { Proposito } from "./db-admin"; // <--- IMPORTAMOS A TIPAGEM AQUI
 
 export interface Aviso {
   id: string;
@@ -18,14 +19,21 @@ export function subscribeToAvisos(callback: (avisos: Aviso[]) => void) {
   });
 }
 
-// 2. Ouvir Contador de Comunidade (Liturgia ou Terço)
+// 2. Ouvir Propósito Mensal (Sem "any")
+export function subscribeToProposito(callback: (proposito: Proposito | null) => void) {
+  return onSnapshot(doc(db, "config_geral", "proposito_mensal"), (docSnap) => {
+    callback(docSnap.exists() ? (docSnap.data() as Proposito) : null);
+  });
+}
+
+// 3. Ouvir Contador de Comunidade (Liturgia ou Terço)
 export function subscribeToContador(dataIso: string, tipo: 'leitura' | 'terco', callback: (total: number) => void) {
   return onSnapshot(doc(db, "estatisticas", `${tipo}_${dataIso}`), (docSnap) => {
     callback(docSnap.exists() ? docSnap.data().contador || 0 : 0);
   });
 }
 
-// 3. Atualizar Contador de Comunidade
+// 4. Atualizar Contador de Comunidade
 export async function atualizarContador(dataIso: string, tipo: 'leitura' | 'terco', somar: boolean) {
   const docRef = doc(db, "estatisticas", `${tipo}_${dataIso}`);
   await setDoc(docRef, { contador: increment(somar ? 1 : -1), ultimaAtualizacao: new Date() }, { merge: true });

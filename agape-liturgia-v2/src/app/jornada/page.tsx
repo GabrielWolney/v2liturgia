@@ -18,16 +18,18 @@ interface ModuloJornada {
   activeShadowClass: string;
 }
 
+// AGORA COM 10 MÓDULOS NA TRILHA (ZIG-ZAG PERFEITO)
 const modulos: ModuloJornada[] = [
-  { id: "palavra", titulo: "Palavra do Dia", icone: "menu_book", href: "/liturgia", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC]", activeShadowClass: "active:shadow-none active:translate-y-[10px]" },
+  { id: "palavra", titulo: "Leitura do Dia", icone: "menu_book", href: "/liturgia", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC]", activeShadowClass: "active:shadow-none active:translate-y-[10px]" },
   { id: "terco", titulo: "Santo Terço", icone: "cruelty_free", href: "/terco", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC]", activeShadowClass: "active:shadow-none active:translate-y-[10px]" },
-  { id: "oracoes", titulo: "Orações", icone: "self_improvement", href: "/oracoes", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC]", activeShadowClass: "active:shadow-none active:translate-y-[10px]" },
   { id: "confissao", titulo: "Confissão", icone: "clean_hands", href: "/confissao", bgClass: "bg-[#6E3AA5]", shadowClass: "shadow-[0_10px_0_#4A2673]", activeShadowClass: "active:shadow-none active:translate-y-[10px]" },
+  { id: "propositos", titulo: "Propósitos", icone: "flag", href: "/propositos", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC]", activeShadowClass: "active:shadow-none active:translate-y-[10px]" }, // <--- O NOVO MÓDULO AQUI!
   { id: "biblia", titulo: "Bíblia", icone: "auto_stories", href: "/biblia", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC]", activeShadowClass: "active:shadow-none active:translate-y-[10px]" },
-  { id: "mural", titulo: "Mural", icone: "volunteer_activism", href: "/mural", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC]", activeShadowClass: "active:shadow-none active:translate-y-[10px]" },
+  { id: "mural", titulo: "Mural de Intercessão", icone: "volunteer_activism", href: "/mural", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC]", activeShadowClass: "active:shadow-none active:translate-y-[10px]" },
+  { id: "novenas", titulo: "Novenas", icone: "event", href: "/novenas", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC]", activeShadowClass: "active:shadow-none active:translate-y-[10px]" },
+ { id: "oracoes", titulo: "Orações", icone: "self_improvement", href: "/oracoes", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC]", activeShadowClass: "active:shadow-none active:translate-y-[10px]" },
   { id: "diario", titulo: "Meu Diário", icone: "edit_note", href: "/anotacoes", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC]", activeShadowClass: "active:shadow-none active:translate-y-[10px]" },
   { id: "calendario", titulo: "Calendário", icone: "calendar_month", href: "/calendario", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC]", activeShadowClass: "active:shadow-none active:translate-y-[10px]" },
-  { id: "novenas", titulo: "Novenas", icone: "event", href: "/novenas", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC]", activeShadowClass: "active:shadow-none active:translate-y-[10px]" },
 ];
 
 export default function JornadaPage() {

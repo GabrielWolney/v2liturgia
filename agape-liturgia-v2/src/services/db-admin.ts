@@ -1,9 +1,8 @@
 import { db } from "@/lib/firebase";
 import { collection, addDoc, deleteDoc, doc, getDoc, setDoc } from "firebase/firestore";
 
-// TIPAGEM PARA ELIMINAR O USO DE "any"
 export interface Proposito {
-  ativo: boolean | string;
+  ativo: boolean;
   tema: string;
   texto: string;
   data_atualizacao?: string;
@@ -18,7 +17,7 @@ export async function deletarAviso(id: string) {
   await deleteDoc(doc(db, "avisos", id));
 }
 
-// --- PROPÓSITO / INTERCESSÃO ---
+// --- PROPÓSITO MENSAL DA COMUNIDADE ---
 export async function getProposito(): Promise<Proposito | null> {
   const snap = await getDoc(doc(db, "config_geral", "proposito_mensal"));
   if (snap.exists()) {
@@ -27,7 +26,7 @@ export async function getProposito(): Promise<Proposito | null> {
   return null;
 }
 
-export async function updateProposito(dados: { ativo: boolean; tema: string; texto: string }) {
+export async function updateProposito(dados: Partial<Proposito>) {
   await setDoc(doc(db, "config_geral", "proposito_mensal"), { 
     ...dados, 
     data_atualizacao: new Date().toISOString() 
