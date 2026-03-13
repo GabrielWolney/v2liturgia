@@ -28,7 +28,7 @@ const modulos: ModuloJornada[] = [
   { id: "mural", titulo: "Mural de Intercessão", icone: "volunteer_activism", href: "/mural", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC]", activeShadowClass: "active:shadow-none active:translate-y-[10px]" },
   { id: "novenas", titulo: "Novenas", icone: "event", href: "/novenas", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC]", activeShadowClass: "active:shadow-none active:translate-y-[10px]" },
  { id: "oracoes", titulo: "Orações", icone: "self_improvement", href: "/oracoes", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC]", activeShadowClass: "active:shadow-none active:translate-y-[10px]" },
-  { id: "diario", titulo: "Meu Diário", icone: "edit_note", href: "/anotacoes", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC]", activeShadowClass: "active:shadow-none active:translate-y-[10px]" },
+  { id: "diario", titulo: "Meu Diário espiritual", icone: "edit_note", href: "/anotacoes", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC]", activeShadowClass: "active:shadow-none active:translate-y-[10px]" },
   { id: "calendario", titulo: "Calendário", icone: "calendar_month", href: "/calendario", bgClass: "bg-[#2F6BFF]", shadowClass: "shadow-[0_10px_0_#1E4BCC]", activeShadowClass: "active:shadow-none active:translate-y-[10px]" },
 ];
 
@@ -181,8 +181,8 @@ export default function JornadaPage() {
             <span className="material-symbols-rounded text-[32px] text-[#2F6BFF]">sports_score</span>
           </div>
           <div className={`${cardBg} p-6 rounded-2xl border ${borderColor} text-center w-[280px]`}>
-            <p className={`font-serif italic mb-3 ${textMain} ${fontClass}`}>&quot;Combati o bom combate, terminei a corrida, guardei a fé.&quot;</p>
-            <p className="font-bold text-[#2F6BFF] text-[10px] uppercase tracking-widest">— São Paulo (2 Tm 4,7)</p>
+            <p className={`font-serif italic mb-3 ${textMain} ${fontClass}`}>&quot;A santidade consiste em fazer as pequenas coisas com grande amor.&quot;</p>
+            <p className="font-bold text-[#2F6BFF] text-[10px] uppercase tracking-widest">Santa Teresinha do Menino Jesus</p>
           </div>
         </div>
       </main>

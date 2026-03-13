@@ -11,10 +11,13 @@ import { useUserStore } from "@/store/useUserStore";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { subscribeToAvisos, Aviso } from "@/services/db-home";
 
+interface AgapeWindow extends Window {
+  __IS_MOUNTED__?: boolean;
+}
+
 export default function PortalInicialPage() {
-  // LÓGICA ANTI-PISCAR: Lembra se a app já fez o primeiro carregamento!
   const [isMounted, setIsMounted] = useState(() => {
-    if (typeof window !== 'undefined') return (window as any).__IS_MOUNTED__ || false;
+    if (typeof window !== 'undefined') return (window as AgapeWindow).__IS_MOUNTED__ || false;
     return false;
   });
   
@@ -30,17 +33,20 @@ export default function PortalInicialPage() {
   useEffect(() => { avisosLidosRef.current = avisosLidos; }, [avisosLidos]);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') (window as any).__IS_MOUNTED__ = true;
-    const mountTimer = setTimeout(() => setIsMounted(true), 0);
-    
-    const hora = new Date().getHours();
-    if (hora >= 5 && hora < 12) setSaudacaoTempo("Bom dia");
-    else if (hora >= 12 && hora < 18) setSaudacaoTempo("Boa tarde");
-    else setSaudacaoTempo("Boa noite");
+    const mountTimer = setTimeout(() => {
+      const win = window as AgapeWindow;
+      win.__IS_MOUNTED__ = true;
+      setIsMounted(true);
+      
+      const hora = new Date().getHours();
+      if (hora >= 5 && hora < 12) setSaudacaoTempo("Bom dia");
+      else if (hora >= 12 && hora < 18) setSaudacaoTempo("Boa tarde");
+      else setSaudacaoTempo("Boa noite");
 
-    const formatter = new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
-    const rawDate = formatter.format(new Date());
-    setDataAtual(rawDate.charAt(0).toUpperCase() + rawDate.slice(1));
+      const formatter = new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+      const rawDate = formatter.format(new Date());
+      setDataAtual(rawDate.charAt(0).toUpperCase() + rawDate.slice(1));
+    }, 0);
 
     verificarStreak();
     getLiturgiaDoDia().then(res => setLiturgia(res));
@@ -64,7 +70,7 @@ export default function PortalInicialPage() {
     }
   };
 
-  if (!isMounted) return <div className="h-[100dvh] bg-background transition-colors duration-300" />;
+  if (!isMounted) return <div className="h-[100dvh] bg-background" />;
 
   const isDark = modoVisual === 'escuro';
   const isSepia = modoVisual === 'leitura';
@@ -81,13 +87,10 @@ export default function PortalInicialPage() {
     ? "bg-[radial-gradient(circle_at_center,_rgba(180,83,9,0.05)_3px,_transparent_3px)]"
     : "bg-[radial-gradient(circle_at_center,_rgba(47,107,255,0.08)_3px,_transparent_3px)]";
 
-  const fontGreeting = tamanhoFonte === 'grande' ? 'text-4xl sm:text-5xl' : 'text-3xl sm:text-4xl';
-  const fontLiturgy = tamanhoFonte === 'grande' ? 'text-3xl sm:text-4xl' : 'text-2xl sm:text-3xl';
-  const fontSmall = tamanhoFonte === 'grande' ? 'text-base' : 'text-sm';
-
   const corDia = liturgia ? getCorLiturgica(liturgia.liturgia, liturgia.cor) : "verde";
   const imagemLiturgica = getImagemPorCor(corDia);
 
+  // --- FUNÇÕES AUXILIARES DE ESTILO ---
   const getBannerGradient = (cor: string) => {
     switch(cor) {
       case 'verde': return 'from-emerald-400 to-emerald-600';
@@ -121,41 +124,30 @@ export default function PortalInicialPage() {
   return (
     <div className={`min-h-[100dvh] flex flex-col font-sans relative overflow-hidden pb-10 transition-colors duration-300 ${wrapperClass} ${radialGradient} bg-[length:24px_24px]`}>
       
-      {/* POPUP DE AVISOS */}
       {avisoAtual && (
         <div className="fixed inset-0 z-[99999] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className={`w-full max-w-[400px] rounded-[2.5rem] p-8 shadow-2xl border flex flex-col items-center text-center transform transition-all scale-100 ${cardBg} ${borderColor}`}>
+          <div className={`w-full max-w-[400px] rounded-[2.5rem] p-8 shadow-2xl border flex flex-col items-center text-center ${cardBg} ${borderColor}`}>
             <div className="w-20 h-20 bg-amber-500/10 rounded-full flex items-center justify-center text-amber-500 mb-6 shadow-inner">
               <span className="material-symbols-rounded text-[40px]">campaign</span>
             </div>
             <h2 className={`text-2xl font-black tracking-tight mb-4 ${textMain}`}>Aviso Importante</h2>
-            <p className={`font-medium text-base leading-relaxed mb-8 ${textMuted}`}>
-              {avisoAtual.texto}
-            </p>
-            <button 
-              onClick={fecharAviso}
-              className="w-full bg-[#2F6BFF] text-white font-bold py-4 rounded-[1.5rem] shadow-[0_6px_0_#1E4BCC] active:translate-y-1 active:shadow-none transition-all hover:brightness-105"
-            >
+            <p className={`font-medium text-base leading-relaxed mb-8 ${textMuted}`}>{avisoAtual.texto}</p>
+            <button onClick={fecharAviso} className="w-full bg-[#2F6BFF] text-white font-bold py-4 rounded-[1.5rem] shadow-[0_6px_0_#1E4BCC] active:translate-y-1 active:shadow-none transition-all hover:brightness-105">
               ENTENDIDO
             </button>
           </div>
         </div>
       )}
 
-      {/* HEADER */}
       <header className="relative z-10 flex items-center justify-between p-6 md:pt-10 max-w-[600px] mx-auto w-full shrink-0">
         <div className="flex items-center gap-4">
-          <img src="/icon-192x192.png" alt="Logo Ágape" className={`w-16 h-16 rounded-2xl shadow-md border-2 transition-transform hover:rotate-3 ${borderColor}`} />
+          <img src="/icon-192x192.png" alt="Logo" className={`w-16 h-16 rounded-2xl shadow-md border-2 ${borderColor}`} />
           <div className="flex flex-col justify-center">
-            <span className="font-black text-2xl tracking-tighter text-[#2F6BFF] leading-none drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.1)]">
-              Liturgia
-            </span>
-            <span className={`text-[11px] font-black uppercase tracking-widest mt-1 opacity-90 ${textMuted}`}>
-              Ágape de jovens
-            </span>
+            <span className="font-black text-2xl tracking-tighter text-[#2F6BFF] leading-none">Liturgia</span>
+            <span className={`text-[11px] font-black uppercase tracking-widest mt-1 opacity-90 ${textMuted}`}>Ágape de jovens</span>
           </div>
         </div>
-        <Link href="/progresso" className={`flex items-center gap-1 px-3 py-1.5 rounded-full border shadow-sm transition-colors active:scale-95 ${isDark ? 'bg-orange-950/30 border-orange-900/50 hover:bg-orange-900/40' : 'bg-orange-50 border-orange-100 hover:bg-orange-100'} ${streak > 0 ? '' : 'opacity-50 grayscale'}`}>
+        <Link href="/progresso" className={`flex items-center gap-1 px-3 py-1.5 rounded-full border shadow-sm transition-colors active:scale-95 ${isDark ? 'bg-orange-950/30 border-orange-900/50' : 'bg-orange-50 border-orange-100'} ${streak > 0 ? '' : 'opacity-50 grayscale'}`}>
           <span className="material-symbols-rounded text-orange-500 text-[18px]">local_fire_department</span>
           <span className="text-orange-500 font-extrabold text-sm">{streak}</span>
         </Link>
@@ -165,7 +157,7 @@ export default function PortalInicialPage() {
         
         {isInstallable && (
           <div className="mb-6 animate-fade-in">
-            <div className="bg-gradient-to-r from-[#2F6BFF] to-[#1E4BCC] rounded-[1.5rem] p-4 flex items-center justify-between shadow-lg shadow-[#2F6BFF]/20 text-white border border-[#2F6BFF]/50">
+            <div className="bg-gradient-to-r from-[#2F6BFF] to-[#1E4BCC] rounded-[1.5rem] p-4 flex items-center justify-between text-white border border-[#2F6BFF]/50 shadow-lg shadow-[#2F6BFF]/20">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shrink-0"><span className="material-symbols-rounded">app_shortcut</span></div>
                 <div>
@@ -173,49 +165,36 @@ export default function PortalInicialPage() {
                   <p className="text-white/80 text-[10px] font-bold uppercase tracking-widest mt-0.5">Acesso nativo</p>
                 </div>
               </div>
-              <button onClick={installPWA} className="bg-white text-[#2F6BFF] text-xs font-black px-4 py-2.5 rounded-xl active:scale-95 transition-transform shadow-sm">INSTALAR</button>
+              <button onClick={installPWA} className="bg-white text-[#2F6BFF] text-xs font-black px-4 py-2.5 rounded-xl active:scale-95 shadow-sm">INSTALAR</button>
             </div>
           </div>
         )}
 
         <div className="mb-8 text-center flex flex-col items-center">
-          <h1 className={`font-extrabold tracking-tight mb-1 truncate max-w-full ${textMain} ${fontGreeting}`}>
+          <h1 className={`font-extrabold tracking-tight mb-1 truncate max-w-full ${textMain} ${tamanhoFonte === 'grande' ? 'text-4xl sm:text-5xl' : 'text-3xl sm:text-4xl'}`}>
             {saudacaoTempo}, {nomeUsuario}
           </h1>
-          <p className={`font-medium ${textMuted} ${fontSmall}`}>
-            {dataAtual}
-          </p>
+          <p className={`font-medium ${textMuted} ${tamanhoFonte === 'grande' ? 'text-base' : 'text-sm'}`}>{dataAtual}</p>
         </div>
 
-        {/* CARD DA LITURGIA PREMIUM (Ou Esqueleto se não carregou) */}
         {!liturgia ? (
-          <div className={`rounded-[2.5rem] p-4 sm:p-5 shadow-soft border w-full mb-8 transition-colors duration-300 ${cardBg} ${borderColor} animate-pulse`}>
-            <div className={`w-full h-44 sm:h-52 rounded-[2rem] mb-6 relative overflow-hidden flex items-end justify-center shadow-inner transition-all duration-500 ${isDark ? 'bg-slate-800' : isSepia ? 'bg-[#E8DEC1]/50' : 'bg-slate-200'}`}>
-              <div className="absolute top-4 left-4 w-24 h-6 rounded-full bg-black/10 dark:bg-white/10 backdrop-blur-md"></div>
-            </div>
-            <div className="px-2 pb-2">
-              <div className={`h-3 w-28 rounded-full mb-2 ${isDark ? 'bg-slate-800' : isSepia ? 'bg-[#E8DEC1]' : 'bg-slate-200'}`}></div>
-              <div className={`h-6 w-3/4 rounded-full mb-6 ${isDark ? 'bg-slate-800' : isSepia ? 'bg-[#E8DEC1]' : 'bg-slate-200'}`}></div>
-              <div className={`pt-4 border-t flex items-center justify-between ${borderColor}`}>
-                <div>
-                  <div className={`h-2 w-16 rounded-full mb-1.5 ${isDark ? 'bg-slate-800' : isSepia ? 'bg-[#E8DEC1]' : 'bg-slate-200'}`}></div>
-                  <div className={`h-3 w-24 rounded-full ${isDark ? 'bg-slate-800' : isSepia ? 'bg-[#E8DEC1]' : 'bg-slate-200'}`}></div>
-                </div>
-                <div className={`w-10 h-10 rounded-full ${isDark ? 'bg-slate-800' : isSepia ? 'bg-[#E8DEC1]' : 'bg-slate-200'}`}></div>
-              </div>
+          <div className={`rounded-[2.5rem] p-4 sm:p-5 shadow-soft border w-full mb-8 ${cardBg} ${borderColor} animate-pulse`}>
+            <div className={`w-full h-44 sm:h-52 rounded-[2rem] mb-6 flex items-end justify-center ${isDark ? 'bg-slate-800' : isSepia ? 'bg-[#E8DEC1]/50' : 'bg-slate-200'}`}></div>
+            <div className="px-2 pb-2 space-y-4">
+              <div className={`h-4 w-1/3 rounded-full ${isDark ? 'bg-slate-800' : 'bg-slate-200'}`}></div>
+              <div className={`h-8 w-2/3 rounded-full ${isDark ? 'bg-slate-800' : 'bg-slate-200'}`}></div>
             </div>
           </div>
         ) : (
-          <div className={`rounded-[2.5rem] p-4 sm:p-5 shadow-soft border w-full mb-8 transition-colors duration-300 ${cardBg} ${borderColor} animate-fade-in`}>
-            <div className={`w-full h-44 sm:h-52 rounded-[2rem] mb-6 relative overflow-hidden bg-gradient-to-tr ${getBannerGradient(corDia)} flex items-end justify-center shadow-inner transition-all duration-500`}>
+          <div className={`rounded-[2.5rem] p-4 sm:p-5 shadow-soft border w-full mb-8 transition-colors duration-300 ${cardBg} ${borderColor}`}>
+            <div className={`w-full h-44 sm:h-52 rounded-[2rem] mb-6 relative overflow-hidden bg-gradient-to-tr flex items-end justify-center shadow-inner ${getBannerGradient(corDia)}`}>
               <div className="relative w-full h-[90%] z-10 animate-float flex items-end justify-center">
-                <Image src={imagemLiturgica} alt={liturgia.liturgia} width={165} height={220} style={{ height: 'auto' }} className="object-contain drop-shadow-[0_15px_15px_rgba(0,0,0,0.4)]" priority />
+                <Image src={imagemLiturgica} alt="Liturgia" width={165} height={220} style={{ height: 'auto' }} className="object-contain drop-shadow-[0_15px_15px_rgba(0,0,0,0.4)]" priority />
               </div>
-              <span className="absolute -bottom-6 -right-6 material-symbols-rounded text-white/15 text-[150px] rotate-12 pointer-events-none z-0">
-                {corDia === 'verde' ? 'eco' : corDia === 'roxo' ? 'church' : 'local_fire_department'}
-              </span>
+              
+              {/* PÍLULA RECUPERADA COM PONTO E TEXTO CORRETO */}
               <div className={`absolute top-4 left-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-2 border ${borderColor} shadow-sm z-20`}>
-                <div className={`w-2.5 h-2.5 rounded-full ${getDotColor(corDia)} shadow-inner`}></div>
+                <div className={`w-2 h-2 rounded-full ${getDotColor(corDia)} shadow-inner`}></div>
                 <span className={`text-[10px] font-black uppercase tracking-tighter ${getBadgeTextColor(corDia)}`}>
                   {corDia === 'branco' ? 'Festivo' : corDia}
                 </span>
@@ -224,14 +203,13 @@ export default function PortalInicialPage() {
 
             <div className="px-2 pb-2">
               <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${textMuted}`}>Tempo Litúrgico</p>
-              <h2 className={`font-extrabold leading-tight mb-6 ${textMain} ${fontLiturgy}`}>{liturgia.liturgia}</h2>
-
+              <h2 className={`font-extrabold leading-tight mb-6 ${textMain} ${tamanhoFonte === 'grande' ? 'text-3xl sm:text-4xl' : 'text-2xl sm:text-3xl'}`}>{liturgia.liturgia}</h2>
               <div className={`pt-4 border-t flex items-center justify-between group ${borderColor}`}>
                 <div>
                   <p className={`text-[10px] font-bold uppercase tracking-widest mb-0.5 ${textMuted}`}>Santo do Dia</p>
-                  <p className={`font-bold ${textMain} ${fontSmall}`}>Conhecer a História</p>
+                  <p className={`font-bold ${textMain} ${tamanhoFonte === 'grande' ? 'text-base' : 'text-sm'}`}>Conhecer a História</p>
                 </div>
-                <a href="https://santo.cancaonova.com" target="_blank" rel="noopener noreferrer" className={`w-10 h-10 rounded-full flex items-center justify-center text-[#2F6BFF] transition-colors active:scale-95 group-hover:bg-[#2F6BFF] group-hover:text-white ${isDark ? 'bg-slate-800' : isSepia ? 'bg-[#E8DEC1]/50' : 'bg-background'}`}>
+                <a href="https://santo.cancaonova.com" target="_blank" rel="noopener noreferrer" className={`w-10 h-10 rounded-full flex items-center justify-center text-[#2F6BFF] ${isDark ? 'bg-slate-800' : 'bg-background'}`}>
                   <span className="material-symbols-rounded text-[20px]">north_east</span>
                 </a>
               </div>
@@ -239,9 +217,8 @@ export default function PortalInicialPage() {
           </div>
         )}
 
-        <Link href="/jornada" className="w-full bg-[#2F6BFF] text-white font-black text-lg py-5 rounded-[2rem] flex items-center justify-center gap-3 shadow-[0_8px_0_#1E4BCC] active:translate-y-1 active:shadow-[0_0px_0_#1E4BCC] transition-all hover:brightness-105">
-          ACESSAR JORNADA
-          <span className="material-symbols-rounded">arrow_forward</span>
+        <Link href="/jornada" className="w-full bg-[#2F6BFF] text-white font-black text-lg py-5 rounded-[2rem] flex items-center justify-center gap-3 shadow-[0_8px_0_#1E4BCC] active:translate-y-1 active:shadow-none transition-all hover:brightness-105">
+          ACESSAR JORNADA <span className="material-symbols-rounded">arrow_forward</span>
         </Link>
       </main>
     </div>
