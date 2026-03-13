@@ -8,7 +8,7 @@ import { LiturgiaDiaria } from "@/types/liturgia";
 import { useUserStore } from "@/store/useUserStore";
 import { getDataIso } from "@/lib/date-utils";
 import { trackEvent } from "@/lib/analytics";
-import { atualizarContador } from "@/services/db-home"; // <--- NOVO IMPORT
+import { atualizarContador } from "@/services/db-home";
 
 type Step = {
   id: string;
@@ -16,6 +16,7 @@ type Step = {
   referencia: string;
   texto: string;
   refrao?: string; 
+  isOverview?: boolean; // <--- NOVA FLAG PARA O PASSO DE REFERÊNCIAS
 };
 
 export default function LiturgiaAulaPage() {
@@ -27,7 +28,6 @@ export default function LiturgiaAulaPage() {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
 
-  // EXTRAÍDOS OS ESTADOS NECESSÁRIOS
   const { marcarLeituraConcluida, modoVisual, tamanhoFonte, registrarAtividade, leiturasConcluidas } = useUserStore();
 
   useEffect(() => {
@@ -37,6 +37,17 @@ export default function LiturgiaAulaPage() {
       if (data) {
         setLiturgia(data);
         const newSteps: Step[] = [];
+
+        // --- 1. O NOVO PASSO: VISÃO GERAL DAS REFERÊNCIAS ---
+        newSteps.push({
+          id: '0',
+          titulo: 'Visão Geral',
+          referencia: 'Prepare a sua Bíblia',
+          texto: '', // Vazio porque o conteúdo será renderizado por Cards
+          isOverview: true
+        });
+
+        // --- 2. OS PASSOS DE LEITURA NORMAIS ---
         if (data.primeiraLeitura) {
           newSteps.push({ id: '1', titulo: 'Primeira Leitura', referencia: data.primeiraLeitura.referencia, texto: data.primeiraLeitura.texto });
         }
@@ -68,7 +79,6 @@ export default function LiturgiaAulaPage() {
       setCurrentStepIndex(prev => prev + 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
-      // --- LÓGICA DO FOGUINHO E FIREBASE ---
       const dataHoje = getDataIso();
       
       // Só soma +1 na Igreja se for a primeira vez do dia!
@@ -77,7 +87,7 @@ export default function LiturgiaAulaPage() {
       }
 
       marcarLeituraConcluida(dataHoje);
-      registrarAtividade(); // <--- Sobe o Foguinho
+      registrarAtividade();
       setIsFinished(true);
       trackEvent("liturgia_concluida");
     }
@@ -139,9 +149,11 @@ export default function LiturgiaAulaPage() {
   const currentStep = steps[currentStepIndex];
   const progressPercentage = ((currentStepIndex + 1) / steps.length) * 100;
   
-  const textoFormatado = currentStep.titulo === "Salmo" 
-    ? (currentStep.refrao ? formatarSalmo(currentStep.texto, currentStep.refrao) : currentStep.texto.replace(/\n/g, '<br />'))
-    : formatarTextoLiturgico(currentStep.texto);
+  const textoFormatado = currentStep.isOverview ? "" : (
+    currentStep.titulo === "Salmo" 
+      ? (currentStep.refrao ? formatarSalmo(currentStep.texto, currentStep.refrao) : currentStep.texto.replace(/\n/g, '<br />'))
+      : formatarTextoLiturgico(currentStep.texto)
+  );
 
   return (
     <div className={`min-h-[100dvh] flex flex-col font-sans pb-40 selection:bg-[#2F6BFF]/30 transition-colors ${wrapperClass}`}>
@@ -167,7 +179,7 @@ export default function LiturgiaAulaPage() {
         
         <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#2F6BFF]/10 text-[#2F6BFF] rounded-lg font-extrabold text-[10px] uppercase tracking-widest mb-3">
           <span className="material-symbols-rounded text-[14px]">
-            {currentStep.titulo === 'Evangelho' ? 'menu_book' : currentStep.titulo === 'Salmo' ? 'music_note' : 'auto_stories'}
+            {currentStep.isOverview ? 'format_list_bulleted' : currentStep.titulo === 'Evangelho' ? 'church' : currentStep.titulo === 'Salmo' ? 'music_note' : 'auto_stories'}
           </span>
           {currentStep.titulo}
         </div>
@@ -176,25 +188,85 @@ export default function LiturgiaAulaPage() {
           {currentStep.referencia}
         </h2>
 
-        {currentStep.refrao && (
-          <div className={`mb-8 p-6 border-2 rounded-[1.5rem] shadow-sm flex flex-col items-center text-center transition-colors ${cardBg} ${borderColor}`}>
-            <span className={`font-bold text-[10px] uppercase tracking-widest mb-2 flex items-center gap-1 ${textMuted}`}>
-              <span className="material-symbols-rounded text-[14px]">graphic_eq</span>
-              Refrão
-            </span>
-            <h3 className={`font-serif text-lg sm:text-2xl font-bold leading-snug ${textMain}`}>
-              <span className="text-[#2F6BFF] mr-2">—</span>
-              {currentStep.refrao}
-            </h3>
+        {/* SE FOR A TELA DE REFERÊNCIAS (PASSO 1) */}
+        {currentStep.isOverview ? (
+          <div className="flex flex-col gap-3 animate-fade-in">
+            <p className={`font-medium text-sm mb-4 ${textMuted}`}>
+              Se preferir acompanhar as leituras de hoje na sua própria Bíblia, procure as seguintes passagens:
+            </p>
+
+            {liturgia?.primeiraLeitura && (
+              <div className={`p-4 rounded-[1.25rem] border shadow-sm flex items-center gap-4 transition-colors ${cardBg} ${borderColor}`}>
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${isDark ? 'bg-slate-800 text-slate-400' : 'bg-[#2F6BFF]/10 text-[#2F6BFF]'}`}>
+                  <span className="material-symbols-rounded text-[20px]">auto_stories</span>
+                </div>
+                <div>
+                  <p className={`text-[10px] font-bold uppercase tracking-widest ${textMuted}`}>Primeira Leitura</p>
+                  <p className={`font-bold ${textMain} ${tamanhoFonte === 'grande' ? 'text-lg' : 'text-base'}`}>{liturgia.primeiraLeitura.referencia}</p>
+                </div>
+              </div>
+            )}
+
+            {liturgia?.salmo && (
+              <div className={`p-4 rounded-[1.25rem] border shadow-sm flex items-center gap-4 transition-colors ${cardBg} ${borderColor}`}>
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${isDark ? 'bg-slate-800 text-slate-400' : 'bg-[#2F6BFF]/10 text-[#2F6BFF]'}`}>
+                  <span className="material-symbols-rounded text-[20px]">music_note</span>
+                </div>
+                <div>
+                  <p className={`text-[10px] font-bold uppercase tracking-widest ${textMuted}`}>Salmo Responsorial</p>
+                  <p className={`font-bold ${textMain} ${tamanhoFonte === 'grande' ? 'text-lg' : 'text-base'}`}>{liturgia.salmo.referencia}</p>
+                </div>
+              </div>
+            )}
+
+            {liturgia?.segundaLeitura && typeof liturgia.segundaLeitura !== 'string' && (
+              <div className={`p-4 rounded-[1.25rem] border shadow-sm flex items-center gap-4 transition-colors ${cardBg} ${borderColor}`}>
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${isDark ? 'bg-slate-800 text-slate-400' : 'bg-[#2F6BFF]/10 text-[#2F6BFF]'}`}>
+                  <span className="material-symbols-rounded text-[20px]">menu_book</span>
+                </div>
+                <div>
+                  <p className={`text-[10px] font-bold uppercase tracking-widest ${textMuted}`}>Segunda Leitura</p>
+                  <p className={`font-bold ${textMain} ${tamanhoFonte === 'grande' ? 'text-lg' : 'text-base'}`}>{liturgia.segundaLeitura.referencia}</p>
+                </div>
+              </div>
+            )}
+
+            {liturgia?.evangelho && (
+              <div className={`p-4 rounded-[1.25rem] border shadow-sm flex items-center gap-4 transition-colors ${cardBg} ${borderColor}`}>
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${isDark ? 'bg-emerald-900/30 text-emerald-500' : 'bg-emerald-50 text-emerald-600'}`}>
+                  <span className="material-symbols-rounded text-[20px]">church</span>
+                </div>
+                <div>
+                  <p className={`text-[10px] font-bold uppercase tracking-widest ${textMuted}`}>Evangelho</p>
+                  <p className={`font-bold ${textMain} ${tamanhoFonte === 'grande' ? 'text-lg' : 'text-base'}`}>{liturgia.evangelho.referencia}</p>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          // SE FOR O TEXTO DA LEITURA NORMAL (PASSO 2, 3, 4...)
+          <div className="animate-fade-in">
+            {currentStep.refrao && (
+              <div className={`mb-8 p-6 border-2 rounded-[1.5rem] shadow-sm flex flex-col items-center text-center transition-colors ${cardBg} ${borderColor}`}>
+                <span className={`font-bold text-[10px] uppercase tracking-widest mb-2 flex items-center gap-1 ${textMuted}`}>
+                  <span className="material-symbols-rounded text-[14px]">graphic_eq</span>
+                  Refrão
+                </span>
+                <h3 className={`font-serif text-lg sm:text-2xl font-bold leading-snug ${textMain}`}>
+                  <span className="text-[#2F6BFF] mr-2">—</span>
+                  {currentStep.refrao}
+                </h3>
+              </div>
+            )}
+
+            <article 
+              className={`font-serif ${textMain} ${fontReading} text-left ${ 
+                currentStep.titulo === 'Evangelho' ? `p-6 md:p-8 rounded-3xl shadow-sm border ${cardBg} ${borderColor}` : ''
+              } ${currentStep.titulo === 'Salmo' ? 'text-center italic' : ''}`}
+              dangerouslySetInnerHTML={{ __html: textoFormatado }}
+            />
           </div>
         )}
-
-        <article 
-          className={`font-serif ${textMain} ${fontReading} text-left ${ 
-            currentStep.titulo === 'Evangelho' ? `p-6 md:p-8 rounded-3xl shadow-sm border ${cardBg} ${borderColor}` : ''
-          } ${currentStep.titulo === 'Salmo' ? 'text-center italic' : ''}`}
-          dangerouslySetInnerHTML={{ __html: textoFormatado }}
-        />
       </main>
 
       <footer className={`fixed bottom-0 left-0 w-full bg-gradient-to-t ${footerGradient} from-70% to-transparent pt-12 pb-6 px-5 z-50`}>
@@ -207,7 +279,7 @@ export default function LiturgiaAulaPage() {
                 : 'bg-[#2F6BFF] text-white shadow-[0_8px_0_#1E4BCC] active:shadow-none'
             } hover:brightness-105 ${tamanhoFonte === 'grande' ? 'text-lg' : 'text-base'}`}
           >
-            {currentStep.titulo === 'Evangelho' ? 'CONCLUIR' : 'CONTINUAR'}
+            {currentStep.isOverview ? 'INICIAR LEITURA' : currentStep.titulo === 'Evangelho' ? 'CONCLUIR' : 'CONTINUAR'}
           </button>
         </div>
       </footer>

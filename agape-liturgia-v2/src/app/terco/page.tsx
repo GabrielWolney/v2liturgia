@@ -5,13 +5,40 @@ import { useRouter } from "next/navigation";
 import { obterMisterioDoDia, getDataIso } from "@/lib/date-utils";
 import { useUserStore } from "@/store/useUserStore";
 import { trackEvent } from "@/lib/analytics";
-import { atualizarContador } from "@/services/db-home"; // <--- NOVO IMPORT
+import { atualizarContador } from "@/services/db-home";
 
-const misteriosRosario: Record<string, string[]> = {
-  "Gozosos": ["A Anunciação do Anjo a Nossa Senhora", "A Visitação de Nossa Senhora a Santa Isabel", "O Nascimento de Jesus em Belém", "A Apresentação do Menino Jesus no Templo", "A Perda e o Encontro de Jesus no Templo"],
-  "Luminosos": ["O Batismo de Jesus no Jordão", "A Auto-revelação de Jesus nas Bodas de Caná", "O Anúncio do Reino de Deus e o convite à conversão", "A Transfiguração de Jesus no Monte Tabor", "A Instituição da Eucaristia"],
-  "Dolorosos": ["A Agonia de Jesus no Horto das Oliveiras", "A Flagelação de Jesus atado à coluna", "A Coroação de espinhos de Nosso Senhor", "Jesus carrega a pesada Cruz para o Calvário", "A Crucifixão e Morte de Nosso Senhor"],
-  "Gloriosos": ["A Ressurreição de Nosso Senhor Jesus Cristo", "A Ascensão de Jesus ao Céu", "A descida do Espírito Santo sobre os Apóstolos", "A Assunção de Nossa Senhora ao Céu", "A Coroação de Nossa Senhora como Rainha do Céu e da Terra"]
+// Base de dados rica para os Mistérios do Terço (com passagens em PT-BR)
+type Misterio = { titulo: string; passagem: string };
+
+const misteriosRosario: Record<string, Misterio[]> = {
+  "Gozosos": [
+    { titulo: "A Anunciação do Anjo a Maria", passagem: "«Eis aqui a serva do Senhor. Faça-se em mim segundo a tua palavra.» (Lc 1, 38)" },
+    { titulo: "A Visitação de Maria a Santa Isabel", passagem: "«Bendita és tu entre as mulheres e bendito é o fruto do teu ventre!» (Lc 1, 42)" },
+    { titulo: "O Nascimento de Jesus em Belém", passagem: "«Ela deu à luz o seu filho primogênito, envolveu-o em faixas e deitou-o numa manjedoura.» (Lc 2, 7)" },
+    { titulo: "A Apresentação do Menino Jesus no Templo", passagem: "«Simeão os abençoou e disse a Maria: 'Eis que este menino está destinado a ser uma causa de queda e de soerguimento para muitos... E a ti, uma espada trespassará a tua alma'.» (Lc 2, 34-35)" },
+    { titulo: "O Encontro de Jesus no Templo", passagem: "«Por que me procuráveis? Não sabíeis que devo ocupar-me das coisas de meu Pai?» (Lc 2, 49)" }
+  ],
+  "Luminosos": [
+    { titulo: "O Batismo de Jesus no rio Jordão", passagem: "«E do céu baixou uma voz: 'Eis o meu Filho muito amado, em quem ponho minha afeição'.» (Mt 3, 17)" },
+    { titulo: "A Auto-revelação nas Bodas de Caná", passagem: "«Sua mãe disse aos serventes: 'Fazei tudo o que ele vos disser'.» (Jo 2, 5)" },
+    { titulo: "O Anúncio do Reino de Deus", passagem: "«O tempo completou-se e o Reino de Deus está próximo. Arrependei-vos e crede no Evangelho.» (Mc 1, 15)" },
+    { titulo: "A Transfiguração de Jesus", passagem: "«Seu rosto brilhou como o sol e suas roupas ficaram brancas como a luz.» (Mt 17, 2)" },
+    { titulo: "A Instituição da Eucaristia", passagem: "«Tomai e comei, isto é o meu corpo... Isto é o meu sangue, o sangue da nova aliança.» (Mt 26, 26.28)" }
+  ],
+  "Dolorosos": [
+    { titulo: "A Agonia de Jesus no Horto", passagem: "«Pai, se queres, afasta de mim este cálice! Contudo, não a minha vontade, mas a tua seja feita!» (Lc 22, 42)" },
+    { titulo: "A Flagelação de Jesus", passagem: "«Então Pilatos mandou prender Jesus e flagelá-lo.» (Jo 19, 1)" },
+    { titulo: "A Coroação de espinhos", passagem: "«Os soldados teceram de espinhos uma coroa, puseram-lha sobre a cabeça e cobriram-no com um manto de púrpura.» (Jo 19, 2)" },
+    { titulo: "Jesus carrega a Cruz para o Calvário", passagem: "«Jesus, carregando a sua cruz, saiu para o lugar chamado Calvário.» (Jo 19, 17)" },
+    { titulo: "A Crucifixão e Morte de Jesus", passagem: "«Jesus deu um grande grito e disse: 'Pai, nas tuas mãos entrego o meu espírito'.» (Lc 23, 46)" }
+  ],
+  "Gloriosos": [
+    { titulo: "A Ressurreição de Jesus", passagem: "«Por que buscais entre os mortos aquele que vive? Não está aqui, ressuscitou!» (Lc 24, 5-6)" },
+    { titulo: "A Ascensão de Jesus ao Céu", passagem: "«Enquanto os abençoava, separou-se deles e foi arrebatado ao céu.» (Lc 24, 51)" },
+    { titulo: "A descida do Espírito Santo", passagem: "«Todos ficaram cheios do Espírito Santo e começaram a falar em outras línguas.» (At 2, 4)" },
+    { titulo: "A Assunção de Nossa Senhora ao Céu", passagem: "«Desde agora, todas as gerações me chamarão bem-aventurada, porque o Todo-Poderoso fez em mim maravilhas.» (Lc 1, 48-49)" },
+    { titulo: "A Coroação de Nossa Senhora no Céu", passagem: "«Apareceu em seguida um grande sinal no céu: uma mulher revestida do sol, a lua debaixo dos seus pés e na cabeça uma coroa de doze estrelas.» (Ap 12, 1)" }
+  ]
 };
 
 export default function SantoTercoPage() {
@@ -19,7 +46,6 @@ export default function SantoTercoPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
   
-  // EXTRAÍDOS OS ESTADOS NECESSÁRIOS
   const { marcarTercoConcluido, modoVisual, tamanhoFonte, registrarAtividade, tercosConcluidos } = useUserStore();
 
   useEffect(() => {
@@ -34,21 +60,18 @@ export default function SantoTercoPage() {
   const listaMisterios = misteriosRosario[misterioHoje.tipo] || misteriosRosario["Gloriosos"];
 
   const handleFinish = () => {
-    // --- LÓGICA DO FOGUINHO E FIREBASE ---
     const dataHoje = getDataIso();
     
-    // Só soma +1 na Igreja se for o primeiro terço rezado no dia
     if (!tercosConcluidos[dataHoje]) {
       atualizarContador(dataHoje, 'terco', true);
     }
 
     marcarTercoConcluido(dataHoje);
-    registrarAtividade(); // <--- Sobe o Foguinho
+    registrarAtividade();
     setIsFinished(true);
     trackEvent("terco_concluido", { misterio: misterioHoje.tipo });
   };
 
-  // --- CLASSES DO TEMA ---
   const isDark = modoVisual === 'escuro';
   const isSepia = modoVisual === 'leitura';
 
@@ -60,8 +83,7 @@ export default function SantoTercoPage() {
   const headerBg = isDark ? "bg-slate-950/90" : isSepia ? "bg-[#FDF6E3]/90" : "bg-background/90";
   const arrowHover = isDark ? "hover:bg-slate-800 text-slate-400 hover:text-slate-100" : isSepia ? "hover:bg-[#E8DEC1] text-[#8C7B65] hover:text-[#4A3C31]" : "hover:bg-slate-200 text-muted hover:text-foreground";
 
-  // Lógica de Fonte
-  const fontMeditation = tamanhoFonte === 'grande' ? 'text-xl leading-relaxed' : 'text-base leading-relaxed';
+  const fontMeditation = tamanhoFonte === 'grande' ? 'text-lg leading-relaxed' : 'text-base leading-relaxed';
   const fontStandard = tamanhoFonte === 'grande' ? 'text-lg' : 'text-sm';
   const fontHeader = tamanhoFonte === 'grande' ? 'text-xl' : 'text-lg';
 
@@ -93,10 +115,9 @@ export default function SantoTercoPage() {
 
       <main className="flex-1 w-full max-w-[800px] mx-auto px-5 pt-6 animate-fade-in">
         
-        <section className="bg-gradient-to-br from-[#2F6BFF] to-[#1E4BCC] rounded-[2rem] p-8 shadow-lg mb-8 text-white relative overflow-hidden">
+        {/* HERO CARD DOS MISTÉRIOS */}
+        <section className="bg-gradient-to-br from-[#2F6BFF] to-[#1E4BCC] rounded-[2rem] p-8 shadow-lg mb-6 text-white relative overflow-hidden">
           <div className="absolute -right-4 -top-4 text-white/10 pointer-events-none">
-            <div className="absolute -right-4 -top-4 text-white/10 pointer-events-none">
-            {/* O SEU SVG DO TERÇO AQUI (Tamanho Gigante = w-36 h-36) */}
             <svg viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg" className="w-40 h-40 fill-current opacity-60">
               <g transform="matrix(.1 0 0 -.1 0 512)">
                 <path d="m4074.7 4995.1c-377.8-136.9-564.8-534-412.5-875.2 67.5-152.3 233.2-308.4 387.5-366.3 348.9-131.1 747.9 94.5 846.2 480 36.6 146.5 19.3 269.9-57.8 420.2-57.8 115.7-215.9 266-335.4 318.1-119.6 54-314.2 63.7-428 23.2zm347-339.3c111.8-57.8 163.8-146.5 163.8-285.3 0-198.5-107.9-312.3-304.6-323.8-142.7-7.7-231.3 30.8-296.9 129.1-55.9 82.9-61.7 266-9.6 368.2 40.5 82.9 171.6 154.2 283.4 154.2 42.5 0 117.6-19.3 163.9-42.4z"/>
@@ -115,58 +136,106 @@ export default function SantoTercoPage() {
               </g>
             </svg>
           </div>
-          </div>
           <div className="relative z-10">
+            <p className="text-white/80 font-bold uppercase tracking-widest text-[10px] mb-1">Mistérios de Hoje</p>
             <h2 className="text-3xl md:text-4xl font-extrabold font-serif mb-2 leading-tight drop-shadow-md">
               {misterioHoje.tipo}
             </h2>
             <p className="text-white/90 font-medium text-sm flex items-center gap-2">
+              <span className="material-symbols-rounded text-[18px]">lightbulb</span>
               Foco: <span className="font-bold bg-white/20 px-2 py-0.5 rounded-md">{misterioHoje.foco}</span>
             </p>
           </div>
         </section>
 
-        <div className="mb-10">
-          <h3 className={`font-bold text-sm uppercase tracking-widest mb-4 pl-2 ${textMuted}`}>Orações Iniciais</h3>
-          <div className={`rounded-[1.5rem] p-6 shadow-soft border flex flex-col gap-6 transition-colors duration-300 ${cardBg} ${borderColor}`}>
+        {/* ORAÇÕES INICIAIS */}
+        <h3 className={`font-bold text-sm uppercase tracking-widest mb-3 pl-2 mt-8 ${textMuted}`}>Início do Terço</h3>
+        <details className={`group mb-8 rounded-[1.5rem] shadow-soft border overflow-hidden [&_summary::-webkit-details-marker]:hidden transition-colors duration-300 ${cardBg} ${borderColor}`} open>
+          <summary className={`flex items-center justify-between p-5 cursor-pointer outline-none transition-colors ${isDark ? 'hover:bg-slate-800' : isSepia ? 'hover:bg-[#E8DEC1]/50' : 'hover:bg-slate-50'}`}>
+            <span className={`font-extrabold ${fontHeader} ${textMain}`}>Orações Iniciais</span>
+            <span className={`material-symbols-rounded group-open:rotate-180 transition-transform duration-300 ${textMuted}`}>expand_more</span>
+          </summary>
+          <div className={`p-6 pt-2 border-t flex flex-col gap-6 ${borderColor} ${textMain} ${fontStandard}`}>
             <div>
-              <h4 className={`font-bold mb-1 ${textMain} ${fontStandard}`}>1. Sinal da Cruz</h4>
-              <p className={`font-serif ${fontStandard} ${textMuted}`}>Em nome do Pai, e do Filho, e do Espírito Santo. Amém.</p>
+              <h4 className="font-bold text-[#2F6BFF] mb-1">1. Sinal da Cruz</h4>
+              <p className={`font-serif ${textMuted}`}>Pelo sinal da Santa Cruz, livrai-nos, Deus, Nosso Senhor, dos nossos inimigos. Em nome do Pai, e do Filho, e do Espírito Santo. Amém.</p>
             </div>
             <div>
-              <h4 className={`font-bold mb-1 ${textMain} ${fontStandard}`}>2. Oferecimento</h4>
-              <p className={`font-serif ${fontStandard} ${textMuted}`}>Divino Jesus, nós Vos oferecemos este terço que vamos rezar, meditando nos mistérios da nossa Redenção...</p>
+              <h4 className="font-bold text-[#2F6BFF] mb-1">2. Oferecimento</h4>
+              <p className={`font-serif ${textMuted}`}>Divino Jesus, nós Vos oferecemos este terço que vamos rezar, meditando nos mistérios da nossa Redenção. Concedei-nos, por intercessão da Virgem Maria, Mãe de Deus e nossa Mãe, as virtudes que nos são necessárias para bem rezá-lo e a graça de ganharmos as indulgências desta santa devoção.</p>
+            </div>
+            <div>
+              <h4 className="font-bold text-[#2F6BFF] mb-1">3. Credo</h4>
+              <p className={`font-serif ${textMuted}`}>Creio em Deus Pai Todo-Poderoso, Criador do céu e da terra; e em Jesus Cristo, seu único Filho... <span className="text-[11px] uppercase tracking-widest">(Na Cruz)</span></p>
+            </div>
+            <div>
+              <h4 className="font-bold text-[#2F6BFF] mb-1">4. Pai Nosso e 3 Ave Marias</h4>
+              <p className={`font-serif ${textMuted}`}>Para que nos aumente a <strong className={textMain}>Fé</strong>, a <strong className={textMain}>Esperança</strong> e a <strong className={textMain}>Caridade</strong>. <br/>1x Pai Nosso, 3x Ave Marias, 1x Glória ao Pai.</p>
             </div>
           </div>
-        </div>
+        </details>
 
-        <div className="mb-10">
-          <h3 className={`font-bold text-sm uppercase tracking-widest mb-4 pl-2 ${textMuted}`}>Contemplação</h3>
-          <div className="flex flex-col gap-3">
-            {listaMisterios.map((mist, idx) => (
-              <details key={idx} className={`group rounded-[1.5rem] shadow-soft border overflow-hidden [&_summary::-webkit-details-marker]:hidden transition-colors duration-300 ${cardBg} ${borderColor}`}>
-                <summary className={`flex items-center justify-between p-5 cursor-pointer outline-none transition-colors ${isDark ? 'hover:bg-slate-800' : isSepia ? 'hover:bg-[#E8DEC1]/50' : 'hover:bg-background'}`}>
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-[#2F6BFF]/10 text-[#2F6BFF] font-black flex items-center justify-center text-sm shrink-0">{idx + 1}</div>
-                    <span className={`font-extrabold pr-4 ${textMain} ${fontHeader}`}>{idx + 1}º Mistério</span>
-                  </div>
-                  <span className={`material-symbols-rounded group-open:rotate-180 transition-transform duration-300 rounded-full p-1 shrink-0 ${isDark ? 'bg-slate-800 text-slate-400' : isSepia ? 'bg-[#E8DEC1] text-[#8C7B65]' : 'bg-background text-muted'}`}>expand_more</span>
-                </summary>
-                
-                <div className={`p-5 pt-2 border-t ${borderColor} ${isDark ? 'bg-slate-950/50' : isSepia ? 'bg-[#E8DEC1]/20' : 'bg-background/50'}`}>
-                  <p className={`font-serif font-semibold mb-4 text-center ${fontMeditation} ${textMain}`}>
-                    {mist}
-                  </p>
-                  <div className={`flex flex-col gap-2 p-4 rounded-xl border ${borderColor} ${fontStandard} ${textMuted} ${isDark ? 'bg-slate-950' : 'bg-background'}`}>
-                    <p className={`flex justify-between border-b pb-2 ${borderColor}`}><span>1x</span> <span className="font-bold">Pai Nosso</span></p>
-                    <p className={`flex justify-between border-b pb-2 ${borderColor}`}><span>10x</span> <span className="font-bold">Ave-Marias</span></p>
-                    <p className="flex justify-between pb-1"><span>1x</span> <span className="font-bold">Glória ao Pai</span></p>
+        {/* MISTÉRIOS (CONTEMPLAÇÃO) */}
+        <h3 className={`font-bold text-sm uppercase tracking-widest mb-3 pl-2 ${textMuted}`}>Contemplação</h3>
+        <div className="flex flex-col gap-3 mb-10">
+          {listaMisterios.map((mist, idx) => (
+            <details key={idx} className={`group rounded-[1.5rem] shadow-soft border overflow-hidden [&_summary::-webkit-details-marker]:hidden transition-colors duration-300 ${cardBg} ${borderColor}`}>
+              <summary className={`flex items-center justify-between p-5 cursor-pointer outline-none transition-colors ${isDark ? 'hover:bg-slate-800' : isSepia ? 'hover:bg-[#E8DEC1]/50' : 'hover:bg-slate-50'}`}>
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-[#2F6BFF] text-white font-black flex items-center justify-center text-lg shrink-0 shadow-sm">{idx + 1}</div>
+                  <div className="flex flex-col text-left">
+                    <span className={`font-extrabold leading-tight ${textMain} ${fontHeader}`}>{idx + 1}º Mistério</span>
+                    <span className={`text-[10px] font-bold uppercase tracking-widest ${textMuted} truncate max-w-[180px] sm:max-w-xs`}>{mist.titulo}</span>
                   </div>
                 </div>
-              </details>
-            ))}
-          </div>
+                <span className={`material-symbols-rounded group-open:rotate-180 transition-transform duration-300 rounded-full p-1 shrink-0 ${textMuted}`}>expand_more</span>
+              </summary>
+              
+              <div className={`p-5 pt-0 border-t ${borderColor}`}>
+                <div className="mt-4 text-center">
+                  <h4 className={`font-black text-xl mb-3 ${textMain}`}>{mist.titulo}</h4>
+                  <p className={`font-serif italic mb-6 ${fontMeditation} ${textMuted}`}>
+                    {mist.passagem}
+                  </p>
+                </div>
+                
+                <div className={`flex flex-col gap-2 p-4 rounded-xl border ${borderColor} ${fontStandard} ${textMuted} ${isDark ? 'bg-slate-950' : isSepia ? 'bg-[#E8DEC1]/30' : 'bg-slate-50'}`}>
+                  <p className={`flex justify-between items-center border-b pb-2 ${borderColor}`}>
+                    <span className="font-black text-lg">1x</span> <span className="font-bold text-right">Pai Nosso</span>
+                  </p>
+                  <p className={`flex justify-between items-center border-b pb-2 ${borderColor}`}>
+                    <span className="font-black text-lg">10x</span> <span className="font-bold text-right">Ave-Marias</span>
+                  </p>
+                  <p className={`flex justify-between items-center pb-1`}>
+                    <span className="font-black text-lg">1x</span> <span className="font-bold text-right">Glória ao Pai</span>
+                  </p>
+                </div>
+                <p className={`text-center font-serif italic ${fontStandard} text-[#2F6BFF] mt-4`}>
+                  &quot;Ó meu Jesus, perdoai-nos, livrai-nos do fogo do inferno, levai as almas todas para o Céu e socorrei principalmente as que mais precisarem. Amém.&quot;
+                </p>
+              </div>
+            </details>
+          ))}
         </div>
+
+        {/* ORAÇÕES FINAIS */}
+        <h3 className={`font-bold text-sm uppercase tracking-widest mb-3 pl-2 ${textMuted}`}>Encerramento</h3>
+        <details className={`group mb-10 rounded-[1.5rem] shadow-soft border overflow-hidden [&_summary::-webkit-details-marker]:hidden transition-colors duration-300 ${cardBg} ${borderColor}`}>
+          <summary className={`flex items-center justify-between p-5 cursor-pointer outline-none transition-colors ${isDark ? 'hover:bg-slate-800' : isSepia ? 'hover:bg-[#E8DEC1]/50' : 'hover:bg-slate-50'}`}>
+            <span className={`font-extrabold ${fontHeader} ${textMain}`}>Orações Finais</span>
+            <span className={`material-symbols-rounded group-open:rotate-180 transition-transform duration-300 ${textMuted}`}>expand_more</span>
+          </summary>
+          <div className={`p-6 pt-2 border-t flex flex-col gap-6 ${borderColor} ${textMain} ${fontStandard}`}>
+            <div>
+              <h4 className="font-bold text-[#2F6BFF] mb-1">1. Agradecimento</h4>
+              <p className={`font-serif ${textMuted}`}>Infinitas graças Vos damos, Soberana Rainha, pelos benefícios que todos os dias recebemos de vossas mãos liberais. Dignai-vos agora e para sempre tomar-nos debaixo do vosso poderoso amparo e para mais Vos obrigar Vos saudamos com uma Salve Rainha:</p>
+            </div>
+            <div>
+              <h4 className="font-bold text-[#2F6BFF] mb-1">2. Salve Rainha</h4>
+              <p className={`font-serif ${textMuted}`}>Salve Rainha, Mãe de misericórdia, vida, doçura e esperança nossa, salve! A vós bradamos, os degredados filhos de Eva; a vós suspiramos, gemendo e chorando neste vale de lágrimas. Eia, pois, advogada nossa, esses vossos olhos misericordiosos a nós volvei; e depois deste desterro nos mostrai Jesus, bendito fruto do vosso ventre, ó clemente, ó piedosa, ó doce sempre Virgem Maria. Rogai por nós, santa Mãe de Deus. Para que sejamos dignos das promessas de Cristo. Amém.</p>
+            </div>
+          </div>
+        </details>
 
         <button 
           onClick={handleFinish} 

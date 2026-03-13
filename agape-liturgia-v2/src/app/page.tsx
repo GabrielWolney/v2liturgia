@@ -45,7 +45,6 @@ export default function PortalInicialPage() {
   const [dataAtual, setDataAtual] = useState("");
   const [avisoAtual, setAvisoAtual] = useState<Aviso | null>(null);
   
-  // EXTRAÍDO O ultimaAtividade AQUI
   const { nomeUsuario, modoVisual, tamanhoFonte, streak, ultimaAtividade, verificarStreak, avisosLidos, marcarAvisoLido } = useUserStore();
   const { isInstallable, installPWA } = usePWAInstall();
 
@@ -140,7 +139,6 @@ export default function PortalInicialPage() {
     }
   };
 
-  // --- LÓGICA DO FOGUINHO ESTILO TIKTOK ---
   const dataHojeISO = new Date().toLocaleDateString("en-CA");
   const isFoguinhoAcesoHoje = ultimaAtividade === dataHojeISO;
   
@@ -166,15 +164,16 @@ export default function PortalInicialPage() {
         </div>
       )}
 
-      <header className="relative z-10 flex items-center justify-between p-6 md:pt-10 max-w-[600px] mx-auto w-full shrink-0">
-        <div className="flex items-center gap-4">
-          <img src="/icon-192x192.png" alt="Logo" className={`w-16 h-16 rounded-2xl shadow-md border-2 ${borderColor}`} />
+      {/* HEADER AJUSTADO PARA O DESIGN DE PÍLULA FLUTUANTE */}
+      <header className="flex items-center justify-between transition-colors duration-300">
+        <div className="flex items-center gap-3">
+          <img src="/icon-192x192.png" alt="Logo" className="w-10 h-10 rounded-xl border shadow-sm" />
           <div className="flex flex-col justify-center">
-            <span className="font-black text-2xl tracking-tighter text-[#2F6BFF] leading-none">Liturgia</span>
-            <span className={`text-[11px] font-black uppercase tracking-widest mt-1 opacity-90 ${textMuted}`}>Ágape de jovens</span>
+            <span className="font-black text-base tracking-tighter text-[#2F6BFF] leading-none">Liturgia</span>
+            <span className={`text-[8px] font-black uppercase tracking-widest mt-0.5 opacity-90 ${textMuted}`}>Ágape de jovens</span>
           </div>
         </div>
-        <Link href="/progresso" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border shadow-sm transition-colors active:scale-95 ${foguinhoClass}`}>
+        <Link href="/progresso" className={`flex items-center gap-1 px-3 py-1.5 rounded-full border shadow-sm transition-colors active:scale-95 ${foguinhoClass}`}>
           <span className="material-symbols-rounded text-[18px]">local_fire_department</span>
           <span className="font-extrabold text-sm">{streak}</span>
         </Link>
@@ -216,7 +215,7 @@ export default function PortalInicialPage() {
           <div className={`rounded-[2.5rem] p-4 sm:p-5 shadow-soft border w-full mb-8 transition-colors duration-300 ${cardBg} ${borderColor}`}>
             <div className={`w-full h-44 sm:h-52 rounded-[2rem] mb-6 relative overflow-hidden bg-gradient-to-tr flex items-end justify-center shadow-inner ${getBannerGradient(corDia)}`}>
               <div className="relative w-full h-[90%] z-10 animate-float flex items-end justify-center">
-                <Image src={imagemLiturgica} alt="Liturgia" width={165} height={220} style={{ height: 'auto' }} className="object-contain drop-shadow-[0_15px_15px_rgba(0,0,0,0.4)]" priority />
+                <Image src={imagemLiturgica} alt="Liturgia" width={165} height={220} style={{ width: 'auto', height: 'auto' }} className="object-contain drop-shadow-[0_15px_15px_rgba(0,0,0,0.4)]" priority />
               </div>
               
               <div className={`absolute top-4 left-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-2 border ${borderColor} shadow-sm z-20`}>

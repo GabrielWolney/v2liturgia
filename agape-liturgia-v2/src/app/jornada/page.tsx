@@ -188,16 +188,16 @@ export default function JornadaPage() {
   return (
     <div className={`min-h-screen flex flex-col font-sans pb-32 transition-colors duration-300 ${wrapperClass} bg-[radial-gradient(circle_at_center,_rgba(47,107,255,0.08)_3px,_transparent_3px)] bg-[length:28px_28px]`}>
       
-      <header className={`sticky top-0 z-50 backdrop-blur-md border-b px-4 sm:px-6 py-4 flex items-center justify-between max-w-[600px] mx-auto w-full transition-colors duration-300 ${headerBg} ${borderColor}`}>
+      <header className={`flex items-center justify-between transition-colors duration-300 ${headerBg} ${borderColor}`}>
         <div className="flex items-center gap-3">
           <Link href="/" className={`w-9 h-9 flex items-center justify-center rounded-full transition-colors ${arrowHover}`}>
-            <span className="material-symbols-rounded text-[26px]">arrow_back</span>
+            <span className="material-symbols-rounded text-[24px]">arrow_back</span>
           </Link>
           <div className="flex items-center gap-3">
-            <img src="/icon-192x192.png" className={`w-11 h-11 rounded-xl border-2 shadow-sm ${borderColor}`} alt="Logo" />
+            <img src="/icon-192x192.png" className="w-10 h-10 rounded-xl border shadow-sm" alt="Logo" />
             <div className="flex flex-col">
-              <span className="font-black text-lg tracking-tight text-[#2F6BFF] leading-none">Liturgia</span>
-              <span className={`text-[9px] font-black uppercase tracking-wider ${textMuted}`}>Ágape de jovens</span>
+              <span className="font-black text-base tracking-tight text-[#2F6BFF] leading-none">Liturgia</span>
+              <span className={`text-[8px] font-black uppercase tracking-wider ${textMuted}`}>Ágape de jovens</span>
             </div>
           </div>
         </div>
@@ -207,7 +207,7 @@ export default function JornadaPage() {
             <span className="font-extrabold text-sm">{streak}</span>
           </Link>
           <Link href="/menu" className={`w-9 h-9 flex items-center justify-center rounded-full transition-colors ${arrowHover}`}>
-            <span className="material-symbols-rounded text-[26px]">settings</span>
+            <span className="material-symbols-rounded text-[24px]">settings</span>
           </Link>
         </div>
       </header>
