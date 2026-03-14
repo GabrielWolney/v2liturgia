@@ -141,10 +141,6 @@ export default function SantoTercoPage() {
             <h2 className="text-3xl md:text-4xl font-extrabold font-serif mb-2 leading-tight drop-shadow-md">
               {misterioHoje.tipo}
             </h2>
-            <p className="text-white/90 font-medium text-sm flex items-center gap-2">
-              <span className="material-symbols-rounded text-[18px]">lightbulb</span>
-              Foco: <span className="font-bold bg-white/20 px-2 py-0.5 rounded-md">{misterioHoje.foco}</span>
-            </p>
           </div>
         </section>
 

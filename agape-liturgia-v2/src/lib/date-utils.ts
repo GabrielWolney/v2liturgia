@@ -28,15 +28,6 @@ export function isDiaDeJejum(tituloLiturgia: string): boolean {
   return (titulo.includes("cinzas") && titulo.includes("quarta")) || titulo.includes("paixão do senhor");
 }
 
-// REGRA: Mistérios do Terço
-export function obterMisterioDoDia() {
-  const diaSemana = new Date().getDay();
-  if (diaSemana === 0 || diaSemana === 3) return { tipo: "Gloriosos", foco: "Esperança e Céu" };
-  if (diaSemana === 1 || diaSemana === 6) return { tipo: "Gozosos", foco: "Alegria e Humildade" };
-  if (diaSemana === 2 || diaSemana === 5) return { tipo: "Dolorosos", foco: "Coragem e Arrependimento" };
-  return { tipo: "Luminosos", foco: "Luz e Conversão" };
-}
-
 // REGRA: Status da Novena
 export function getNovenaStatus(inicioStr: string, fimStr: string): 'agora' | 'breve' | 'fim' {
   const hoje = new Date();
