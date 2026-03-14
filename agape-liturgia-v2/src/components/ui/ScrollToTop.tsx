@@ -60,12 +60,13 @@ export function ScrollToTop() {
     <button
       onClick={scrollToTop}
       aria-label="Voltar ao topo"
-      // w-14 e h-14 deixam-no ligeiramente maior e mais fácil de clicar!
-      className={`fixed bottom-8 right-6 z-[9999] w-14 h-14 rounded-full shadow-2xl border-2 flex items-center justify-center transition-all duration-300 ease-in-out ${
-        isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0 pointer-events-none"
+      // bottom-4 e right-4 encostam o botão bem no canto inferior. 
+      // translate-y-16 garante que ele desce para fora da tela quando se esconde.
+      className={`fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[9999] w-12 h-12 sm:w-14 sm:h-14 rounded-full shadow-2xl border-2 flex items-center justify-center transition-all duration-300 ease-in-out ${
+        isVisible ? "translate-y-0 opacity-100" : "translate-y-16 opacity-0 pointer-events-none"
       } ${btnBg}`}
     >
-      <span className="material-symbols-rounded text-[28px] font-black">arrow_upward</span>
+      <span className="material-symbols-rounded text-[24px] sm:text-[28px] font-black">arrow_upward</span>
     </button>
   );
 }
