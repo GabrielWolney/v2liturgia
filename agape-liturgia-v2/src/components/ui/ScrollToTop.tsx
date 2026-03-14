@@ -40,10 +40,10 @@ export function ScrollToTop() {
   }, []);
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    // Caso o scroll esteja num div interno, isto força o topo absoluto:
-    document.body.scrollTop = 0; 
-    document.documentElement.scrollTop = 0;
+    window.scrollTo({ 
+      top: 0, 
+      behavior: "smooth" 
+    });
   };
 
   // Cores de fallback seguras para o primeiro milissegundo de carregamento
