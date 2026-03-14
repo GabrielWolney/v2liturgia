@@ -96,7 +96,7 @@ export default function SantoTercoPage() {
         <h1 className={`text-3xl font-extrabold tracking-tight mb-2 ${textMain}`}>Terço Concluído!</h1>
         <p className={`font-medium mb-12 ${textMuted}`}>A sua coroa de orações foi entregue a Nossa Senhora.</p>
         <button onClick={() => router.push('/jornada')} className="w-full max-w-[400px] bg-[#2F6BFF] text-white font-bold py-5 rounded-[1.5rem] shadow-[0_8px_0_#1E4BCC] active:translate-y-[8px] active:shadow-none transition-all hover:brightness-105">
-          VOLTAR À JORNADA
+          VOLTAR À PEQUENA VIA
         </button>
       </div>
     );

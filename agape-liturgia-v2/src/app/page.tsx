@@ -247,7 +247,7 @@ export default function PortalInicialPage() {
         )}
 
         <Link href="/jornada" className="w-full bg-[#2F6BFF] text-white font-black text-lg py-5 rounded-[2rem] flex items-center justify-center gap-3 shadow-[0_8px_0_#1E4BCC] active:translate-y-1 active:shadow-none transition-all hover:brightness-105">
-          ACESSAR JORNADA <span className="material-symbols-rounded">arrow_forward</span>
+          ACESSAR PEQUENA VIA <span className="material-symbols-rounded">arrow_forward</span>
         </Link>
       </main>
     </div>

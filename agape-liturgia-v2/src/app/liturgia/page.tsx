@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { getLiturgiaDoDia } from "@/services/api-liturgia";
 import { formatarTextoLiturgico, formatarSalmo } from "@/lib/formatters";
 import { LiturgiaDiaria } from "@/types/liturgia";
@@ -16,7 +17,7 @@ type Step = {
   referencia: string;
   texto: string;
   refrao?: string; 
-  isOverview?: boolean; // <--- NOVA FLAG PARA O PASSO DE REFERÊNCIAS
+  isOverview?: boolean; 
 };
 
 export default function LiturgiaAulaPage() {
@@ -27,48 +28,59 @@ export default function LiturgiaAulaPage() {
   const [steps, setSteps] = useState<Step[]>([]);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
+  
+  // Estado para controlar a falha da API
+  const [erroApi, setErroApi] = useState(false);
 
   const { marcarLeituraConcluida, modoVisual, tamanhoFonte, registrarAtividade, leiturasConcluidas } = useUserStore();
 
   useEffect(() => {
     const mountTimer = setTimeout(() => setIsMounted(true), 0);
     
-    getLiturgiaDoDia().then((data) => {
-      if (data) {
-        setLiturgia(data);
-        const newSteps: Step[] = [];
+    getLiturgiaDoDia()
+      .then((data) => {
+        if (data) {
+          setLiturgia(data);
+          const newSteps: Step[] = [];
 
-        // --- 1. O NOVO PASSO: VISÃO GERAL DAS REFERÊNCIAS ---
-        newSteps.push({
-          id: '0',
-          titulo: 'Visão Geral',
-          referencia: 'Prepare a sua Bíblia',
-          texto: '', // Vazio porque o conteúdo será renderizado por Cards
-          isOverview: true
-        });
-
-        // --- 2. OS PASSOS DE LEITURA NORMAIS ---
-        if (data.primeiraLeitura) {
-          newSteps.push({ id: '1', titulo: 'Primeira Leitura', referencia: data.primeiraLeitura.referencia, texto: data.primeiraLeitura.texto });
-        }
-        if (data.salmo) {
-          newSteps.push({ 
-            id: '2', 
-            titulo: 'Salmo', 
-            referencia: data.salmo.referencia, 
-            texto: data.salmo.texto,
-            refrao: data.salmo.refrao 
+          // 1. VISÃO GERAL DAS REFERÊNCIAS
+          newSteps.push({
+            id: '0',
+            titulo: 'Visão Geral',
+            referencia: 'Prepare a sua Bíblia',
+            texto: '', 
+            isOverview: true
           });
+
+          // 2. PASSOS DE LEITURA
+          if (data.primeiraLeitura) {
+            newSteps.push({ id: '1', titulo: 'Primeira Leitura', referencia: data.primeiraLeitura.referencia, texto: data.primeiraLeitura.texto });
+          }
+          if (data.salmo) {
+            newSteps.push({ 
+              id: '2', 
+              titulo: 'Salmo', 
+              referencia: data.salmo.referencia, 
+              texto: data.salmo.texto,
+              refrao: data.salmo.refrao 
+            });
+          }
+          if (data.segundaLeitura && typeof data.segundaLeitura !== 'string') {
+            newSteps.push({ id: '3', titulo: 'Segunda Leitura', referencia: data.segundaLeitura.referencia, texto: data.segundaLeitura.texto });
+          }
+          if (data.evangelho) {
+            newSteps.push({ id: '4', titulo: 'Evangelho', referencia: data.evangelho.referencia, texto: data.evangelho.texto });
+          }
+          setSteps(newSteps);
+        } else {
+          // Se a API não devolver dados
+          setErroApi(true);
         }
-        if (data.segundaLeitura && typeof data.segundaLeitura !== 'string') {
-          newSteps.push({ id: '3', titulo: 'Segunda Leitura', referencia: data.segundaLeitura.referencia, texto: data.segundaLeitura.texto });
-        }
-        if (data.evangelho) {
-          newSteps.push({ id: '4', titulo: 'Evangelho', referencia: data.evangelho.referencia, texto: data.evangelho.texto });
-        }
-        setSteps(newSteps);
-      }
-    });
+      })
+      .catch(() => {
+        // Se a chamada falhar completamente (ex: servidor em baixo)
+        setErroApi(true);
+      });
 
     trackEvent("page_view", { page_name: "liturgia_aula" });
     return () => clearTimeout(mountTimer);
@@ -81,7 +93,6 @@ export default function LiturgiaAulaPage() {
     } else {
       const dataHoje = getDataIso();
       
-      // Só soma +1 na Igreja se for a primeira vez do dia!
       if (!leiturasConcluidas[dataHoje]) {
         atualizarContador(dataHoje, 'leitura', true);
       }
@@ -95,7 +106,6 @@ export default function LiturgiaAulaPage() {
 
   if (!isMounted) return null;
 
-  // --- CLASSES DINÂMICAS PARA TEMAS ---
   const isDark = modoVisual === 'escuro';
   const isSepia = modoVisual === 'leitura';
 
@@ -114,6 +124,40 @@ export default function LiturgiaAulaPage() {
 
   const fontReading = tamanhoFonte === 'grande' ? 'text-xl leading-[2.1]' : 'text-base leading-[1.8]';
 
+  // --- PLANO B: TELA DE ERRO (SERVIDOR EM ORAÇÃO) ---
+  if (erroApi) {
+    return (
+      <div className={`min-h-[100dvh] flex flex-col items-center justify-center px-6 text-center animate-fade-in transition-colors ${wrapperClass}`}>
+        <div className="w-24 h-24 bg-amber-500/10 text-amber-500 rounded-[2rem] flex items-center justify-center mb-6 shadow-inner">
+          <span className="material-symbols-rounded text-[48px]">cloud_off</span>
+        </div>
+        <h2 className={`text-2xl sm:text-3xl font-extrabold mb-3 tracking-tight ${textMain}`}>
+          Servidor em Oração...
+        </h2>
+        <p className={`mb-8 max-w-[320px] leading-relaxed ${textMuted}`}>
+          A Liturgia de hoje está a demorar um pouco a chegar. Enquanto o sistema recupera o fôlego, que tal alimentar a alma de outra forma?
+        </p>
+        <div className="flex flex-col w-full max-w-[320px] gap-3">
+          <Link href="/biblia" className="bg-[#2F6BFF] text-white py-4 rounded-[1rem] font-bold flex items-center justify-center gap-2 active:scale-95 transition-all shadow-[0_6px_0_#1E4BCC] hover:brightness-105">
+            <span className="material-symbols-rounded">menu_book</span> 
+            LER A BÍBLIA
+          </Link>
+          <Link href="/terco" className={`py-4 rounded-[1rem] font-bold flex items-center justify-center gap-2 active:scale-95 transition-all mt-2 ${cardBg} ${textMain} border ${borderColor}`}>
+            <span className="material-symbols-rounded">psychology_alt</span> 
+            REZAR O TERÇO
+          </Link>
+          <button onClick={() => window.location.reload()} className="text-sm font-bold text-[#2F6BFF] mt-4 p-2 opacity-80 hover:opacity-100">
+            Tentar carregar novamente
+          </button>
+        </div>
+        <button onClick={() => router.push('/jornada')} className={`mt-10 font-bold p-3 rounded-full ${textMuted} hover:${textMain} transition-colors`}>
+          <span className="material-symbols-rounded text-[32px]">cancel</span>
+        </button>
+      </div>
+    );
+  }
+
+  // --- TELA DE CARREGAMENTO ---
   if (steps.length === 0) {
     return (
       <div className={`h-[100dvh] flex flex-col items-center justify-center transition-colors ${wrapperClass}`}>
@@ -125,6 +169,7 @@ export default function LiturgiaAulaPage() {
     );
   }
 
+  // --- TELA DE SUCESSO / FIM DA LITURGIA ---
   if (isFinished) {
     return (
       <div className={`h-[100dvh] flex flex-col items-center justify-center p-6 text-center animate-fade-in transition-colors ${wrapperClass}`}>
@@ -140,7 +185,7 @@ export default function LiturgiaAulaPage() {
           onClick={() => router.push('/jornada')}
           className="w-full max-w-[400px] bg-[#2F6BFF] text-white font-bold py-5 rounded-[1.5rem] shadow-[0_8px_0_#1E4BCC] active:translate-y-[8px] active:shadow-none transition-all hover:brightness-105"
         >
-          VOLTAR À JORNADA
+          VOLTAR À PEQUENA VIA
         </button>
       </div>
     );
@@ -188,7 +233,7 @@ export default function LiturgiaAulaPage() {
           {currentStep.referencia}
         </h2>
 
-        {/* SE FOR A TELA DE REFERÊNCIAS (PASSO 1) */}
+        {/* PASSO 1: VISÃO GERAL */}
         {currentStep.isOverview ? (
           <div className="flex flex-col gap-3 animate-fade-in">
             <p className={`font-medium text-sm mb-4 ${textMuted}`}>
@@ -244,7 +289,7 @@ export default function LiturgiaAulaPage() {
             )}
           </div>
         ) : (
-          // SE FOR O TEXTO DA LEITURA NORMAL (PASSO 2, 3, 4...)
+          // PASSOS 2, 3, 4: TEXTO DAS LEITURAS
           <div className="animate-fade-in">
             {currentStep.refrao && (
               <div className={`mb-8 p-6 border-2 rounded-[1.5rem] shadow-sm flex flex-col items-center text-center transition-colors ${cardBg} ${borderColor}`}>
