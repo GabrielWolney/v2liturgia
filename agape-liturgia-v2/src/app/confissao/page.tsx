@@ -143,21 +143,10 @@ export default function ConfissaoPage() {
           </span>
         </button>
         <h1
-          className={`font-extrabold tracking-tight ${textMain} ${fontHeader}`}
+          className={`font-extrabold tracking-tight pr-10 ${textMain} ${fontHeader}`}
         >
           Reconciliação
         </h1>
-        {quantidadePecados > 0 ? (
-          <button
-            onClick={limparExame}
-            className="flex items-center gap-1 bg-red-500/10 text-red-500 px-3 py-1.5 rounded-full text-xs font-bold active:scale-95 transition-colors hover:bg-red-500/20"
-          >
-            <span className="material-symbols-rounded text-[16px]">delete</span>{" "}
-            Limpar
-          </button>
-        ) : (
-          <div className="w-10 h-10"></div>
-        )}
       </header>
 
       <main className="flex-1 w-full max-w-[800px] mx-auto px-5 pt-8 animate-fade-in">
@@ -386,6 +375,33 @@ export default function ConfissaoPage() {
             </div>
           </div>
         </section>
+
+        {/* BARRA DE AÇÕES FLUTUANTE (Aparece se houver pecados marcados) */}
+        {quantidadePecados > 0 && (
+          <div className="fixed bottom-6 left-0 right-0 z-50 px-5 pointer-events-none animate-fade-in flex justify-center">
+            <div className={`pointer-events-auto flex items-center justify-between gap-4 p-4 rounded-full shadow-2xl border backdrop-blur-md ${isDark ? 'bg-slate-900/90 border-slate-700' : isSepia ? 'bg-[#F4ECD8]/95 border-[#D9CFB3]' : 'bg-white/95 border-slate-200'} max-w-[400px] w-full`}>
+              <div className="flex items-center gap-3 pl-2">
+                <div className="w-8 h-8 rounded-full bg-[#6E3AA5] text-white font-black flex items-center justify-center text-sm shadow-inner">
+                  {quantidadePecados}
+                </div>
+                <span className={`font-bold text-sm ${textMain}`}>
+                  {quantidadePecados === 1 ? 'Falta anotada' : 'Faltas anotadas'}
+                </span>
+              </div>
+              <button
+                onClick={() => {
+                  if(window.confirm("Deseja apagar todas as faltas marcadas?")) {
+                    limparExame();
+                  }
+                }}
+                className="flex items-center gap-1.5 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white px-4 py-2 rounded-full text-xs font-bold transition-all active:scale-95"
+              >
+                <span className="material-symbols-rounded text-[16px]">delete_sweep</span>
+                Apagar
+              </button>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
