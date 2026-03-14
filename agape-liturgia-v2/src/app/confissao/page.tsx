@@ -143,10 +143,12 @@ export default function ConfissaoPage() {
           </span>
         </button>
         <h1
-          className={`font-extrabold tracking-tight pr-10 ${textMain} ${fontHeader}`}
+          className={`font-extrabold tracking-tight ${textMain} ${fontHeader}`}
         >
-          Reconciliação
+          Confissão
         </h1>
+        {/* Bloco invisível para manter o título perfeitamente centrado */}
+        <div className="w-10 h-10 shrink-0"></div>
       </header>
 
       <main className="flex-1 w-full max-w-[800px] mx-auto px-5 pt-8 animate-fade-in">
