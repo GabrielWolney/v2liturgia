@@ -12,7 +12,7 @@ export default function NovenaLeituraPage({ params }: { params: Promise<{ slug: 
   const slug = resolvedParams.slug;
   const [isMounted, setIsMounted] = useState(false);
   
-  const db = novenasJson as unknown as NovenasData;
+  const db = novenasJson as NovenasData;
   const novena = db.detalhes[slug];
 
   const { novenasProgresso, toggleDiaNovena, tamanhoFonte, registrarAtividade } = useUserStore();

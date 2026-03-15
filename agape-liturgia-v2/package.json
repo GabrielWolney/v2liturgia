@@ -2,7 +2,7 @@
   "name": "agape-liturgia-v2",
   "version": "0.1.0",
   "private": true,
- "scripts": {
+  "scripts": {
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
@@ -12,6 +12,7 @@
     "@ducanh2912/next-pwa": "^10.2.9",
     "firebase": "^12.10.0",
     "next": "16.1.6",
+    "next-themes": "^0.4.6",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },

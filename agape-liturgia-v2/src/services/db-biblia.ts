@@ -1,8 +1,4 @@
-import bibliaJson from "@/data/biblia.json";
 import { BibliaData, LivroBiblia, Capitulo } from "@/types/biblia";
-
-const bibliaData = bibliaJson as unknown as BibliaData;
-
 
 export interface ResultadoBusca {
   livro: string;
@@ -11,23 +7,22 @@ export interface ResultadoBusca {
   texto: string;
 }
 
-
 const normalizar = (str: string) => 
   str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 
-/**
- * Retorna todos os livros em uma única lista plana
- */
-export function getTodosLivros(): LivroBiblia[] {
-  return [...bibliaData.antigoTestamento, ...bibliaData.novoTestamento];
+export async function getBibliaData(): Promise<BibliaData> {
+  const modulo = await import("@/data/biblia.json");
+  return modulo.default as BibliaData; 
 }
 
-/**
- * Busca um livro pelo nome ou slug
- */
-export function buscarLivro(query: string): LivroBiblia | undefined {
+export async function getTodosLivros(): Promise<LivroBiblia[]> {
+  const bibliaData = await getBibliaData();
+  return [...(bibliaData.antigoTestamento || []), ...(bibliaData.novoTestamento || [])];
+}
+
+export async function buscarLivro(query: string): Promise<LivroBiblia | undefined> {
   const q = normalizar(query.replace(/-/g, " "));
-  const livros = getTodosLivros();
+  const livros = await getTodosLivros();
   
   return livros.find(l => {
     const nomeLivro = normalizar(l.nome);
@@ -35,26 +30,19 @@ export function buscarLivro(query: string): LivroBiblia | undefined {
   });
 }
 
-/**
- * Obtém um capítulo específico de um livro
- */
-export function getCapitulo(livroSlug: string, numeroCapitulo: number): Capitulo | undefined {
-  const livro = buscarLivro(livroSlug);
+export async function getCapitulo(livroSlug: string, numeroCapitulo: number): Promise<Capitulo | undefined> {
+  const livro = await buscarLivro(livroSlug);
   if (!livro) return undefined;
   
   return livro.capitulos.find(c => c.capitulo === numeroCapitulo);
 }
 
-/**
- * Lógica de Pesquisa Global
- * Busca uma palavra em toda a Bíblia e retorna as ocorrências
- */
-export function pesquisarNaBiblia(termo: string): ResultadoBusca[] {
+export async function pesquisarNaBiblia(termo: string): Promise<ResultadoBusca[]> {
   const termoNorm = normalizar(termo);
   if (termoNorm.length < 3) return []; 
 
   const resultados: ResultadoBusca[] = []; 
-  const livros = getTodosLivros();
+  const livros = await getTodosLivros();
 
   for (const livro of livros) {
     for (const cap of livro.capitulos) {
@@ -67,7 +55,6 @@ export function pesquisarNaBiblia(termo: string): ResultadoBusca[] {
             texto: ver.texto
           });
         }
-        
         if (resultados.length >= 50) return resultados;
       }
     }

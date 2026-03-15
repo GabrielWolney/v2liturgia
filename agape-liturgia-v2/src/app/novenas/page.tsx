@@ -13,7 +13,7 @@ type Aba = 'agora' | 'breve' | 'fim';
 export default function NovenasPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [abaAtiva, setAbaAtiva] = useState<Aba>('agora');
-  const db = novenasJson as unknown as NovenasData;
+  const db = novenasJson as NovenasData;
   
   const { tamanhoFonte } = useUserStore();
 

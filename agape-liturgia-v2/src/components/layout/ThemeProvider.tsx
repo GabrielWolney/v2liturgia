@@ -5,16 +5,15 @@ import { useUserStore } from "@/store/useUserStore";
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const { modoVisual, tamanhoFonte } = useUserStore();
-  const [isMounted, setIsMounted] = useState(false);
   
   const [showSplash, setShowSplash] = useState(true);
   const [fadeSplash, setFadeSplash] = useState(false);
   const [progress, setProgress] = useState(0);
   const [typedText, setTypedText] = useState("");
 
+  // Aplica o tema e o tamanho da fonte nativamente no HTML
   useEffect(() => {
     const root = document.documentElement;
-    // É isso aqui que faz toda a mágica do CSS nativo funcionar!
     if (modoVisual === 'escuro') root.setAttribute("data-theme", "dark");
     else if (modoVisual === 'leitura') root.setAttribute("data-theme", "sepia");
     else root.removeAttribute("data-theme");
@@ -25,8 +24,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [modoVisual, tamanhoFonte]);
 
   useEffect(() => {
-    const mountTimer = setTimeout(() => setIsMounted(true), 0);
-    
     setTimeout(() => setProgress(100), 100);
 
     const fullText = "Liturgia Ágape";
@@ -41,7 +38,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const t2 = setTimeout(() => setShowSplash(false), 2100);
 
     return () => {
-      clearTimeout(mountTimer);
       clearInterval(typingInterval);
       clearTimeout(t1);
       clearTimeout(t2);
@@ -54,7 +50,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         <div 
           className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center transition-all duration-500 ease-in-out bg-background ${fadeSplash ? 'opacity-0 pointer-events-none scale-105' : 'opacity-100 scale-100'}`}
         >
-          {/* BLOCO CENTRAL (Logo + Nome + Barra) */}
           <div className="flex flex-col items-center animate-float w-full max-w-[220px]">
             <div className="relative mb-6">
               <div className="absolute inset-0 bg-primary blur-2xl opacity-20 rounded-full animate-pulse"></div>
@@ -70,7 +65,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
               <span className="w-1 h-7 ml-1 bg-primary animate-pulse rounded-full"></span>
             </h1>
 
-            {/* Barra de Progresso colada ao nome */}
             <div className="w-full flex flex-col gap-2">
               <div className="w-full h-2 rounded-full overflow-hidden shadow-inner transition-colors duration-300 bg-muted/20">
                 <div 
@@ -85,6 +79,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         </div>
       )}
 
+      {/* O SEGREDO ESTÁ AQUI: RENDERIZAR O CHILDREN DIRETAMENTE! */}
       {children}
     </>
   );
