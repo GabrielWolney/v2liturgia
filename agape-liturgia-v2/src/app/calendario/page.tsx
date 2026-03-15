@@ -203,18 +203,26 @@ export default function CalendarioPage() {
         </div>
 
         {/* SELETOR DE ABAS */}
-        <div className={`flex p-1 rounded-xl w-full max-w-[400px] mx-auto ${isDark ? 'bg-slate-900' : isSepia ? 'bg-[#E8DEC1]/50' : 'bg-slate-100'}`}>
+        <div className={`flex p-1.5 rounded-2xl w-full max-w-[400px] mx-auto border shadow-inner ${borderColor} ${isDark ? 'bg-slate-950/50' : isSepia ? 'bg-[#E8DEC1]/30' : 'bg-slate-200/50'}`}>
           <button 
             onClick={() => setAbaAtiva('grupo')}
-            className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${abaAtiva === 'grupo' ? 'bg-white dark:bg-slate-800 text-[#2F6BFF] shadow-sm' : `${textMuted} hover:text-foreground`}`}
+            className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 ${
+              abaAtiva === 'grupo' 
+                ? `${cardBg} text-[#2F6BFF] shadow-sm` 
+                : `${textMuted} hover:brightness-90`
+            }`}
           >
             Ágape
           </button>
           <button 
             onClick={() => setAbaAtiva('liturgia')}
-            className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${abaAtiva === 'liturgia' ? 'bg-white dark:bg-slate-800 text-[#6E3AA5] shadow-sm' : `${textMuted} hover:text-foreground`}`}
+            className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 ${
+              abaAtiva === 'liturgia' 
+                ? `${cardBg} text-[#6E3AA5] shadow-sm` 
+                : `${textMuted} hover:brightness-90`
+            }`}
           >
-            Liturgico
+            Litúrgico
           </button>
         </div>
       </header>
