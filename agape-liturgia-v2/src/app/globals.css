@@ -27,23 +27,23 @@
   }
 
   [data-theme="dark"] {
-    --bg: #0f172a;
-    --card-bg: #1e293b;
-    --text: #f8fafc;
-    --muted: #cbd5e1;
-    --border: #334155;
+    --bg: #020617;
+    --card-bg: #0f172a;
+    --text: #f1f5f9;
+    --muted: #94a3b8;
+    --border: #1e293b;
     --primary: #3b82f6;
     --primary-light: rgba(37, 99, 235, 0.35);
   }
 
   [data-theme="sepia"] {
-    --bg: #f4ecd8;
-    --card-bg: #fbf0d9;
-    --text: #5f4b32;
-    --muted: #8c7b65;
-    --border: #e3d3b7;
-    --primary: #b45309;
-    --primary-light: rgba(180, 83, 9, 0.15);
+    --bg: #FDF6E3; 
+    --card-bg: #F4ECD8; 
+    --text: #4A3C31; 
+    --muted: #8C7B65; 
+    --border: #E8DEC1; 
+    --primary: #2F6BFF;
+    --primary-light: rgba(47, 107, 255, 0.15);
   }
 
   * {
