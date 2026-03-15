@@ -27,9 +27,9 @@ export default function PropositosPage() {
     };
   }, []);
 
-  const fontClass = isMounted && tamanhoFonte === 'grande' ? 'text-lg' : 'text-base';
-  const fontTitle = isMounted && tamanhoFonte === 'grande' ? 'text-3xl' : 'text-2xl';
-  const fontText = isMounted && tamanhoFonte === 'grande' ? 'text-xl' : 'text-lg';
+  const fontClass =  tamanhoFonte === 'grande' ? 'text-lg' : 'text-base';
+  const fontTitle =  tamanhoFonte === 'grande' ? 'text-3xl' : 'text-2xl';
+  const fontText =  tamanhoFonte === 'grande' ? 'text-xl' : 'text-lg';
 
   const hasProposito = proposito?.ativo === true || String(proposito?.ativo) === "true";
 

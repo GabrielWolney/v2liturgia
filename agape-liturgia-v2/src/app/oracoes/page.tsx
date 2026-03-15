@@ -25,8 +25,8 @@ export default function OracoesPage() {
     removerAcentos(o.titulo).includes(removerAcentos(busca))
   );
 
-  const fontClass = isMounted && tamanhoFonte === 'grande' ? 'text-lg' : 'text-base';
-  const fontHeader = isMounted && tamanhoFonte === 'grande' ? 'text-xl' : 'text-lg';
+  const fontClass =  tamanhoFonte === 'grande' ? 'text-lg' : 'text-base';
+  const fontHeader =  tamanhoFonte === 'grande' ? 'text-xl' : 'text-lg';
 
   return (
     <div className="min-h-[100dvh] flex flex-col font-sans pb-32 transition-colors duration-300 selection:bg-primary/30 bg-background">

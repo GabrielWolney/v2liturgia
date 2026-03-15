@@ -43,7 +43,7 @@ export default function MuralPage() {
   };
 
   // Prevenção segura contra flash de hidratação na troca da fonte
-  const fontClass = isMounted && tamanhoFonte === 'grande' ? 'text-lg' : 'text-sm';
+  const fontClass =  tamanhoFonte === 'grande' ? 'text-lg' : 'text-sm';
 
   return (
     <div className="min-h-[100dvh] flex flex-col font-sans pb-32 transition-colors duration-300 selection:bg-primary/30 bg-background">
@@ -51,7 +51,7 @@ export default function MuralPage() {
         <Link href="/jornada" className="flex items-center justify-center w-10 h-10 rounded-full active:scale-95 shrink-0 transition-colors text-muted hover:bg-muted/20 hover:text-foreground">
           <span className="material-symbols-rounded text-[26px]">arrow_back</span>
         </Link>
-        <h1 className={`font-extrabold tracking-tight text-foreground ${isMounted && tamanhoFonte === 'grande' ? 'text-xl' : 'text-lg'}`}>Intercessão</h1>
+        <h1 className={`font-extrabold tracking-tight text-foreground ${ tamanhoFonte === 'grande' ? 'text-xl' : 'text-lg'}`}>Intercessão</h1>
         <div className="w-10 h-10"></div>
       </header>
 
@@ -76,8 +76,8 @@ export default function MuralPage() {
 
         <ul className="flex flex-col gap-4">
           {pedidos.map(p => {
-            const isMeu = isMounted && meusPedidosMural.includes(p.id);
-            const jaRezei = isMounted && oracoesFeitas.includes(p.id);
+            const isMeu =  meusPedidosMural.includes(p.id);
+            const jaRezei =  oracoesFeitas.includes(p.id);
             
             return (
               <li key={p.id} className="border shadow-sm rounded-[1.5rem] p-5 relative overflow-hidden transition-colors duration-300 bg-card border-border">

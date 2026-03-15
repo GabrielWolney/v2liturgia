@@ -118,19 +118,19 @@ const eventosIgreja = [
 
 export default function CalendarioPage() {
   // Mantemos o isMounted para o mês ativo sincronizar corretamente com o relógio do cliente, sem quebrar.
-  const [isMounted, setIsMounted] = useState(false);
-  const [mesAtivo, setMesAtivo] = useState(1);
+  const [mesAtivo, setMesAtivo] = useState(1); // Inicia sempre em Janeiro no servidor
   const [abaAtiva, setAbaAtiva] = useState<'grupo' | 'liturgia'>('grupo');
   
   const { tamanhoFonte } = useUserStore();
 
   useEffect(() => {
-    const mountTimer = setTimeout(() => {
-      setIsMounted(true);
+    const timer = setTimeout(() => {
       setMesAtivo(new Date().getMonth() + 1);
     }, 0);
+
     trackEvent("page_view", { page_name: "calendario_v2" });
-    return () => clearTimeout(mountTimer);
+
+    return () => clearTimeout(timer);
   }, []);
 
   const eventosFormatados = useMemo(() => {
@@ -153,7 +153,7 @@ export default function CalendarioPage() {
 
   const eventosLiturgiaDoMes = eventosLiturgiaFormatados.filter(e => e.mes === mesAtivo);
 
-  const fontClass = isMounted && tamanhoFonte === 'grande' ? 'text-readable' : 'text-base';
+  const fontClass =  tamanhoFonte === 'grande' ? 'text-readable' : 'text-base';
 
   const getBadgeStyle = (tipo: string) => {
     // Usando as cores padrão do Tailwind com opacidade na cor de fundo
@@ -182,7 +182,7 @@ export default function CalendarioPage() {
           >
             <span className="material-symbols-rounded text-[26px]">arrow_back</span>
           </Link>
-          <h1 className={`font-extrabold tracking-tight text-foreground ${isMounted && tamanhoFonte === 'grande' ? 'text-xl' : 'text-lg'}`}>Calendário</h1>
+          <h1 className={`font-extrabold tracking-tight text-foreground ${ tamanhoFonte === 'grande' ? 'text-xl' : 'text-lg'}`}>Calendário</h1>
           <div className="w-10 h-10"></div>
         </div>
 

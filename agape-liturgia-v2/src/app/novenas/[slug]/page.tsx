@@ -27,7 +27,7 @@ export default function NovenaLeituraPage({ params }: { params: Promise<{ slug: 
 
   if (!novena) return <div className="min-h-[100dvh] bg-background" />;
 
-  const fontReading = isMounted && tamanhoFonte === 'grande' ? 'text-xl leading-[2.2]' : 'text-base leading-[1.8]';
+  const fontReading =  tamanhoFonte === 'grande' ? 'text-xl leading-[2.2]' : 'text-base leading-[1.8]';
 
   return (
     <div className="min-h-[100dvh] flex flex-col font-sans pb-32 transition-colors duration-300 selection:bg-primary/30 bg-background">
@@ -36,7 +36,7 @@ export default function NovenaLeituraPage({ params }: { params: Promise<{ slug: 
         <Link href="/novenas" className="flex items-center justify-center w-10 h-10 rounded-full active:scale-95 shrink-0 transition-colors text-muted hover:bg-muted/20 hover:text-foreground">
           <span className="material-symbols-rounded text-[26px]">arrow_back</span>
         </Link>
-        <h1 className={`font-extrabold tracking-tight truncate max-w-[200px] sm:max-w-[400px] text-foreground ${isMounted && tamanhoFonte === 'grande' ? 'text-lg' : 'text-base'}`}>
+        <h1 className={`font-extrabold tracking-tight truncate max-w-[200px] sm:max-w-[400px] text-foreground ${ tamanhoFonte === 'grande' ? 'text-lg' : 'text-base'}`}>
           {novena.titulo}
         </h1>
         <div className="w-10 h-10"></div>
@@ -48,7 +48,7 @@ export default function NovenaLeituraPage({ params }: { params: Promise<{ slug: 
           <h3 className="font-bold text-sm uppercase tracking-widest mb-4 pl-2 text-muted">A Sua Jornada</h3>
           <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-9 gap-2 md:gap-3">
             {novena.dias.map((d: NovenaDia, index: number) => {
-              const isDone = isMounted && progresso.includes(index);
+              const isDone =  progresso.includes(index);
               const isSelected = diaSelecionado === index;
               
               return (
@@ -84,10 +84,10 @@ export default function NovenaLeituraPage({ params }: { params: Promise<{ slug: 
                   toggleDiaNovena(slug, diaSelecionado);
                   registrarAtividade(); 
                 }} 
-                className={`flex items-center gap-2 px-5 py-3 rounded-full font-bold text-sm transition-all active:scale-95 shrink-0 ${isMounted && progresso.includes(diaSelecionado) ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400" : "bg-primary text-white shadow-md shadow-primary/20"}`}
+                className={`flex items-center gap-2 px-5 py-3 rounded-full font-bold text-sm transition-all active:scale-95 shrink-0 ${ progresso.includes(diaSelecionado) ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400" : "bg-primary text-white shadow-md shadow-primary/20"}`}
               >
-                <span className="material-symbols-rounded text-[20px]">{isMounted && progresso.includes(diaSelecionado) ? "check_circle" : "task_alt"}</span>
-                {isMounted && progresso.includes(diaSelecionado) ? "Dia Concluído" : "Marcar como Concluído"}
+                <span className="material-symbols-rounded text-[20px]">{ progresso.includes(diaSelecionado) ? "check_circle" : "task_alt"}</span>
+                { progresso.includes(diaSelecionado) ? "Dia Concluído" : "Marcar como Concluído"}
               </button>
             </div>
             

@@ -20,7 +20,7 @@ export default function OracaoLeituraPage({ params }: { params: Promise<{ slug: 
 
   if (!oracao) return notFound();
 
-  const fontReading = isMounted && tamanhoFonte === 'grande' ? 'text-xl leading-[2.2]' : 'text-lg leading-[1.8]';
+  const fontReading =  tamanhoFonte === 'grande' ? 'text-xl leading-[2.2]' : 'text-lg leading-[1.8]';
   const htmlTexto = oracao.texto.replace(/\n/g, '<br />');
 
   return (

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/store/useUserStore";
 import { trackEvent } from "@/lib/analytics";
@@ -60,7 +60,6 @@ const categoriasPecados = [
 
 export default function ConfissaoPage() {
   const router = useRouter();
-  const [isMounted, setIsMounted] = useState(false);
   const {
     exameConsciencia,
     togglePecado,
@@ -69,14 +68,11 @@ export default function ConfissaoPage() {
   } = useUserStore();
 
   useEffect(() => {
-    // Mantemos isMounted apenas para hidratação segura das marcações e da fonte
-    const mountTimer = setTimeout(() => setIsMounted(true), 0);
     trackEvent("page_view", { page_name: "confissao_tematizada" });
-    return () => clearTimeout(mountTimer);
   }, []);
 
-  const fontBody = isMounted && tamanhoFonte === "grande" ? "text-base sm:text-lg" : "text-sm";
-  const fontHeader = isMounted && tamanhoFonte === "grande" ? "text-lg sm:text-xl" : "text-base";
+  const fontBody = tamanhoFonte === "grande" ? "text-base sm:text-lg" : "text-sm";
+  const fontHeader = tamanhoFonte === "grande" ? "text-lg sm:text-xl" : "text-base";
 
   const quantidadePecados = Object.keys(exameConsciencia).length;
 
@@ -100,12 +96,10 @@ export default function ConfissaoPage() {
         >
           Confissão
         </h1>
-        {/* Bloco invisível para manter o título perfeitamente centrado */}
         <div className="w-10 h-10 shrink-0"></div>
       </header>
 
       <main className="flex-1 w-full max-w-[800px] mx-auto px-5 pt-8 animate-fade-in">
-        {/* CABEÇALHO DO EXAME */}
         <div className="flex flex-col items-center text-center mb-10">
           <div className="w-20 h-20 bg-[#6E3AA5]/10 rounded-[1.5rem] flex items-center justify-center text-[#6E3AA5] mb-5 shadow-inner">
             <svg
@@ -139,7 +133,6 @@ export default function ConfissaoPage() {
           </p>
         </div>
 
-        {/* OS 5 PASSOS - O CAMINHO DA GRAÇA */}
         <section
           className="rounded-[2rem] p-6 sm:p-8 shadow-soft border mb-10 transition-colors duration-300 bg-card border-border"
         >
@@ -241,7 +234,6 @@ export default function ConfissaoPage() {
           </div>
         </section>
 
-        {/* LISTA DE PECADOS (ACORDEÕES) */}
         <div className="flex flex-col gap-4 mb-12">
           {categoriasPecados.map((cat, catIndex) => (
             <details
@@ -266,7 +258,7 @@ export default function ConfissaoPage() {
               >
                 {cat.pecados.map((pecado, pecIndex) => {
                   const idPecado = `${catIndex}-${pecIndex}`;
-                  const isChecked = isMounted && !!exameConsciencia[idPecado];
+                  const isChecked = !!exameConsciencia[idPecado];
 
                   return (
                     <label
@@ -307,7 +299,6 @@ export default function ConfissaoPage() {
           ))}
         </div>
 
-        {/* ATO DE CONTRIÇÃO */}
         <section className="bg-[#6E3AA5] text-white p-8 rounded-[2rem] shadow-[0_10px_0_rgba(110,58,165,0.4)] text-center relative overflow-hidden mb-8">
           <div className="absolute -top-10 -right-10 w-40 h-40 bg-card rounded-full mix-blend-overlay filter blur-3xl opacity-20 pointer-events-none"></div>
           <div className="relative z-10">
@@ -317,7 +308,7 @@ export default function ConfissaoPage() {
               </span>
             </div>
             <p
-              className={`font-serif italic leading-relaxed text-white/95 mb-8 ${isMounted && tamanhoFonte === "grande" ? "text-xl" : "text-lg"}`}
+              className={`font-serif italic leading-relaxed text-white/95 mb-8 ${tamanhoFonte === "grande" ? "text-xl" : "text-lg"}`}
             >
               &quot;Meu Deus, eu me arrependo de todo o coração de vos ter
               ofendido, porque sois tão bom e amável. Prometo, com a vossa
@@ -331,8 +322,7 @@ export default function ConfissaoPage() {
           </div>
         </section>
 
-        {/* BARRA DE AÇÕES FLUTUANTE (Aparece se houver pecados marcados) */}
-        {isMounted && quantidadePecados > 0 && (
+        {quantidadePecados > 0 && (
           <div className="fixed bottom-6 left-0 right-0 z-50 px-5 pointer-events-none animate-fade-in flex justify-center">
             <div className="pointer-events-auto flex items-center justify-between gap-4 p-4 rounded-full shadow-2xl border backdrop-blur-md bg-card/95 border-border max-w-[400px] w-full">
               <div className="flex items-center gap-3 pl-2">

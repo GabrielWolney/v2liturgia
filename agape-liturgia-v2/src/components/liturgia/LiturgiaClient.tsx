@@ -25,7 +25,6 @@ interface LiturgiaClientProps {
 
 export function LiturgiaClient({ liturgiaServer }: LiturgiaClientProps) {
   const router = useRouter();
-  const [isMounted, setIsMounted] = useState(false);
   const [liturgia, setLiturgia] = useState<LiturgiaDiaria | null>(null);
   
   const [steps, setSteps] = useState<Step[]>([]);
@@ -37,7 +36,6 @@ export function LiturgiaClient({ liturgiaServer }: LiturgiaClientProps) {
 
   useEffect(() => {
     const mountTimer = setTimeout(() => {
-      setIsMounted(true);
       
       if (liturgiaServer) {
         setLiturgia(liturgiaServer);
@@ -83,7 +81,7 @@ export function LiturgiaClient({ liturgiaServer }: LiturgiaClientProps) {
     }
   };
 
-  const fontReading = isMounted && tamanhoFonte === 'grande' ? 'text-xl leading-[2.1]' : 'text-base leading-[1.8]';
+  const fontReading =  tamanhoFonte === 'grande' ? 'text-xl leading-[2.1]' : 'text-base leading-[1.8]';
 
   if (erroApi) {
     return (
@@ -109,8 +107,8 @@ export function LiturgiaClient({ liturgiaServer }: LiturgiaClientProps) {
     );
   }
 
-  // Prevenção de quebra de renderização sem bloquear o tema da página
-  if (!isMounted || steps.length === 0) return <div className="h-[100dvh] bg-background"></div>;
+  
+  if (steps.length === 0) return <div className="h-[100dvh] bg-background"></div>;
 
   if (isFinished) {
     return (
@@ -170,7 +168,7 @@ export function LiturgiaClient({ liturgiaServer }: LiturgiaClientProps) {
                 <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-primary/10 text-primary"><span className="material-symbols-rounded text-[20px]">auto_stories</span></div>
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-widest text-muted">Primeira Leitura</p>
-                  <p className={`font-bold text-foreground ${isMounted && tamanhoFonte === 'grande' ? 'text-lg' : 'text-base'}`}>{liturgia.primeiraLeitura.referencia}</p>
+                  <p className={`font-bold text-foreground ${ tamanhoFonte === 'grande' ? 'text-lg' : 'text-base'}`}>{liturgia.primeiraLeitura.referencia}</p>
                 </div>
               </div>
             )}
@@ -179,7 +177,7 @@ export function LiturgiaClient({ liturgiaServer }: LiturgiaClientProps) {
                 <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-primary/10 text-primary"><span className="material-symbols-rounded text-[20px]">music_note</span></div>
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-widest text-muted">Salmo Responsorial</p>
-                  <p className={`font-bold text-foreground ${isMounted && tamanhoFonte === 'grande' ? 'text-lg' : 'text-base'}`}>{liturgia.salmo.referencia}</p>
+                  <p className={`font-bold text-foreground ${ tamanhoFonte === 'grande' ? 'text-lg' : 'text-base'}`}>{liturgia.salmo.referencia}</p>
                 </div>
               </div>
             )}
@@ -188,7 +186,7 @@ export function LiturgiaClient({ liturgiaServer }: LiturgiaClientProps) {
                 <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-primary/10 text-primary"><span className="material-symbols-rounded text-[20px]">menu_book</span></div>
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-widest text-muted">Segunda Leitura</p>
-                  <p className={`font-bold text-foreground ${isMounted && tamanhoFonte === 'grande' ? 'text-lg' : 'text-base'}`}>{liturgia.segundaLeitura.referencia}</p>
+                  <p className={`font-bold text-foreground ${ tamanhoFonte === 'grande' ? 'text-lg' : 'text-base'}`}>{liturgia.segundaLeitura.referencia}</p>
                 </div>
               </div>
             )}
@@ -197,7 +195,7 @@ export function LiturgiaClient({ liturgiaServer }: LiturgiaClientProps) {
                 <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"><span className="material-symbols-rounded text-[20px]">church</span></div>
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-widest text-muted">Evangelho</p>
-                  <p className={`font-bold text-foreground ${isMounted && tamanhoFonte === 'grande' ? 'text-lg' : 'text-base'}`}>{liturgia.evangelho.referencia}</p>
+                  <p className={`font-bold text-foreground ${ tamanhoFonte === 'grande' ? 'text-lg' : 'text-base'}`}>{liturgia.evangelho.referencia}</p>
                 </div>
               </div>
             )}
@@ -226,7 +224,7 @@ export function LiturgiaClient({ liturgiaServer }: LiturgiaClientProps) {
         <div className="max-w-[800px] mx-auto">
           <button 
             onClick={handleNextStep}
-            className={`w-full font-bold py-5 rounded-[1.5rem] transition-all active:translate-y-[8px] flex items-center justify-center gap-2 ${currentStep.titulo === 'Evangelho' ? 'bg-emerald-500 text-white shadow-[0_8px_0_#059669] active:shadow-none' : 'bg-primary text-white shadow-[0_8px_0_var(--primary-light)] active:shadow-none'} hover:brightness-105 ${isMounted && tamanhoFonte === 'grande' ? 'text-lg' : 'text-base'}`}
+            className={`w-full font-bold py-5 rounded-[1.5rem] transition-all active:translate-y-[8px] flex items-center justify-center gap-2 ${currentStep.titulo === 'Evangelho' ? 'bg-emerald-500 text-white shadow-[0_8px_0_#059669] active:shadow-none' : 'bg-primary text-white shadow-[0_8px_0_var(--primary-light)] active:shadow-none'} hover:brightness-105 ${ tamanhoFonte === 'grande' ? 'text-lg' : 'text-base'}`}
           >
             {currentStep.isOverview ? 'INICIAR LEITURA' : currentStep.titulo === 'Evangelho' ? 'CONCLUIR' : 'CONTINUAR'}
           </button>

@@ -13,19 +13,16 @@ export default function BibliaPage() {
   const router = useRouter();
   const [testamentoAtivo, setTestamentoAtivo] = useState<Testament>('novo');
   const [busca, setBusca] = useState("");
-  const [isMounted, setIsMounted] = useState(false);
   
   // O modoVisual foi removido, o CSS faz tudo agora!
   const { tamanhoFonte } = useUserStore();
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsMounted(true), 0);
     trackEvent("page_view", { page_name: "biblia_index" });
-    return () => clearTimeout(timer);
   }, []);
 
   // Previne o erro de hidratação na troca de fontes, sem bloquear a tela toda
-  const fontClass = isMounted && tamanhoFonte === 'grande' ? 'text-lg' : 'text-base';
+  const fontClass =  tamanhoFonte === 'grande' ? 'text-lg' : 'text-base';
 
   const livrosExibidos = bibliaCatolica[testamentoAtivo];
   const livrosFiltrados = livrosExibidos.filter(l => removerAcentos(l.nome).includes(removerAcentos(busca)));

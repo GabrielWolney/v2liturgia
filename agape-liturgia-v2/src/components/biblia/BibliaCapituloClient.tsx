@@ -23,7 +23,7 @@ export function BibliaCapituloClient({ nomeLivro, slug, numeroCapitulo, versicul
     return () => clearTimeout(timer);
   }, []);
 
-  const fontReading = isMounted && tamanhoFonte === 'grande' ? 'text-xl leading-[2.2]' : 'text-base leading-[1.8]';
+  const fontReading =  tamanhoFonte === 'grande' ? 'text-xl leading-[2.2]' : 'text-base leading-[1.8]';
 
   return (
     <div className="min-h-[100dvh] flex flex-col font-sans pb-32 selection:bg-primary/30 transition-colors duration-300 bg-background">

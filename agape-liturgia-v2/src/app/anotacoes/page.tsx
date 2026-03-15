@@ -1,20 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useUserStore } from "@/store/useUserStore";
 
 export default function AnotacoesPage() {
-  const [isMounted, setIsMounted] = useState(false);
   
   const { minhasNotas, setNotas, tamanhoFonte } = useUserStore();
   const [saveStatus, setSaveStatus] = useState<"ocioso" | "guardando" | "guardado">("ocioso");
-
-  useEffect(() => {
-    
-    const mountTimer = setTimeout(() => setIsMounted(true), 0);
-    return () => clearTimeout(mountTimer);
-  }, []);
 
   const handleMudancaTexto = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setNotas(e.target.value);
@@ -56,7 +49,7 @@ export default function AnotacoesPage() {
         <div className="flex-1 flex flex-col rounded-[2rem] shadow-soft border overflow-hidden relative group mb-10 transition-colors duration-300 bg-card border-border">
           <div className="absolute left-0 top-10 bottom-10 w-1.5 bg-primary rounded-r-full opacity-80"></div>
           <textarea 
-            value={isMounted ? minhasNotas : ""} 
+            value={minhasNotas} 
             onChange={handleMudancaTexto} 
             placeholder="Comece a escrever as suas reflexões de hoje..." 
             spellCheck="false"

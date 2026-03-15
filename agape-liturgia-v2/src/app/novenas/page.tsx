@@ -27,7 +27,7 @@ export default function NovenasPage() {
     return db.calendario.filter((n: NovenaCalendario) => getNovenaStatus(n.inicio, n.fim) === abaAtiva);
   }, [abaAtiva, db.calendario]);
 
-  const fontClass = isMounted && tamanhoFonte === 'grande' ? 'text-lg' : 'text-sm';
+  const fontClass =  tamanhoFonte === 'grande' ? 'text-lg' : 'text-sm';
 
   return (
     <div className="min-h-[100dvh] flex flex-col font-sans pb-32 transition-colors duration-300 selection:bg-primary/30 bg-background">
@@ -39,7 +39,7 @@ export default function NovenasPage() {
         >
           <span className="material-symbols-rounded text-[26px]">arrow_back</span>
         </Link>
-        <h1 className={`font-extrabold tracking-tight text-foreground ${isMounted && tamanhoFonte === 'grande' ? 'text-xl' : 'text-lg'}`}>Novenas</h1>
+        <h1 className={`font-extrabold tracking-tight text-foreground ${ tamanhoFonte === 'grande' ? 'text-xl' : 'text-lg'}`}>Novenas</h1>
         <div className="w-10 h-10"></div>
       </header>
 
@@ -82,7 +82,7 @@ export default function NovenasPage() {
             return (
               <li key={n.id} className="rounded-[1.5rem] p-5 shadow-soft border flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all hover:shadow-md bg-card border-border">
                 <div>
-                  <h3 className={`font-extrabold mb-1 text-foreground ${isMounted && tamanhoFonte === 'grande' ? 'text-lg' : 'text-base'}`}>{n.nome}</h3>
+                  <h3 className={`font-extrabold mb-1 text-foreground ${ tamanhoFonte === 'grande' ? 'text-lg' : 'text-base'}`}>{n.nome}</h3>
                   <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-muted">
                     <span className="material-symbols-rounded text-[16px]">date_range</span>
                     {n.inicio.replace('-', '/')} a {n.fim.replace('-', '/')}

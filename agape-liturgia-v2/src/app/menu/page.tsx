@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useUserStore } from "@/store/useUserStore";
@@ -8,16 +8,17 @@ import { usePWAInstall } from "@/hooks/usePWAInstall";
 
 export default function ConfigPage() {
   const router = useRouter();
-  const [isMounted, setIsMounted] = useState(false);
   
-  const { nomeUsuario, setNomeUsuario, modoVisual, setModoVisual, tamanhoFonte, setTamanhoFonte } = useUserStore();
+  const { 
+    nomeUsuario, 
+    setNomeUsuario, 
+    modoVisual, 
+    setModoVisual, 
+    tamanhoFonte, 
+    setTamanhoFonte 
+  } = useUserStore();
+  
   const { isInstallable, installPWA } = usePWAInstall();
-
-  useEffect(() => {
-    // Hidratação segura (usada apenas onde os dados do localStorage são lidos/exibidos)
-    const mountTimer = setTimeout(() => setIsMounted(true), 0);
-    return () => clearTimeout(mountTimer);
-  }, []);
 
   const handleApagarDados = () => {
     if (window.confirm("Atenção: Deseja apagar TODOS os seus dados? Esta ação não pode ser desfeita.")) {
@@ -26,7 +27,7 @@ export default function ConfigPage() {
     }
   };
 
-  const fontClass = isMounted && tamanhoFonte === 'grande' ? 'text-lg' : 'text-base';
+  const fontClass = tamanhoFonte === 'grande' ? 'text-lg' : 'text-base';
 
   return (
     <div className="min-h-[100dvh] flex flex-col font-sans pb-10 transition-colors duration-300 selection:bg-primary/30 bg-background">
@@ -67,7 +68,7 @@ export default function ConfigPage() {
                 <span className="material-symbols-rounded absolute left-4 top-1/2 -translate-y-1/2 text-muted">person</span>
                 <input 
                   id="nome" type="text" 
-                  value={isMounted ? nomeUsuario : ""} 
+                  value={nomeUsuario} 
                   onChange={(e) => setNomeUsuario(e.target.value)} 
                   maxLength={15}
                   className="w-full border-2 rounded-xl py-3 pl-12 pr-4 font-bold focus:outline-none focus:border-primary transition-all bg-background border-border text-foreground"
@@ -84,13 +85,13 @@ export default function ConfigPage() {
             <div>
               <p className="font-bold text-sm mb-3 text-foreground">Modo Visual</p>
               <div className="flex p-1.5 rounded-2xl border bg-background border-border">
-                <button onClick={() => setModoVisual("claro")} className={`flex-1 flex flex-col items-center justify-center py-3 rounded-xl gap-1 transition-all ${isMounted && modoVisual === "claro" ? "bg-card shadow-sm text-primary" : "text-muted hover:brightness-95"}`}>
+                <button onClick={() => setModoVisual("claro")} className={`flex-1 flex flex-col items-center justify-center py-3 rounded-xl gap-1 transition-all ${ modoVisual === "claro" ? "bg-card shadow-sm text-primary" : "text-muted hover:brightness-95"}`}>
                   <span className="material-symbols-rounded text-[22px]">light_mode</span><span className="text-[10px] font-bold uppercase tracking-wide">Claro</span>
                 </button>
-                <button onClick={() => setModoVisual("escuro")} className={`flex-1 flex flex-col items-center justify-center py-3 rounded-xl gap-1 transition-all ${isMounted && modoVisual === "escuro" ? "bg-card shadow-sm text-primary" : "text-muted hover:brightness-95"}`}>
+                <button onClick={() => setModoVisual("escuro")} className={`flex-1 flex flex-col items-center justify-center py-3 rounded-xl gap-1 transition-all ${ modoVisual === "escuro" ? "bg-card shadow-sm text-primary" : "text-muted hover:brightness-95"}`}>
                   <span className="material-symbols-rounded text-[22px]">dark_mode</span><span className="text-[10px] font-bold uppercase tracking-wide">Escuro</span>
                 </button>
-                <button onClick={() => setModoVisual("leitura")} className={`flex-1 flex flex-col items-center justify-center py-3 rounded-xl gap-1 transition-all ${isMounted && modoVisual === "leitura" ? "bg-card shadow-sm text-primary" : "text-muted hover:brightness-95"}`}>
+                <button onClick={() => setModoVisual("leitura")} className={`flex-1 flex flex-col items-center justify-center py-3 rounded-xl gap-1 transition-all ${ modoVisual === "leitura" ? "bg-card shadow-sm text-primary" : "text-muted hover:brightness-95"}`}>
                   <span className="material-symbols-rounded text-[22px]">auto_stories</span><span className="text-[10px] font-bold uppercase tracking-wide">Leitura</span>
                 </button>
               </div>
@@ -99,10 +100,10 @@ export default function ConfigPage() {
             <div>
               <p className="font-bold text-sm mb-3 text-foreground">Tamanho do Texto Bíblico</p>
               <div className="flex gap-3">
-                <button onClick={() => setTamanhoFonte("padrao")} className={`flex-1 py-3 rounded-xl border-2 font-bold text-sm transition-all ${isMounted && tamanhoFonte === "padrao" ? "border-primary bg-primary/5 text-primary" : "border-border bg-background text-muted"}`}>
+                <button onClick={() => setTamanhoFonte("padrao")} className={`flex-1 py-3 rounded-xl border-2 font-bold text-sm transition-all ${ tamanhoFonte === "padrao" ? "border-primary bg-primary/5 text-primary" : "border-border bg-background text-muted"}`}>
                   Aa Padrão
                 </button>
-                <button onClick={() => setTamanhoFonte("grande")} className={`flex-1 py-3 rounded-xl border-2 font-bold transition-all ${isMounted && tamanhoFonte === "grande" ? "border-primary bg-primary/5 text-primary" : "border-border bg-background text-muted"} ${isMounted && tamanhoFonte === 'grande' ? 'text-lg' : 'text-base'}`}>
+                <button onClick={() => setTamanhoFonte("grande")} className={`flex-1 py-3 rounded-xl border-2 font-bold transition-all ${ tamanhoFonte === "grande" ? "border-primary bg-primary/5 text-primary" : "border-border bg-background text-muted"} ${ tamanhoFonte === 'grande' ? 'text-lg' : 'text-base'}`}>
                   Aa Grande
                 </button>
               </div>
@@ -110,7 +111,6 @@ export default function ConfigPage() {
           </div>
         </section>
 
-        {/* INVERTIDO: APAGAR DADOS VEM PRIMEIRO */}
         <section className="mb-8">
           <p className="font-bold text-xs uppercase tracking-widest mb-3 pl-2 text-muted">Privacidade e Dados</p>
           <div className="rounded-[1.5rem] shadow-sm border overflow-hidden transition-colors duration-300 bg-card border-border">
@@ -126,7 +126,6 @@ export default function ConfigPage() {
           </div>
         </section>
 
-        {/* INVERTIDO: ADMIN / COORDENAÇÃO FICA NO FIM */}
         <section className="mb-8">
           <p className="font-bold text-xs uppercase tracking-widest mb-3 pl-2 text-muted">Coordenação</p>
           <div className="rounded-[1.5rem] shadow-sm border overflow-hidden transition-colors duration-300 bg-card border-border">
