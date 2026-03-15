@@ -26,7 +26,7 @@ export default function CapitulosPage({ params }: { params: Promise<{ livro: str
   const { modoVisual } = useUserStore();
 
   useEffect(() => { 
-    // CORREÇÃO ESLINT
+    
     const timer = setTimeout(() => setIsMounted(true), 0);
     return () => clearTimeout(timer);
   }, []);

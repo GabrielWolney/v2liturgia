@@ -77,7 +77,7 @@ export default function ConfissaoPage() {
 
   if (!isMounted) return <div className="min-h-[100dvh] bg-background" />;
 
-  // --- CLASSES DO TEMA ---
+  
   const isDark = modoVisual === "escuro";
   const isSepia = modoVisual === "leitura";
 
@@ -119,7 +119,7 @@ export default function ConfissaoPage() {
       ? "hover:bg-[#E8DEC1]/50"
       : "hover:bg-background";
 
-  // Lógica de Fonte
+  
   const fontBody =
     tamanhoFonte === "grande" ? "text-base sm:text-lg" : "text-sm";
   const fontHeader =

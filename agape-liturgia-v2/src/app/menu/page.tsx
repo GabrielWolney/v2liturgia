@@ -27,7 +27,7 @@ export default function ConfigPage() {
 
   if (!isMounted) return <div className="min-h-screen bg-background" />;
 
-  // --- CLASSES DINÂMICAS PARA TEMAS ---
+  
   const isDark = modoVisual === 'escuro';
   const isSepia = modoVisual === 'leitura';
 

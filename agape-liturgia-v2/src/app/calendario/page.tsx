@@ -11,9 +11,9 @@ const mesesNomes = [
   "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
 ];
 
-// --- DADOS DO CALENDÁRIO LITÚRGICO COMPLETO (2026) ---
+
 const eventosIgreja = [
-  // JANEIRO
+  
   { data: '2026-01-01', titulo: 'Santa Maria, Mãe de Deus', descricao: 'Solenidade.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-01-04', titulo: 'Epifania do Senhor', descricao: 'Solenidade.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-01-11', titulo: 'Batismo do Senhor', descricao: 'Festa.', cor: 'bg-white text-slate-800 border-slate-200' },
@@ -21,18 +21,18 @@ const eventosIgreja = [
   { data: '2026-01-24', titulo: 'São Francisco de Sales', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-01-28', titulo: 'Santo Tomás de Aquino', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-01-31', titulo: 'São João Bosco', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
-  // FEVEREIRO
+  
   { data: '2026-02-02', titulo: 'Apresentação do Senhor', descricao: 'Festa (N. Sra. dos Navegantes).', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-02-03', titulo: 'São Brás', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-02-11', titulo: 'Nossa Senhora de Lourdes', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-02-18', titulo: 'Quarta-feira de Cinzas', descricao: 'Início da Quaresma. Jejum e abstinência.', cor: 'bg-purple-600 text-white border-purple-700' },
-  // MARÇO
+  
   { data: '2026-03-19', titulo: 'São José', descricao: 'Solenidade.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-03-25', titulo: 'Anunciação do Senhor', descricao: 'Solenidade.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-03-29', titulo: 'Domingo de Ramos', descricao: 'Solenidade da Paixão do Senhor.', cor: 'bg-red-600 text-white border-red-700' },
   { data: '2026-03-30', titulo: 'Segunda-feira Santa', descricao: 'Semana Santa.', cor: 'bg-purple-600 text-white border-purple-700' },
   { data: '2026-03-31', titulo: 'Terça-feira Santa', descricao: 'Semana Santa.', cor: 'bg-purple-600 text-white border-purple-700' },
-  // ABRIL
+  
   { data: '2026-04-01', titulo: 'Quarta-feira Santa', descricao: 'Semana Santa.', cor: 'bg-purple-600 text-white border-purple-700' },
   { data: '2026-04-02', titulo: 'Quinta-feira Santa', descricao: 'Tríduo Pascal.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-04-03', titulo: 'Sexta-feira Santa', descricao: 'Paixão do Senhor. Jejum e abstinência.', cor: 'bg-red-600 text-white border-red-700' },
@@ -42,7 +42,7 @@ const eventosIgreja = [
   { data: '2026-04-12', titulo: 'Domingo da Divina Misericórdia', descricao: '2º Domingo da Páscoa.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-04-28', titulo: 'Sta. Gianna e S. Luís Montfort', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-04-29', titulo: 'Santa Catarina de Siena', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
-  // MAIO
+  
   { data: '2026-05-01', titulo: 'São José Operário', descricao: 'Festa.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-05-02', titulo: 'Santo Atanásio', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-05-13', titulo: 'Nossa Senhora de Fátima', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
@@ -51,7 +51,7 @@ const eventosIgreja = [
   { data: '2026-05-24', titulo: 'Pentecostes / Auxiliadora', descricao: 'Solenidade.', cor: 'bg-red-600 text-white border-red-700' },
   { data: '2026-05-26', titulo: 'São Filipe Néri', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-05-31', titulo: 'Santíssima Trindade / Visitação', descricao: 'Festa.', cor: 'bg-white text-slate-800 border-slate-200' },
-  // JUNHO
+  
   { data: '2026-06-12', titulo: 'Sagrado Coração de Jesus', descricao: 'Solenidade.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-06-13', titulo: 'Imaculado Coração de Maria', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-06-21', titulo: 'São Luís Gonzaga', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
@@ -59,14 +59,14 @@ const eventosIgreja = [
   { data: '2026-06-24', titulo: 'Natividade de São João Batista', descricao: 'Solenidade.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-06-27', titulo: 'N. Sra. do Perpétuo Socorro', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-06-29', titulo: 'São Pedro e São Paulo', descricao: 'Solenidade.', cor: 'bg-red-600 text-white border-red-700' },
-  // JULHO
+  
   { data: '2026-07-11', titulo: 'São Bento', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-07-12', titulo: 'São Luís e Santa Zélia Martin', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-07-16', titulo: 'Nossa Senhora do Carmo', descricao: 'Festa.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-07-22', titulo: 'Santa Maria Madalena', descricao: 'Festa.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-07-25', titulo: 'São Joaquim e Santa Ana', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-07-31', titulo: 'Santo Inácio de Loyola', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
-  // AGOSTO
+  
   { data: '2026-08-01', titulo: 'Santo Afonso Maria de Ligório', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-08-04', titulo: 'São João Maria Vianney', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-08-06', titulo: 'Transfiguração do Senhor', descricao: 'Festa.', cor: 'bg-white text-slate-800 border-slate-200' },
@@ -78,7 +78,7 @@ const eventosIgreja = [
   { data: '2026-08-25', titulo: 'São Luís IX', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-08-27', titulo: 'Santa Mônica', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-08-28', titulo: 'Santo Agostinho', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
-  // SETEMBRO
+  
   { data: '2026-09-14', titulo: 'Exaltação da Santa Cruz', descricao: 'Festa.', cor: 'bg-red-600 text-white border-red-700' },
   { data: '2026-09-15', titulo: 'Nossa Senhora das Dores', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-09-17', titulo: 'Santa Hildegarda de Bingen', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
@@ -86,7 +86,7 @@ const eventosIgreja = [
   { data: '2026-09-27', titulo: 'São Vicente de Paulo', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-09-29', titulo: 'Santos Arcanjos', descricao: 'Festa.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-09-30', titulo: 'São Jerônimo', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
-  // OUTUBRO
+  
   { data: '2026-10-01', titulo: 'Santa Teresinha do Menino Jesus', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-10-02', titulo: 'Santos Anjos da Guarda', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-10-04', titulo: 'São Francisco de Assis', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
@@ -99,14 +99,14 @@ const eventosIgreja = [
   { data: '2026-10-19', titulo: 'São Pedro de Alcântara', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-10-22', titulo: 'São João Paulo II', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-10-25', titulo: 'Santo Antônio Galvão', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
-  // NOVEMBRO
+  
   { data: '2026-11-01', titulo: 'Todos os Santos', descricao: 'Solenidade.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-11-02', titulo: 'Comemoração dos Fiéis Defuntos', descricao: 'Finados.', cor: 'bg-purple-600 text-white border-purple-700' },
   { data: '2026-11-21', titulo: 'Apresentação de Nossa Senhora', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-11-22', titulo: 'Cristo Rei do Universo', descricao: 'Solenidade.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-11-25', titulo: 'Santa Catarina de Alexandria', descricao: 'Memória.', cor: 'bg-red-600 text-white border-red-700' },
   { data: '2026-11-29', titulo: '1º Domingo do Advento', descricao: 'Início do Ano Litúrgico.', cor: 'bg-purple-600 text-white border-purple-700' },
-  // DEZEMBRO
+  
   { data: '2026-12-08', titulo: 'Imaculada Conceição', descricao: 'Solenidade.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-12-12', titulo: 'Nossa Senhora de Guadalupe', descricao: 'Memória.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-12-13', titulo: 'Santa Luzia', descricao: 'Memória.', cor: 'bg-red-600 text-white border-red-700' },
@@ -134,7 +134,7 @@ export default function CalendarioPage() {
     return () => clearTimeout(mountTimer);
   }, []);
 
-  // Eventos do Grupo
+  
   const eventosFormatados = useMemo(() => {
     const lista = [];
     for (const [chave, dados] of Object.entries(eventos2026)) {
@@ -146,7 +146,7 @@ export default function CalendarioPage() {
 
   const eventosDoMes = eventosFormatados.filter(e => e.mes === mesAtivo);
 
-  // Eventos Litúrgicos
+  
   const eventosLiturgiaFormatados = useMemo(() => {
     return eventosIgreja.map(e => {
       const parts = e.data.split('-');
@@ -158,7 +158,7 @@ export default function CalendarioPage() {
 
   if (!isMounted) return <div className="min-h-[100dvh] bg-background" />;
 
-  // --- CLASSES DINÂMICAS PARA TEMAS ---
+  
   const isDark = modoVisual === 'escuro';
   const isSepia = modoVisual === 'leitura';
 

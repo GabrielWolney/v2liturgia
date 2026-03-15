@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation"; // <--- ADICIONADO PARA O BOTÃO DE VOLTAR
+import { useRouter } from "next/navigation"; 
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { subscribeToAvisos, Aviso } from "@/services/db-home";
@@ -9,18 +9,18 @@ import { adicionarAviso, deletarAviso, getProposito, updateProposito, Proposito 
 import { useUserStore } from "@/store/useUserStore";
 
 export default function AdminPageCrua() {
-  const router = useRouter(); // <--- INSTANCIADO
+  const router = useRouter(); 
   const [user, setUser] = useState<User | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isMounted, setIsMounted] = useState(false);
 
-  // Estados Avisos
+  
   const [avisos, setAvisos] = useState<Aviso[]>([]);
   const [novoAvisoTexto, setNovoAvisoTexto] = useState("");
   const [novoAvisoData, setNovoAvisoData] = useState("");
 
-  // Estados Propósito Comunidade
+  
   const [propAtivo, setPropAtivo] = useState(false);
   const [propTema, setPropTema] = useState("");
   const [propTexto, setPropTexto] = useState("");
@@ -78,7 +78,7 @@ export default function AdminPageCrua() {
 
   if (!isMounted) return <div className="min-h-screen bg-background" />;
 
-  // --- CLASSES DINÂMICAS PARA TEMAS ---
+  
   const isDark = modoVisual === 'escuro';
   const isSepia = modoVisual === 'leitura';
 
@@ -92,9 +92,9 @@ export default function AdminPageCrua() {
   const arrowHover = isDark ? "hover:bg-slate-800 text-slate-400 hover:text-slate-100" : isSepia ? "hover:bg-[#E8DEC1] text-[#8C7B65] hover:text-[#4A3C31]" : "hover:bg-slate-200 text-muted hover:text-foreground";
   const fontClass = tamanhoFonte === 'grande' ? 'text-lg' : 'text-base';
 
-  // ==========================================
-  // TELA DE LOGIN (COM HEADER E SETA DE VOLTAR)
-  // ==========================================
+  
+  
+  
   if (!user) {
     return (
       <div className={`min-h-screen flex flex-col transition-colors duration-300 ${wrapperClass} ${textMain} ${fontClass}`}>
@@ -130,9 +130,9 @@ export default function AdminPageCrua() {
     );
   }
 
-  // ==========================================
-  // TELA DO PAINEL ADMIN (LOGADO)
-  // ==========================================
+  
+  
+  
   return (
     <div className={`min-h-screen flex flex-col transition-colors duration-300 ${wrapperClass} ${textMain} ${fontClass}`}>
       

@@ -7,7 +7,6 @@ import { useUserStore } from "@/store/useUserStore";
 import { trackEvent } from "@/lib/analytics";
 import { atualizarContador } from "@/services/db-home";
 
-// Base de dados rica para os Mistérios do Terço (com passagens em PT-BR)
 type Misterio = { titulo: string; passagem: string };
 
 const misteriosRosario: Record<string, Misterio[]> = {

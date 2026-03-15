@@ -11,8 +11,6 @@ import { LiturgiaDiaria } from "@/types/liturgia";
 interface AgapeWindow extends Window {
   __IS_MOUNTED__?: boolean;
 }
-
-// 1. A ESTOLA LINEAR DA V1 (Ajustada para w-8 h-8 para igualar o peso visual)
 const IconeEstolaLinear = (
   <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" className="icone-estola-linear w-8 h-8 mb-1 drop-shadow-md group-active:scale-95 transition-transform text-white">
     <g className="traco-estola">
@@ -26,7 +24,6 @@ const IconeEstolaLinear = (
   </svg>
 );
 
-// 2. AS MÃOS A REZAR DA V1 (Ajustadas para w-8 h-8)
 const IconeMaosRezar = (
   <svg viewBox="0 0 682.67 682.67" xmlns="http://www.w3.org/2000/svg" className="icone-oracao-custom w-8 h-8 mb-1 drop-shadow-md group-active:scale-95 transition-transform text-white">
     <g transform="matrix(1.33,0,0,-1.33,0,682.67)">

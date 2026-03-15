@@ -33,7 +33,7 @@ export default function LeituraCapituloPage({ params }: { params: Promise<{ livr
 
   if (!isMounted) return <div className="min-h-screen bg-background" />;
 
-  // --- CLASSES DO TEMA ---
+  
   const isDark = modoVisual === 'escuro';
   const isSepia = modoVisual === 'leitura';
 
@@ -45,7 +45,7 @@ export default function LeituraCapituloPage({ params }: { params: Promise<{ livr
   const headerBg = isDark ? "bg-slate-950/90" : isSepia ? "bg-[#FDF6E3]/90" : "bg-background/90";
   const arrowHover = isDark ? "hover:bg-slate-800 text-slate-400 hover:text-slate-100" : isSepia ? "hover:bg-[#E8DEC1] text-[#8C7B65] hover:text-[#4A3C31]" : "hover:bg-slate-200 text-muted hover:text-foreground";
 
-  // Lógica de Fonte
+  
   const fontReading = tamanhoFonte === 'grande' ? 'text-xl leading-[2.2]' : 'text-base leading-[1.8]';
 
   const bookInfo = [...bibliaCatolica.novo, ...bibliaCatolica.antigo].find(b => b.slug === slug);

@@ -2,8 +2,8 @@ export interface NovenaCalendario {
   id: string;
   nome: string;
   mes: number;
-  inicio: string; // Ex: "12-28"
-  fim: string;    // Ex: "01-05"
+  inicio: string; 
+  fim: string;    
 }
 
 export interface NovenaDia {

@@ -7,13 +7,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const { modoVisual, tamanhoFonte } = useUserStore();
   const [isMounted, setIsMounted] = useState(false);
   
-  // Estados da Splash Screen
+  
   const [showSplash, setShowSplash] = useState(true);
   const [fadeSplash, setFadeSplash] = useState(false);
   const [progress, setProgress] = useState(0);
   const [typedText, setTypedText] = useState("");
 
-  // EFEITO 1: Motor de Temas e Tipografia
+  
   useEffect(() => {
     const root = document.documentElement;
     if (modoVisual === 'escuro') root.setAttribute("data-theme", "dark");
@@ -25,14 +25,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     else root.classList.add('text-base');
   }, [modoVisual, tamanhoFonte]);
 
-  // EFEITO 2: Animações da Splash Screen
+  
   useEffect(() => {
     const mountTimer = setTimeout(() => setIsMounted(true), 0);
     
-    // 1. Animação da Barra de Progresso
+    
     setTimeout(() => setProgress(100), 100);
 
-    // 2. Animação de Máquina de Escrever
+    
     const fullText = "Liturgia Ágape";
     let currentLen = 0;
     const typingInterval = setInterval(() => {
@@ -41,7 +41,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       if (currentLen >= fullText.length) clearInterval(typingInterval);
     }, 60);
 
-    // 3. Fazer a Splash Screen Desaparecer
+  
     const t1 = setTimeout(() => setFadeSplash(true), 1600);
     const t2 = setTimeout(() => setShowSplash(false), 2100);
 

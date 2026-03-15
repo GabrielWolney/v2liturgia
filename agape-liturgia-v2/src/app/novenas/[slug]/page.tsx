@@ -27,7 +27,7 @@ export default function NovenaLeituraPage({ params }: { params: Promise<{ slug: 
 
   if (!isMounted || !novena) return <div className="min-h-[100dvh] bg-background" />;
 
-  // --- CLASSES DO TEMA ---
+  
   const isDark = modoVisual === 'escuro';
   const isSepia = modoVisual === 'leitura';
 
@@ -94,7 +94,7 @@ export default function NovenaLeituraPage({ params }: { params: Promise<{ slug: 
               <button 
                 onClick={() => {
                   toggleDiaNovena(slug, diaSelecionado);
-                  registrarAtividade(); // <--- FOGUINHO AQUI
+                  registrarAtividade(); 
                 }} 
                 className={`flex items-center gap-2 px-5 py-3 rounded-full font-bold text-sm transition-all active:scale-95 shrink-0 ${progresso.includes(diaSelecionado) ? "bg-emerald-500/20 text-emerald-600" : "bg-[#2F6BFF] text-white shadow-md shadow-[#2F6BFF]/20"}`}
               >

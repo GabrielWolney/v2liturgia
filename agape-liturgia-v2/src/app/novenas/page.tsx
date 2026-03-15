@@ -29,7 +29,7 @@ export default function NovenasPage() {
 
   if (!isMounted) return <div className="min-h-[100dvh] bg-background" />;
 
-  // --- CLASSES DO TEMA ---
+  
   const isDark = modoVisual === 'escuro';
   const isSepia = modoVisual === 'leitura';
 

@@ -22,7 +22,6 @@ export default function ProgressoPage() {
 
     const dataHoje = getDataIso();
     
-    // Ouve em tempo real as duas estatísticas da comunidade
     const unsubLeituras = subscribeToContador(dataHoje, 'leitura', setLeiturasComunidade);
     const unsubTercos = subscribeToContador(dataHoje, 'terco', setTercosComunidade);
 

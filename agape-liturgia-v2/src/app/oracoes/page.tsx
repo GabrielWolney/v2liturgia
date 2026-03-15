@@ -6,7 +6,7 @@ import { dbOracoes } from "@/lib/prayers-data";
 import { useUserStore } from "@/store/useUserStore";
 import { trackEvent } from "@/lib/analytics";
 
-// Auxiliar para busca sem sotaque
+
 const removerAcentos = (str: string) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
 export default function OracoesPage() {
@@ -24,7 +24,7 @@ export default function OracoesPage() {
 
   if (!isMounted) return <div className="min-h-[100dvh] bg-background" />;
 
-  // --- CLASSES DO TEMA ---
+  
   const isDark = modoVisual === 'escuro';
   const isSepia = modoVisual === 'leitura';
 
@@ -36,7 +36,7 @@ export default function OracoesPage() {
   const headerBg = isDark ? "bg-slate-950/90" : isSepia ? "bg-[#FDF6E3]/90" : "bg-background/90";
   const arrowHover = isDark ? "hover:bg-slate-800 text-slate-400 hover:text-slate-100" : isSepia ? "hover:bg-[#E8DEC1] text-[#8C7B65] hover:text-[#4A3C31]" : "hover:bg-slate-200 text-muted hover:text-foreground";
 
-  // Lógica de filtragem
+  
   const oracoesFiltradas = listaOracoes.filter(o => 
     removerAcentos(o.titulo).includes(removerAcentos(busca))
   );

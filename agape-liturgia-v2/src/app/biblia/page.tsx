@@ -25,7 +25,7 @@ export default function BibliaPage() {
 
   if (!isMounted) return <div className="min-h-[100dvh] bg-background" />;
 
-  // --- CLASSES DINÂMICAS PARA TEMAS ---
+  
   const isDark = modoVisual === 'escuro';
   const isSepia = modoVisual === 'leitura';
 

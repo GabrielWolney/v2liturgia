@@ -29,7 +29,7 @@ export default function LiturgiaAulaPage() {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
   
-  // Estado para controlar a falha da API
+  
   const [erroApi, setErroApi] = useState(false);
 
   const { marcarLeituraConcluida, modoVisual, tamanhoFonte, registrarAtividade, leiturasConcluidas } = useUserStore();
@@ -43,7 +43,7 @@ export default function LiturgiaAulaPage() {
           setLiturgia(data);
           const newSteps: Step[] = [];
 
-          // 1. VISÃO GERAL DAS REFERÊNCIAS
+          
           newSteps.push({
             id: '0',
             titulo: 'Visão Geral',
@@ -52,7 +52,7 @@ export default function LiturgiaAulaPage() {
             isOverview: true
           });
 
-          // 2. PASSOS DE LEITURA
+          
           if (data.primeiraLeitura) {
             newSteps.push({ id: '1', titulo: 'Primeira Leitura', referencia: data.primeiraLeitura.referencia, texto: data.primeiraLeitura.texto });
           }
@@ -73,12 +73,12 @@ export default function LiturgiaAulaPage() {
           }
           setSteps(newSteps);
         } else {
-          // Se a API não devolver dados
+          
           setErroApi(true);
         }
       })
       .catch(() => {
-        // Se a chamada falhar completamente (ex: servidor em baixo)
+        
         setErroApi(true);
       });
 
@@ -124,7 +124,7 @@ export default function LiturgiaAulaPage() {
 
   const fontReading = tamanhoFonte === 'grande' ? 'text-xl leading-[2.1]' : 'text-base leading-[1.8]';
 
-  // --- PLANO B: TELA DE ERRO (SERVIDOR EM ORAÇÃO) ---
+  
   if (erroApi) {
     return (
       <div className={`min-h-[100dvh] flex flex-col items-center justify-center px-6 text-center animate-fade-in transition-colors ${wrapperClass}`}>
@@ -157,7 +157,7 @@ export default function LiturgiaAulaPage() {
     );
   }
 
-  // --- TELA DE CARREGAMENTO ---
+  
   if (steps.length === 0) {
     return (
       <div className={`h-[100dvh] flex flex-col items-center justify-center transition-colors ${wrapperClass}`}>
@@ -169,7 +169,7 @@ export default function LiturgiaAulaPage() {
     );
   }
 
-  // --- TELA DE SUCESSO / FIM DA LITURGIA ---
+  
   if (isFinished) {
     return (
       <div className={`h-[100dvh] flex flex-col items-center justify-center p-6 text-center animate-fade-in transition-colors ${wrapperClass}`}>
@@ -289,7 +289,7 @@ export default function LiturgiaAulaPage() {
             )}
           </div>
         ) : (
-          // PASSOS 2, 3, 4: TEXTO DAS LEITURAS
+          
           <div className="animate-fade-in">
             {currentStep.refrao && (
               <div className={`mb-8 p-6 border-2 rounded-[1.5rem] shadow-sm flex flex-col items-center text-center transition-colors ${cardBg} ${borderColor}`}>

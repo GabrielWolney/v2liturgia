@@ -8,7 +8,7 @@ export interface Proposito {
   data_atualizacao?: string;
 }
 
-// --- AVISOS ---
+
 export async function adicionarAviso(texto: string, dataExpiracao: string) {
   await addDoc(collection(db, "avisos"), { texto, dataExpiracao, dataCriacao: new Date() });
 }
@@ -17,7 +17,7 @@ export async function deletarAviso(id: string) {
   await deleteDoc(doc(db, "avisos", id));
 }
 
-// --- PROPÓSITO MENSAL DA COMUNIDADE ---
+
 export async function getProposito(): Promise<Proposito | null> {
   const snap = await getDoc(doc(db, "config_geral", "proposito_mensal"));
   if (snap.exists()) {

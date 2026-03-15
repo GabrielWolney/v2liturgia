@@ -1,10 +1,10 @@
 import { formatarTextoLiturgico } from "@/lib/formatters";
 
 interface LeituraBlocoProps {
-  tipo: string; // Ex: "Primeira Leitura", "Evangelho"
+  tipo: string; 
   referencia: string;
   texto: string;
-  isDestaque?: boolean; // Se for o Evangelho, damos um destaque visual
+  isDestaque?: boolean; 
 }
 
 export function LeituraBloco({ tipo, referencia, texto, isDestaque = false }: LeituraBlocoProps) {

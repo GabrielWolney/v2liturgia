@@ -10,7 +10,7 @@ export default function AnotacoesPage() {
   const [saveStatus, setSaveStatus] = useState<"ocioso" | "guardando" | "guardado">("ocioso");
 
   useEffect(() => {
-    // CORREÇÃO: setTimeout evita o erro de "cascading renders" do ESLint
+    
     const mountTimer = setTimeout(() => setIsMounted(true), 0);
     return () => clearTimeout(mountTimer);
   }, []);
@@ -26,7 +26,7 @@ export default function AnotacoesPage() {
 
   if (!isMounted) return <div className="min-h-screen bg-background" />;
 
-  // --- CLASSES DINÂMICAS PARA TEMAS ---
+  
   const isDark = modoVisual === 'escuro';
   const isSepia = modoVisual === 'leitura';
 
@@ -38,7 +38,7 @@ export default function AnotacoesPage() {
   const headerBg = isDark ? "bg-slate-950/90" : isSepia ? "bg-[#FDF6E3]/90" : "bg-background/90";
   const arrowHover = isDark ? "hover:bg-slate-800 text-slate-400 hover:text-slate-100" : isSepia ? "hover:bg-[#E8DEC1] text-[#8C7B65] hover:text-[#4A3C31]" : "hover:bg-slate-200 text-muted hover:text-foreground";
   
-  // Mapeamento de tamanho de fonte para o editor
+  
   const fontClass = tamanhoFonte === 'grande' ? 'text-xl' : 'text-base';
   const leadingClass = tamanhoFonte === 'grande' ? 'leading-[1.8]' : 'leading-[1.6]';
 

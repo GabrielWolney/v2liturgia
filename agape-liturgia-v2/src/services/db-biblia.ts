@@ -3,7 +3,7 @@ import { BibliaData, LivroBiblia, Capitulo } from "@/types/biblia";
 
 const bibliaData = bibliaJson as unknown as BibliaData;
 
-// Interface para o resultado da pesquisa
+
 export interface ResultadoBusca {
   livro: string;
   capitulo: number;
@@ -11,7 +11,7 @@ export interface ResultadoBusca {
   texto: string;
 }
 
-// Auxiliar para normalização
+
 const normalizar = (str: string) => 
   str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 
@@ -53,7 +53,7 @@ export function pesquisarNaBiblia(termo: string): ResultadoBusca[] {
   const termoNorm = normalizar(termo);
   if (termoNorm.length < 3) return []; 
 
-  const resultados: ResultadoBusca[] = []; // CORRIGIDO: Tipagem explícita em vez de any
+  const resultados: ResultadoBusca[] = []; 
   const livros = getTodosLivros();
 
   for (const livro of livros) {

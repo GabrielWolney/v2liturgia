@@ -8,7 +8,7 @@ const montserrat = Montserrat({ subsets: ["latin"], variable: '--font-montserrat
 const lora = Lora({ subsets: ["latin"], variable: '--font-lora' });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://seusite.com"), // <--- ADICIONE ESTA LINHA AQUI!
+  metadataBase: new URL("https://https://liturgia-agape.vercel.app"), 
   title: "Ágape Liturgia",
   description: "A sua jornada espiritual diária. Liturgia, Santo Terço, Bíblia e Orações num só lugar.",
   manifest: "/site.webmanifest",
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Ágape Liturgia | Jovens Católicos",
     description: "Acompanhe a Liturgia Diária, reze o Santo Terço, leia a Bíblia e faça o seu Diário Espiritual. Uma ferramenta feita para elevar a sua fé.",
-    url: "https://seusite.com", 
+    url: "https://https://liturgia-agape.vercel.app", 
     siteName: "Ágape Liturgia",
     images: [
       {

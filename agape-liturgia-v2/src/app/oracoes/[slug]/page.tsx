@@ -21,7 +21,7 @@ export default function OracaoLeituraPage({ params }: { params: Promise<{ slug: 
   if (!oracao) return notFound();
   if (!isMounted) return <div className="min-h-[100dvh] bg-background" />;
 
-  // --- CLASSES DO TEMA ---
+  
   const isDark = modoVisual === 'escuro';
   const isSepia = modoVisual === 'leitura';
 

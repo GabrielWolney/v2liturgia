@@ -3,10 +3,10 @@ export function getFormattedDate(): string {
 }
 
 export function getDataIso(): string {
-  return new Date().toLocaleDateString("en-CA"); // Retorna YYYY-MM-DD
+  return new Date().toLocaleDateString("en-CA"); 
 }
 
-// REGRA: Identificação Visual (Cores)
+
 export function getCorLiturgica(tituloLiturgia: string, corApi: string): string {
   const titulo = (tituloLiturgia || "").toLowerCase();
   let corBase = (corApi || "Branco").toLowerCase();
@@ -22,13 +22,13 @@ export function getCorLiturgica(tituloLiturgia: string, corApi: string): string 
   return "branco";
 }
 
-// REGRA: Jejum (Quarta de Cinzas e Sexta Santa)
+
 export function isDiaDeJejum(tituloLiturgia: string): boolean {
   const titulo = (tituloLiturgia || "").toLowerCase();
   return (titulo.includes("cinzas") && titulo.includes("quarta")) || titulo.includes("paixão do senhor");
 }
 
-// REGRA: Mistérios do Terço
+
 export function obterMisterioDoDia() {
   const diaSemana = new Date().getDay();
   if (diaSemana === 0 || diaSemana === 3) return { tipo: "Gloriosos"};
@@ -37,7 +37,7 @@ export function obterMisterioDoDia() {
   return { tipo: "Luminosos"};
 }
 
-// REGRA: Status da Novena
+
 export function getNovenaStatus(inicioStr: string, fimStr: string): 'agora' | 'breve' | 'fim' {
   const hoje = new Date();
   hoje.setHours(0, 0, 0, 0);
@@ -71,22 +71,22 @@ export function getImagemPorCor(cor: string): string {
   return mapaImagens[c] || "/liturgia/verde.png"; 
 }
 
-// Função auxiliar segura contra Fuso Horário (DST - Horário de Verão)
+
 function diffDias(dataMenor: Date, dataMaior: Date): number {
   const utc1 = Date.UTC(dataMenor.getFullYear(), dataMenor.getMonth(), dataMenor.getDate());
   const utc2 = Date.UTC(dataMaior.getFullYear(), dataMaior.getMonth(), dataMaior.getDate());
   return Math.floor((utc2 - utc1) / (1000 * 60 * 60 * 24));
 }
 
-// =====================================================================
-// REGRA: MOTOR CALENDÁRIO LITÚRGICO (ALGORITMO ASTRONÔMICO)
-// =====================================================================
+
+
+
 export function calcularProgressoTempo(tituloLiturgia: string) {
   const hoje = new Date();
   const anoAtual = hoje.getFullYear();
 
-  // 1. ALGORITMO DE MEEUS/JONES/BUTCHER PARA O DOMINGO DE PÁSCOA
-  // (A fórmula matemática que a Igreja Católica usa para definir o calendário)
+  
+  
   const a = anoAtual % 19;
   const b = Math.floor(anoAtual / 100);
   const c = anoAtual % 100;
@@ -103,61 +103,61 @@ export function calcularProgressoTempo(tituloLiturgia: string) {
   const day = ((h + l - 7 * m + 114) % 31) + 1;
   const pascoa = new Date(anoAtual, month, day);
 
-  // 2. CALCULAR AS DATAS ÂNCORA MÓVEIS
+  
   const cinzas = new Date(pascoa);
-  cinzas.setDate(pascoa.getDate() - 46); // A Quarta de Cinzas é sempre 46 dias antes da Páscoa
+  cinzas.setDate(pascoa.getDate() - 46); 
 
   const pentecostes = new Date(pascoa);
-  pentecostes.setDate(pascoa.getDate() + 49); // Pentecostes é 49 dias depois da Páscoa
+  pentecostes.setDate(pascoa.getDate() + 49); 
 
-  // 3. CALCULAR O ADVENTO E NATAL (Fixo de Dezembro)
+  
   const natal = new Date(anoAtual, 11, 25);
-  const offset = natal.getDay() === 0 ? 7 : natal.getDay(); // Quantos dias voltar para o Domingo
+  const offset = natal.getDay() === 0 ? 7 : natal.getDay(); 
   const advento = new Date(natal);
-  advento.setDate(natal.getDate() - offset - 21); // O 1º Dom. do Advento é 4 domingos antes do Natal
+  advento.setDate(natal.getDate() - offset - 21); 
 
-  const batismoAnt = new Date(anoAtual, 0, 13); // Data aproximada do fim do tempo do Natal (Batismo)
+  const batismoAnt = new Date(anoAtual, 0, 13); 
 
-  // 4. LÓGICA DE ATRIBUIÇÃO
+  
   let nome = "Tempo Comum";
   let diaAtual = 1;
   let totalDias = 238;
 
   if (hoje >= cinzas && hoje < pascoa) {
-    // QUARESMA (Das Cinzas até o Sábado Santo)
+    
     nome = "Quaresma";
-    totalDias = 46; // Na Liturgia, o tempo real corrido no calendário é de 46 dias.
+    totalDias = 46; 
     diaAtual = diffDias(cinzas, hoje) + 1;
   } 
   else if (hoje >= pascoa && hoje <= pentecostes) {
-    // PÁSCOA
+    
     nome = "Páscoa";
     totalDias = 50;
     diaAtual = diffDias(pascoa, hoje) + 1;
   } 
   else if (hoje >= advento && hoje < natal) {
-    // ADVENTO
+    
     nome = "Advento";
     totalDias = diffDias(advento, natal);
     diaAtual = diffDias(advento, hoje) + 1;
   } 
   else if (hoje >= natal || hoje <= batismoAnt) {
-    // NATAL
+    
     nome = "Natal";
     totalDias = 20; 
     const refNatal = hoje >= natal ? natal : new Date(anoAtual - 1, 11, 25);
     diaAtual = diffDias(refNatal, hoje) + 1;
   } 
   else {
-    // TEMPO COMUM
-    nome = "Tempo Comum";
-    totalDias = 238; // Aproximadamente 34 semanas
     
-    // Parte 1: Entre o Batismo e as Cinzas
+    nome = "Tempo Comum";
+    totalDias = 238; 
+    
+    
     if (hoje > batismoAnt && hoje < cinzas) {
         diaAtual = diffDias(batismoAnt, hoje) + 1;
     } 
-    // Parte 2: Entre Pentecostes e o Advento
+    
     else if (hoje > pentecostes && hoje < advento) {
         const diasBloco1 = diffDias(batismoAnt, cinzas);
         const diasBloco2 = diffDias(pentecostes, hoje);
@@ -165,11 +165,11 @@ export function calcularProgressoTempo(tituloLiturgia: string) {
     }
   }
 
-  // Prevenir falhas visuais no anel (caso ocorram viragens de dia bizarras no fuso horário do telemóvel)
+  
   if (diaAtual > totalDias) diaAtual = totalDias;
   if (diaAtual < 1) diaAtual = 1;
 
-  // 5. MATEMÁTICA DO CÍRCULO SVG
+  
   const dasharray = 263.89;
   const progresso = diaAtual / totalDias;
   const dashoffset = dasharray - (dasharray * progresso);

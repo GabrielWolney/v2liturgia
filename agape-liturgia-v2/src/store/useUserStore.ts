@@ -9,41 +9,41 @@ interface UserState {
   tamanhoFonte: "padrao" | "grande";
   setTamanhoFonte: (tamanho: "padrao" | "grande") => void;
   
-  // --- FOGUINHO (STREAK) ---
+  
   streak: number;
   ultimaAtividade: string | null;
   registrarAtividade: () => void;
   verificarStreak: () => void;
 
-  // --- AVISOS (NOVO) ---
+  
   avisosLidos: string[];
   marcarAvisoLido: (id: string) => void;
 
-  // Liturgia Diária
+  
   leiturasConcluidas: Record<string, boolean>;
   marcarLeituraConcluida: (dataIso: string) => void;
 
-  // Santo Terço
+  
   tercosConcluidos: Record<string, boolean>;
   marcarTercoConcluido: (dataIso: string) => void;
 
-  // Mural de Intercessão
+  
   meusPedidosMural: string[];
   addMeuPedido: (id: string) => void;
   removeMeuPedido: (id: string) => void;
   oracoesFeitas: string[];
   toggleOracaoFeita: (id: string) => void;
 
-  // Confissão (Exame de Consciência)
+  
   exameConsciencia: Record<string, boolean>;
   togglePecado: (id: string) => void;
   limparExame: () => void;
 
-  // Diário Espiritual (Anotações)
+  
   minhasNotas: string;
   setNotas: (notas: string) => void;
 
-  // Novenas
+  
   novenasProgresso: Record<string, number[]>;
   toggleDiaNovena: (slug: string, dia: number) => void;
 }
@@ -58,7 +58,7 @@ export const useUserStore = create<UserState>()(
       tamanhoFonte: "padrao",
       setTamanhoFonte: (tamanho) => set({ tamanhoFonte: tamanho }),
       
-      // --- LÓGICA DO FOGUINHO ---
+      
       streak: 0,
       ultimaAtividade: null,
       registrarAtividade: () => set((state) => {
@@ -84,11 +84,11 @@ export const useUserStore = create<UserState>()(
         return {};
       }),
 
-      // --- LÓGICA DE AVISOS ---
+      
       avisosLidos: [],
       marcarAvisoLido: (id) => set((state) => ({ avisosLidos: [...state.avisosLidos, id] })),
 
-      // --- OUTRAS AÇÕES ---
+      
       leiturasConcluidas: {},
       marcarLeituraConcluida: (dataIso) => set((state) => ({ leiturasConcluidas: { ...state.leiturasConcluidas, [dataIso]: true } })),
 
