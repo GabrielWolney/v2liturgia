@@ -53,12 +53,12 @@ export default function ProgressoPage() {
   const isDark = modoVisual === 'escuro';
   const isSepia = modoVisual === 'leitura';
 
-  const wrapperClass = isDark ? "bg-slate-950" : isSepia ? "bg-[#FDF6E3]" : "bg-background";
-  const textMain = isDark ? "text-slate-100" : isSepia ? "text-[#4A3C31]" : "text-foreground";
-  const textMuted = isDark ? "text-slate-400" : isSepia ? "text-[#8C7B65]" : "text-muted";
-  const cardBg = isDark ? "bg-slate-900" : isSepia ? "bg-[#F4ECD8]" : "bg-card";
-  const borderColor = isDark ? "border-slate-800" : isSepia ? "border-[#E8DEC1]" : "border-border";
-  const headerBg = isDark ? "bg-slate-950/90" : isSepia ? "bg-[#FDF6E3]/90" : "bg-background/90";
+  
+  
+  
+  
+  
+  
   const arrowHover = isDark ? "hover:bg-slate-800 text-slate-400 hover:text-slate-100" : isSepia ? "hover:bg-[#E8DEC1] text-[#8C7B65] hover:text-[#4A3C31]" : "hover:bg-slate-200 text-muted hover:text-foreground";
 
   const fontClass = tamanhoFonte === 'grande' ? 'text-lg' : 'text-base';
@@ -76,27 +76,27 @@ export default function ProgressoPage() {
     : 'text-slate-400';
 
   return (
-    <div className={`min-h-[100dvh] flex flex-col font-sans pb-32 transition-colors duration-300 selection:bg-primary/30 ${wrapperClass}`}>
+    <div className={`min-h-[100dvh] flex flex-col font-sans pb-32 transition-colors duration-300 selection:bg-primary/30 bg-background`}>
       
-      <header className={`sticky top-0 z-50 backdrop-blur-md border-b px-4 sm:px-6 py-4 flex items-center justify-between max-w-[800px] mx-auto w-full transition-colors duration-300 ${headerBg} ${borderColor}`}>
+      <header className={`sticky top-0 z-50 backdrop-blur-md border-b px-4 sm:px-6 py-4 flex items-center justify-between max-w-[800px] mx-auto w-full transition-colors duration-300 bg-background/90 border-border`}>
         <button onClick={() => router.back()} className={`flex items-center justify-center w-10 h-10 rounded-full active:scale-95 shrink-0 transition-colors ${arrowHover}`}>
           <span className="material-symbols-rounded text-[26px]">arrow_back</span>
         </button>
-        <h1 className={`font-extrabold tracking-tight ${textMain} ${fontClass}`}>Meu Progresso</h1>
+        <h1 className={`font-extrabold tracking-tight text-foreground ${fontClass}`}>Meu Progresso</h1>
         <div className="w-10 h-10"></div>
       </header>
 
       <main className="flex-1 w-full max-w-[600px] mx-auto px-5 pt-8 animate-fade-in">
         
         {/* O FOGUINHO (OFENSIVA) */}
-        <section className={`flex flex-col items-center justify-center p-8 rounded-[2rem] shadow-soft border mb-6 transition-colors duration-300 ${cardBg} ${borderColor}`}>
+        <section className={`flex flex-col items-center justify-center p-8 rounded-[2rem] shadow-soft border mb-6 transition-colors duration-300 bg-card border-border`}>
           <div className={`relative flex items-center justify-center w-24 h-24 rounded-full mb-4 transition-colors ${fireBg}`}>
             <span className={`material-symbols-rounded text-[56px] transition-colors ${fireIconColor}`}>
               local_fire_department
             </span>
           </div>
-          <h2 className={`font-black text-4xl mb-1 ${textMain}`}>{streak} {streak === 1 ? 'dia' : 'dias'}</h2>
-          <p className={`font-bold uppercase tracking-widest text-xs ${textMuted}`}>De Ofensiva Espiritual</p>
+          <h2 className={`font-black text-4xl mb-1 text-foreground`}>{streak} {streak === 1 ? 'dia' : 'dias'}</h2>
+          <p className={`font-bold uppercase tracking-widest text-xs text-muted`}>De Ofensiva Espiritual</p>
           
           {!isFoguinhoAcesoHoje && streak > 0 && (
             <p className={`mt-5 text-center text-sm font-bold text-orange-500 animate-pulse bg-orange-500/10 px-4 py-2 rounded-xl`}>
@@ -105,22 +105,22 @@ export default function ProgressoPage() {
           )}
 
           {streak === 0 && (
-            <p className={`mt-5 text-center text-sm font-medium ${textMuted}`}>
+            <p className={`mt-5 text-center text-sm font-medium text-muted`}>
               Leia a Palavra ou reze o Terço hoje para iniciar a sua chama!
             </p>
           )}
         </section>
 
         {/* ESTATÍSTICAS PESSOAIS */}
-        <h3 className={`font-bold text-sm uppercase tracking-widest mb-3 pl-2 mt-8 ${textMuted}`}>Neste Mês</h3>
+        <h3 className={`font-bold text-sm uppercase tracking-widest mb-3 pl-2 mt-8 text-muted`}>Neste Mês</h3>
         <div className="grid grid-cols-2 gap-4 mb-8">
-          <div className={`p-5 rounded-[1.5rem] shadow-sm border flex flex-col transition-colors duration-300 ${cardBg} ${borderColor}`}>
+          <div className={`p-5 rounded-[1.5rem] shadow-sm border flex flex-col transition-colors duration-300 bg-card border-border`}>
             <span className="material-symbols-rounded text-[#2F6BFF] mb-2 text-[28px]">menu_book</span>
-            <span className={`font-black text-3xl mb-1 ${textMain}`}>{leiturasEsteMes}</span>
-            <span className={`text-xs font-bold leading-tight ${textMuted}`}>Liturgias<br/>Lidas</span>
+            <span className={`font-black text-3xl mb-1 text-foreground`}>{leiturasEsteMes}</span>
+            <span className={`text-xs font-bold leading-tight text-muted`}>Liturgias<br/>Lidas</span>
           </div>
           
-          <div className={`p-5 rounded-[1.5rem] shadow-sm border flex flex-col transition-colors duration-300 ${cardBg} ${borderColor}`}>
+          <div className={`p-5 rounded-[1.5rem] shadow-sm border flex flex-col transition-colors duration-300 bg-card border-border`}>
             <svg viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg" className="w-7 h-7 mb-2 text-[#6E3AA5] fill-current">
               <g transform="matrix(.1 0 0 -.1 0 512)">
                 <path d="m4074.7 4995.1c-377.8-136.9-564.8-534-412.5-875.2 67.5-152.3 233.2-308.4 387.5-366.3 348.9-131.1 747.9 94.5 846.2 480 36.6 146.5 19.3 269.9-57.8 420.2-57.8 115.7-215.9 266-335.4 318.1-119.6 54-314.2 63.7-428 23.2zm347-339.3c111.8-57.8 163.8-146.5 163.8-285.3 0-198.5-107.9-312.3-304.6-323.8-142.7-7.7-231.3 30.8-296.9 129.1-55.9 82.9-61.7 266-9.6 368.2 40.5 82.9 171.6 154.2 283.4 154.2 42.5 0 117.6-19.3 163.9-42.4z"/>
@@ -138,30 +138,30 @@ export default function ProgressoPage() {
                 <path d="m4219.3-1366.2c-383.6-214-453-267.9-453-348.9 0-27 73.2-179.3 163.9-335.4 90.6-158 163.8-293 163.8-302.6s-133-92.5-296.9-185.1c-310.4-177.3-360.5-225.5-329.6-320 21.2-69.4 433.7-778.8 466.5-803.8 67.5-52.1 144.6-27 435.6 140.7 266 152.3 293 163.8 314.2 133 13.5-17.4 181.2-310.4 374-647.7 289.2-510.8 360.5-624.6 420.2-661.2 94.5-61.7 225.5-94.5 310.4-79 77.1 13.5 460.7 221.7 508.9 275.6 67.5 75.2 113.7 217.8 106 323.8-7.7 90.6-48.2 171.6-343.1 686.3-185 321.9-350.8 611.1-368.2 641.9l-34.7 57.8 298.8 169.6c163.8 94.5 306.5 187 316.1 206.3 11.6 19.3 19.3 59.7 19.3 88.7 0 54-383.6 757.6-447.2 821.2-65.5 65.5-150.3 44.3-404.8-102.2-129.2-75.2-260.2-148.4-287.2-163.9l-52-25-167.7 298.8c-92.5 163.8-183.1 306.5-202.4 316.1-79.1 42.5-150.4 17.4-510.9-185zm528.2-472.3c88.7-158.1 181.2-302.6 202.4-318.1 75.2-52 140.7-30.8 429.9 134.9 156.1 90.6 289.2 160 296.8 154.2 19.3-11.6 235.2-395.2 225.5-401-1.9-3.9-138.8-82.9-300.7-175.4-293-167.7-331.6-200.5-331.6-283.4 0-23.1 187-372 416.4-773 348.9-613 412.5-734.5 391.3-755.6-15.4-13.5-104.1-69.4-200.5-123.4-134.9-77.1-177.3-92.5-196.6-73.2-11.6 11.6-185 310.4-381.7 659.3-198.5 350.8-381.7 672.8-406.7 715.1-57.8 100.3-136.9 135-225.5 96.4-34.7-13.5-177.3-92.5-320-173.5-142.6-80.9-260.2-144.6-262.2-142.6-32.8 54-221.7 401-221.7 406.7 0 5.8 119.5 79 266 162 287.2 161.9 370.1 229.4 370.1 298.8 0 25.1-77.1 181.2-171.6 347l-171.6 302.6 206.3 115.7c111.8 65.5 208.2 117.6 214 117.6 5.9 0 83-131.1 171.7-291.1z"/>
               </g>
             </svg>
-            <span className={`font-black text-3xl mb-1 ${textMain}`}>{tercosEsteMes}</span>
-            <span className={`text-xs font-bold leading-tight ${textMuted}`}>Terços<br/>Rezados</span>
+            <span className={`font-black text-3xl mb-1 text-foreground`}>{tercosEsteMes}</span>
+            <span className={`text-xs font-bold leading-tight text-muted`}>Terços<br/>Rezados</span>
           </div>
         </div>
 
         {/* ESTATÍSTICAS DA COMUNIDADE */}
-        <h3 className={`font-bold text-sm uppercase tracking-widest mb-3 pl-2 mt-8 ${textMuted}`}>O Ágape de jovens hoje</h3>
+        <h3 className={`font-bold text-sm uppercase tracking-widest mb-3 pl-2 mt-8 text-muted`}>O Ágape de jovens hoje</h3>
         <div className="grid grid-cols-2 gap-4 mb-8">
-          <div className={`p-5 rounded-[1.5rem] shadow-sm border flex flex-col justify-between transition-colors duration-300 ${cardBg} ${borderColor}`}>
+          <div className={`p-5 rounded-[1.5rem] shadow-sm border flex flex-col justify-between transition-colors duration-300 bg-card border-border`}>
             <div className="flex items-center gap-2 mb-3">
               <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
               <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Ao vivo</span>
             </div>
             <span className={`font-black text-3xl mb-1 text-[#2F6BFF]`}>{leiturasComunidade}</span>
-            <span className={`text-xs font-bold leading-tight ${textMuted}`}>Fizeram a<br/>Leitura</span>
+            <span className={`text-xs font-bold leading-tight text-muted`}>Fizeram a<br/>Leitura</span>
           </div>
           
-          <div className={`p-5 rounded-[1.5rem] shadow-sm border flex flex-col justify-between transition-colors duration-300 ${cardBg} ${borderColor}`}>
+          <div className={`p-5 rounded-[1.5rem] shadow-sm border flex flex-col justify-between transition-colors duration-300 bg-card border-border`}>
             <div className="flex items-center gap-2 mb-3">
               <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
               <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Ao vivo</span>
             </div>
             <span className={`font-black text-3xl mb-1 text-[#6E3AA5]`}>{tercosComunidade}</span>
-            <span className={`text-xs font-bold leading-tight ${textMuted}`}>Rezaram o<br/>Terço</span>
+            <span className={`text-xs font-bold leading-tight text-muted`}>Rezaram o<br/>Terço</span>
           </div>
         </div>
 

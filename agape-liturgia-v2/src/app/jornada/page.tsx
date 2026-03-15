@@ -115,12 +115,12 @@ export default function JornadaPage() {
   const isDark = modoVisual === "escuro";
   const isSepia = modoVisual === "leitura";
 
-  const wrapperClass = isDark ? "bg-slate-950" : isSepia ? "bg-[#FDF6E3]" : "bg-background";
-  const textMain = isDark ? "text-slate-100" : isSepia ? "text-[#4A3C31]" : "text-foreground";
-  const textMuted = isDark ? "text-slate-400" : isSepia ? "text-[#8C7B65]" : "text-muted";
-  const cardBg = isDark ? "bg-slate-900" : isSepia ? "bg-[#F4ECD8]" : "bg-card";
-  const borderColor = isDark ? "border-slate-800" : isSepia ? "border-[#E8DEC1]" : "border-border";
-  const headerBg = isDark ? "bg-slate-950/95" : isSepia ? "bg-[#FDF6E3]/95" : "bg-background/95";
+  
+  
+  
+  
+  
+  
   const ringBgColor = isDark ? "#1e293b" : isSepia ? "#e2d1b1" : "#F1F5F9";
   const flagBorderColor = isDark ? "#020617" : isSepia ? "#FDF6E3" : "#F5F7FA";
   const arrowHover = isDark ? "hover:bg-slate-800 text-slate-400 hover:text-slate-100" : isSepia ? "hover:bg-[#E8DEC1] text-[#8C7B65] hover:text-[#4A3C31]" : "hover:bg-slate-200 text-muted hover:text-foreground";
@@ -183,9 +183,9 @@ export default function JornadaPage() {
   }
 
   return (
-    <div className={`min-h-screen flex flex-col font-sans pb-32 transition-colors duration-300 ${wrapperClass} bg-[radial-gradient(circle_at_center,_rgba(47,107,255,0.08)_3px,_transparent_3px)] bg-[length:28px_28px]`}>
+    <div className={`min-h-screen flex flex-col font-sans pb-32 transition-colors duration-300 bg-background bg-[radial-gradient(circle_at_center,_rgba(47,107,255,0.08)_3px,_transparent_3px)] bg-[length:28px_28px]`}>
       
-      <header className={`cabecalho-fixo flex items-center justify-between transition-colors duration-300 ${headerBg} ${borderColor}`}>
+      <header className={`cabecalho-fixo flex items-center justify-between transition-colors duration-300 bg-background/90 border-border`}>
         <div className="flex items-center gap-3">
           <Link href="/" className={`w-9 h-9 flex items-center justify-center rounded-full transition-colors ${arrowHover}`}>
             <span className="material-symbols-rounded text-[24px]">arrow_back</span>
@@ -194,7 +194,7 @@ export default function JornadaPage() {
             <img src="/icon-192x192.png" className="w-10 h-10 rounded-xl border shadow-sm" alt="Logo" />
             <div className="flex flex-col">
               <span className="font-black text-base tracking-tight text-[#2F6BFF] leading-none">Liturgia</span>
-              <span className={`text-[8px] font-black uppercase tracking-wider ${textMuted}`}>Ágape de jovens</span>
+              <span className={`text-[8px] font-black uppercase tracking-wider text-muted`}>Ágape de jovens</span>
             </div>
           </div>
         </div>
@@ -211,7 +211,7 @@ export default function JornadaPage() {
 
       <div className="px-5 mt-6 mb-10 max-w-[600px] mx-auto w-full">
         {!liturgia || !tempoInfo ? (
-          <div className={`rounded-[1.5rem] p-6 flex items-center justify-between shadow-soft border transition-colors duration-300 ${cardBg} ${borderColor} animate-pulse`}>
+          <div className={`rounded-[1.5rem] p-6 flex items-center justify-between shadow-soft border transition-colors duration-300 bg-card border-border animate-pulse`}>
             <div className="flex flex-col gap-2">
               <div className={`h-4 w-28 rounded-full ${isDark ? 'bg-slate-800' : isSepia ? 'bg-[#E8DEC1]' : 'bg-slate-200'}`}></div>
               <div className={`h-6 w-36 rounded-full ${isDark ? 'bg-slate-800' : isSepia ? 'bg-[#E8DEC1]' : 'bg-slate-200'}`}></div>
@@ -219,9 +219,9 @@ export default function JornadaPage() {
             <div className={`w-[75px] h-[75px] rounded-full border-[10px] ${isDark ? 'border-slate-800' : isSepia ? 'border-[#E8DEC1]' : 'border-slate-200'}`}></div>
           </div>
         ) : (
-          <div className={`rounded-[1.5rem] p-6 flex items-center justify-between shadow-soft border transition-colors duration-300 ${cardBg} ${borderColor} animate-fade-in`}>
+          <div className={`rounded-[1.5rem] p-6 flex items-center justify-between shadow-soft border transition-colors duration-300 bg-card border-border animate-fade-in`}>
             <div>
-              <h2 className={`font-bold flex items-center gap-2 ${textMain} ${fontClass}`}>Tempo Litúrgico</h2>
+              <h2 className={`font-bold flex items-center gap-2 text-foreground ${fontClass}`}>Tempo Litúrgico</h2>
               <p className={`text-[#2F6BFF] font-extrabold ${fontClass}`}>{tempoInfo.nome}</p>
             </div>
             <div className="relative w-[75px] h-[75px]">
@@ -229,7 +229,7 @@ export default function JornadaPage() {
                 <circle cx="50" cy="50" r="42" stroke={ringBgColor} strokeWidth="10" fill="none" />
                 <circle cx="50" cy="50" r="42" stroke={hexColor} strokeWidth="10" fill="none" strokeLinecap="round" strokeDasharray={tempoInfo.dasharray} strokeDashoffset={tempoInfo.dashoffset} className="transition-all duration-1000" />
               </svg>
-              <div className={`absolute inset-0 flex flex-col items-center justify-center ${textMain}`}>
+              <div className={`absolute inset-0 flex flex-col items-center justify-center text-foreground`}>
                 <span className="text-sm font-black">{tempoInfo.diaAtual}</span>
                 <span className="text-[10px] opacity-60">/{tempoInfo.totalDias}</span>
               </div>
@@ -266,11 +266,11 @@ export default function JornadaPage() {
           );
         })}
         <div className="relative w-full flex flex-col items-center z-10 pt-4">
-          <div className={`w-16 h-16 rounded-full border-[6px] outline outline-4 outline-[#2F6BFF] flex items-center justify-center shadow-lg mb-4 ${cardBg}`} style={{ borderColor: flagBorderColor }}>
+          <div className={`w-16 h-16 rounded-full border-[6px] outline outline-4 outline-[#2F6BFF] flex items-center justify-center shadow-lg mb-4 bg-card`} style={{ borderColor: flagBorderColor }}>
             <span className="material-symbols-rounded text-[32px] text-[#2F6BFF]">sports_score</span>
           </div>
-          <div className={`${cardBg} p-6 rounded-2xl border ${borderColor} text-center w-[280px]`}>
-            <p className={`font-serif italic mb-3 ${textMain} ${fontClass}`}>&quot;A santidade consiste em fazer as pequenas coisas com grande amor.&quot;</p>
+          <div className={`bg-card p-6 rounded-2xl border border-border text-center w-[280px]`}>
+            <p className={`font-serif italic mb-3 text-foreground ${fontClass}`}>&quot;A santidade consiste em fazer as pequenas coisas com grande amor.&quot;</p>
             <p className="font-bold text-[#2F6BFF] text-[10px] uppercase tracking-widest">Santa Teresinha do Menino Jesus</p>
           </div>
         </div>

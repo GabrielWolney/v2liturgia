@@ -45,7 +45,8 @@ export default function SantoTercoPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
   
-  const { marcarTercoConcluido, modoVisual, tamanhoFonte, registrarAtividade, tercosConcluidos } = useUserStore();
+  // modoVisual removido com sucesso
+  const { marcarTercoConcluido, tamanhoFonte, registrarAtividade, tercosConcluidos } = useUserStore();
 
   useEffect(() => {
     const mountTimer = setTimeout(() => setIsMounted(true), 0);
@@ -71,29 +72,18 @@ export default function SantoTercoPage() {
     trackEvent("terco_concluido", { misterio: misterioHoje.tipo });
   };
 
-  const isDark = modoVisual === 'escuro';
-  const isSepia = modoVisual === 'leitura';
-
-  const wrapperClass = isDark ? "bg-slate-950" : isSepia ? "bg-[#FDF6E3]" : "bg-background";
-  const textMain = isDark ? "text-slate-100" : isSepia ? "text-[#4A3C31]" : "text-foreground";
-  const textMuted = isDark ? "text-slate-400" : isSepia ? "text-[#8C7B65]" : "text-muted";
-  const cardBg = isDark ? "bg-slate-900" : isSepia ? "bg-[#F4ECD8]" : "bg-card";
-  const borderColor = isDark ? "border-slate-800" : isSepia ? "border-[#E8DEC1]" : "border-border";
-  const headerBg = isDark ? "bg-slate-950/90" : isSepia ? "bg-[#FDF6E3]/90" : "bg-background/90";
-  const arrowHover = isDark ? "hover:bg-slate-800 text-slate-400 hover:text-slate-100" : isSepia ? "hover:bg-[#E8DEC1] text-[#8C7B65] hover:text-[#4A3C31]" : "hover:bg-slate-200 text-muted hover:text-foreground";
-
   const fontMeditation = tamanhoFonte === 'grande' ? 'text-lg leading-relaxed' : 'text-base leading-relaxed';
   const fontStandard = tamanhoFonte === 'grande' ? 'text-lg' : 'text-sm';
   const fontHeader = tamanhoFonte === 'grande' ? 'text-xl' : 'text-lg';
 
   if (isFinished) {
     return (
-      <div className={`h-[100dvh] flex flex-col items-center justify-center p-6 text-center animate-fade-in transition-colors duration-300 ${wrapperClass}`}>
-        <div className={`w-32 h-32 rounded-[2rem] flex items-center justify-center mb-8 shadow-inner relative ${isDark ? 'bg-emerald-900/20' : 'bg-emerald-100'}`}>
+      <div className="h-[100dvh] flex flex-col items-center justify-center p-6 text-center animate-fade-in transition-colors duration-300 bg-background">
+        <div className="w-32 h-32 rounded-[2rem] flex items-center justify-center mb-8 shadow-inner relative bg-emerald-500/20">
           <span className="material-symbols-rounded text-emerald-500 text-[80px]">task_alt</span>
         </div>
-        <h1 className={`text-3xl font-extrabold tracking-tight mb-2 ${textMain}`}>Terço Concluído!</h1>
-        <p className={`font-medium mb-12 ${textMuted}`}>A sua coroa de orações foi entregue a Nossa Senhora.</p>
+        <h1 className="text-3xl font-extrabold tracking-tight mb-2 text-foreground">Terço Concluído!</h1>
+        <p className="font-medium mb-12 text-muted">A sua coroa de orações foi entregue a Nossa Senhora.</p>
         <button onClick={() => router.push('/jornada')} className="w-full max-w-[400px] bg-[#2F6BFF] text-white font-bold py-5 rounded-[1.5rem] shadow-[0_8px_0_#1E4BCC] active:translate-y-[8px] active:shadow-none transition-all hover:brightness-105">
           VOLTAR À PEQUENA VIA
         </button>
@@ -102,13 +92,13 @@ export default function SantoTercoPage() {
   }
 
   return (
-    <div className={`min-h-[100dvh] flex flex-col font-sans pb-32 transition-colors duration-300 selection:bg-[#2F6BFF]/30 ${wrapperClass}`}>
+    <div className="min-h-[100dvh] flex flex-col font-sans pb-32 transition-colors duration-300 selection:bg-[#2F6BFF]/30 bg-background">
       
-      <header className={`sticky top-0 z-50 backdrop-blur-md border-b px-4 sm:px-6 py-4 flex items-center justify-between max-w-[800px] mx-auto w-full transition-colors duration-300 ${headerBg} ${borderColor}`}>
-        <button onClick={() => router.back()} className={`flex items-center justify-center w-10 h-10 rounded-full active:scale-95 shrink-0 transition-colors ${arrowHover}`}>
+      <header className="sticky top-0 z-50 backdrop-blur-md border-b px-4 sm:px-6 py-4 flex items-center justify-between max-w-[800px] mx-auto w-full transition-colors duration-300 bg-background/90 border-border">
+        <button onClick={() => router.back()} className="flex items-center justify-center w-10 h-10 rounded-full active:scale-95 shrink-0 transition-colors text-muted hover:bg-muted/20 hover:text-foreground">
           <span className="material-symbols-rounded text-[26px]">arrow_back</span>
         </button>
-        <h1 className={`font-extrabold tracking-tight ${textMain} ${fontHeader}`}>Santo Terço</h1>
+        <h1 className={`font-extrabold tracking-tight text-foreground ${fontHeader}`}>Santo Terço</h1>
         <div className="w-10 h-10"></div>
       </header>
 
@@ -144,64 +134,64 @@ export default function SantoTercoPage() {
         </section>
 
         {/* ORAÇÕES INICIAIS */}
-        <h3 className={`font-bold text-sm uppercase tracking-widest mb-3 pl-2 mt-8 ${textMuted}`}>Início do Terço</h3>
-        <details className={`group mb-8 rounded-[1.5rem] shadow-soft border overflow-hidden [&_summary::-webkit-details-marker]:hidden transition-colors duration-300 ${cardBg} ${borderColor}`} open>
-          <summary className={`flex items-center justify-between p-5 cursor-pointer outline-none transition-colors ${isDark ? 'hover:bg-slate-800' : isSepia ? 'hover:bg-[#E8DEC1]/50' : 'hover:bg-slate-50'}`}>
-            <span className={`font-extrabold ${fontHeader} ${textMain}`}>Orações Iniciais</span>
-            <span className={`material-symbols-rounded group-open:rotate-180 transition-transform duration-300 ${textMuted}`}>expand_more</span>
+        <h3 className="font-bold text-sm uppercase tracking-widest mb-3 pl-2 mt-8 text-muted">Início do Terço</h3>
+        <details className="group mb-8 rounded-[1.5rem] shadow-soft border overflow-hidden [&_summary::-webkit-details-marker]:hidden transition-colors duration-300 bg-card border-border" open>
+          <summary className="flex items-center justify-between p-5 cursor-pointer outline-none transition-colors hover:bg-muted/10">
+            <span className={`font-extrabold ${fontHeader} text-foreground`}>Orações Iniciais</span>
+            <span className="material-symbols-rounded group-open:rotate-180 transition-transform duration-300 text-muted">expand_more</span>
           </summary>
-          <div className={`p-6 pt-2 border-t flex flex-col gap-6 ${borderColor} ${textMain} ${fontStandard}`}>
+          <div className={`p-6 pt-2 border-t flex flex-col gap-6 border-border text-foreground ${fontStandard}`}>
             <div>
               <h4 className="font-bold text-[#2F6BFF] mb-1">1. Sinal da Cruz</h4>
-              <p className={`font-serif ${textMuted}`}>Pelo sinal da Santa Cruz, livrai-nos, Deus, Nosso Senhor, dos nossos inimigos. Em nome do Pai, e do Filho, e do Espírito Santo. Amém.</p>
+              <p className="font-serif text-muted">Pelo sinal da Santa Cruz, livrai-nos, Deus, Nosso Senhor, dos nossos inimigos. Em nome do Pai, e do Filho, e do Espírito Santo. Amém.</p>
             </div>
             <div>
               <h4 className="font-bold text-[#2F6BFF] mb-1">2. Oferecimento</h4>
-              <p className={`font-serif ${textMuted}`}>Divino Jesus, nós Vos oferecemos este terço que vamos rezar, meditando nos mistérios da nossa Redenção. Concedei-nos, por intercessão da Virgem Maria, Mãe de Deus e nossa Mãe, as virtudes que nos são necessárias para bem rezá-lo e a graça de ganharmos as indulgências desta santa devoção.</p>
+              <p className="font-serif text-muted">Divino Jesus, nós Vos oferecemos este terço que vamos rezar, meditando nos mistérios da nossa Redenção. Concedei-nos, por intercessão da Virgem Maria, Mãe de Deus e nossa Mãe, as virtudes que nos são necessárias para bem rezá-lo e a graça de ganharmos as indulgências desta santa devoção.</p>
             </div>
             <div>
               <h4 className="font-bold text-[#2F6BFF] mb-1">3. Credo</h4>
-              <p className={`font-serif ${textMuted}`}>Creio em Deus Pai Todo-Poderoso, Criador do céu e da terra; e em Jesus Cristo, seu único Filho... <span className="text-[11px] uppercase tracking-widest">(Na Cruz)</span></p>
+              <p className="font-serif text-muted">Creio em Deus Pai Todo-Poderoso, Criador do céu e da terra; e em Jesus Cristo, seu único Filho... <span className="text-[11px] uppercase tracking-widest">(Na Cruz)</span></p>
             </div>
             <div>
               <h4 className="font-bold text-[#2F6BFF] mb-1">4. Pai Nosso e 3 Ave Marias</h4>
-              <p className={`font-serif ${textMuted}`}>Para que nos aumente a <strong className={textMain}>Fé</strong>, a <strong className={textMain}>Esperança</strong> e a <strong className={textMain}>Caridade</strong>. <br/>1x Pai Nosso, 3x Ave Marias, 1x Glória ao Pai.</p>
+              <p className="font-serif text-muted">Para que nos aumente a <strong className="text-foreground">Fé</strong>, a <strong className="text-foreground">Esperança</strong> e a <strong className="text-foreground">Caridade</strong>. <br/>1x Pai Nosso, 3x Ave Marias, 1x Glória ao Pai.</p>
             </div>
           </div>
         </details>
 
         {/* MISTÉRIOS (CONTEMPLAÇÃO) */}
-        <h3 className={`font-bold text-sm uppercase tracking-widest mb-3 pl-2 ${textMuted}`}>Contemplação</h3>
+        <h3 className="font-bold text-sm uppercase tracking-widest mb-3 pl-2 text-muted">Contemplação</h3>
         <div className="flex flex-col gap-3 mb-10">
           {listaMisterios.map((mist, idx) => (
-            <details key={idx} className={`group rounded-[1.5rem] shadow-soft border overflow-hidden [&_summary::-webkit-details-marker]:hidden transition-colors duration-300 ${cardBg} ${borderColor}`}>
-              <summary className={`flex items-center justify-between p-5 cursor-pointer outline-none transition-colors ${isDark ? 'hover:bg-slate-800' : isSepia ? 'hover:bg-[#E8DEC1]/50' : 'hover:bg-slate-50'}`}>
+            <details key={idx} className="group rounded-[1.5rem] shadow-soft border overflow-hidden [&_summary::-webkit-details-marker]:hidden transition-colors duration-300 bg-card border-border">
+              <summary className="flex items-center justify-between p-5 cursor-pointer outline-none transition-colors hover:bg-muted/10">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-full bg-[#2F6BFF] text-white font-black flex items-center justify-center text-lg shrink-0 shadow-sm">{idx + 1}</div>
                   <div className="flex flex-col text-left">
-                    <span className={`font-extrabold leading-tight ${textMain} ${fontHeader}`}>{idx + 1}º Mistério</span>
-                    <span className={`text-[10px] font-bold uppercase tracking-widest ${textMuted} truncate max-w-[180px] sm:max-w-xs`}>{mist.titulo}</span>
+                    <span className={`font-extrabold leading-tight text-foreground ${fontHeader}`}>{idx + 1}º Mistério</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-muted truncate max-w-[180px] sm:max-w-xs">{mist.titulo}</span>
                   </div>
                 </div>
-                <span className={`material-symbols-rounded group-open:rotate-180 transition-transform duration-300 rounded-full p-1 shrink-0 ${textMuted}`}>expand_more</span>
+                <span className="material-symbols-rounded group-open:rotate-180 transition-transform duration-300 rounded-full p-1 shrink-0 text-muted">expand_more</span>
               </summary>
               
-              <div className={`p-5 pt-0 border-t ${borderColor}`}>
+              <div className="p-5 pt-0 border-t border-border">
                 <div className="mt-4 text-center">
-                  <h4 className={`font-black text-xl mb-3 ${textMain}`}>{mist.titulo}</h4>
-                  <p className={`font-serif italic mb-6 ${fontMeditation} ${textMuted}`}>
+                  <h4 className="font-black text-xl mb-3 text-foreground">{mist.titulo}</h4>
+                  <p className={`font-serif italic mb-6 ${fontMeditation} text-muted`}>
                     {mist.passagem}
                   </p>
                 </div>
                 
-                <div className={`flex flex-col gap-2 p-4 rounded-xl border ${borderColor} ${fontStandard} ${textMuted} ${isDark ? 'bg-slate-950' : isSepia ? 'bg-[#E8DEC1]/30' : 'bg-slate-50'}`}>
-                  <p className={`flex justify-between items-center border-b pb-2 ${borderColor}`}>
+                <div className={`flex flex-col gap-2 p-4 rounded-xl border border-border ${fontStandard} text-muted bg-muted/5`}>
+                  <p className="flex justify-between items-center border-b pb-2 border-border">
                     <span className="font-black text-lg">1x</span> <span className="font-bold text-right">Pai Nosso</span>
                   </p>
-                  <p className={`flex justify-between items-center border-b pb-2 ${borderColor}`}>
+                  <p className="flex justify-between items-center border-b pb-2 border-border">
                     <span className="font-black text-lg">10x</span> <span className="font-bold text-right">Ave-Marias</span>
                   </p>
-                  <p className={`flex justify-between items-center pb-1`}>
+                  <p className="flex justify-between items-center pb-1">
                     <span className="font-black text-lg">1x</span> <span className="font-bold text-right">Glória ao Pai</span>
                   </p>
                 </div>
@@ -214,20 +204,20 @@ export default function SantoTercoPage() {
         </div>
 
         {/* ORAÇÕES FINAIS */}
-        <h3 className={`font-bold text-sm uppercase tracking-widest mb-3 pl-2 ${textMuted}`}>Encerramento</h3>
-        <details className={`group mb-10 rounded-[1.5rem] shadow-soft border overflow-hidden [&_summary::-webkit-details-marker]:hidden transition-colors duration-300 ${cardBg} ${borderColor}`}>
-          <summary className={`flex items-center justify-between p-5 cursor-pointer outline-none transition-colors ${isDark ? 'hover:bg-slate-800' : isSepia ? 'hover:bg-[#E8DEC1]/50' : 'hover:bg-slate-50'}`}>
-            <span className={`font-extrabold ${fontHeader} ${textMain}`}>Orações Finais</span>
-            <span className={`material-symbols-rounded group-open:rotate-180 transition-transform duration-300 ${textMuted}`}>expand_more</span>
+        <h3 className="font-bold text-sm uppercase tracking-widest mb-3 pl-2 text-muted">Encerramento</h3>
+        <details className="group mb-10 rounded-[1.5rem] shadow-soft border overflow-hidden [&_summary::-webkit-details-marker]:hidden transition-colors duration-300 bg-card border-border">
+          <summary className="flex items-center justify-between p-5 cursor-pointer outline-none transition-colors hover:bg-muted/10">
+            <span className={`font-extrabold ${fontHeader} text-foreground`}>Orações Finais</span>
+            <span className="material-symbols-rounded group-open:rotate-180 transition-transform duration-300 text-muted">expand_more</span>
           </summary>
-          <div className={`p-6 pt-2 border-t flex flex-col gap-6 ${borderColor} ${textMain} ${fontStandard}`}>
+          <div className={`p-6 pt-2 border-t flex flex-col gap-6 border-border text-foreground ${fontStandard}`}>
             <div>
               <h4 className="font-bold text-[#2F6BFF] mb-1">1. Agradecimento</h4>
-              <p className={`font-serif ${textMuted}`}>Infinitas graças Vos damos, Soberana Rainha, pelos benefícios que todos os dias recebemos de vossas mãos liberais. Dignai-vos agora e para sempre tomar-nos debaixo do vosso poderoso amparo e para mais Vos obrigar Vos saudamos com uma Salve Rainha:</p>
+              <p className="font-serif text-muted">Infinitas graças Vos damos, Soberana Rainha, pelos benefícios que todos os dias recebemos de vossas mãos liberais. Dignai-vos agora e para sempre tomar-nos debaixo do vosso poderoso amparo e para mais Vos obrigar Vos saudamos com uma Salve Rainha:</p>
             </div>
             <div>
               <h4 className="font-bold text-[#2F6BFF] mb-1">2. Salve Rainha</h4>
-              <p className={`font-serif ${textMuted}`}>Salve Rainha, Mãe de misericórdia, vida, doçura e esperança nossa, salve! A vós bradamos, os degredados filhos de Eva; a vós suspiramos, gemendo e chorando neste vale de lágrimas. Eia, pois, advogada nossa, esses vossos olhos misericordiosos a nós volvei; e depois deste desterro nos mostrai Jesus, bendito fruto do vosso ventre, ó clemente, ó piedosa, ó doce sempre Virgem Maria. Rogai por nós, santa Mãe de Deus. Para que sejamos dignos das promessas de Cristo. Amém.</p>
+              <p className="font-serif text-muted">Salve Rainha, Mãe de misericórdia, vida, doçura e esperança nossa, salve! A vós bradamos, os degredados filhos de Eva; a vós suspiramos, gemendo e chorando neste vale de lágrimas. Eia, pois, advogada nossa, esses vossos olhos misericordiosos a nós volvei; e depois deste desterro nos mostrai Jesus, bendito fruto do vosso ventre, ó clemente, ó piedosa, ó doce sempre Virgem Maria. Rogai por nós, santa Mãe de Deus. Para que sejamos dignos das promessas de Cristo. Amém.</p>
             </div>
           </div>
         </details>

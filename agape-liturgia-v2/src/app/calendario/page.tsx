@@ -11,9 +11,7 @@ const mesesNomes = [
   "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
 ];
 
-
 const eventosIgreja = [
-  
   { data: '2026-01-01', titulo: 'Santa Maria, Mãe de Deus', descricao: 'Solenidade.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-01-04', titulo: 'Epifania do Senhor', descricao: 'Solenidade.', cor: 'bg-white text-slate-800 border-slate-200' },
   { data: '2026-01-11', titulo: 'Batismo do Senhor', descricao: 'Festa.', cor: 'bg-white text-slate-800 border-slate-200' },
@@ -119,11 +117,12 @@ const eventosIgreja = [
 ];
 
 export default function CalendarioPage() {
+  // Mantemos o isMounted para o mês ativo sincronizar corretamente com o relógio do cliente, sem quebrar.
   const [isMounted, setIsMounted] = useState(false);
   const [mesAtivo, setMesAtivo] = useState(1);
   const [abaAtiva, setAbaAtiva] = useState<'grupo' | 'liturgia'>('grupo');
   
-  const { modoVisual, tamanhoFonte } = useUserStore();
+  const { tamanhoFonte } = useUserStore();
 
   useEffect(() => {
     const mountTimer = setTimeout(() => {
@@ -134,7 +133,6 @@ export default function CalendarioPage() {
     return () => clearTimeout(mountTimer);
   }, []);
 
-  
   const eventosFormatados = useMemo(() => {
     const lista = [];
     for (const [chave, dados] of Object.entries(eventos2026)) {
@@ -146,7 +144,6 @@ export default function CalendarioPage() {
 
   const eventosDoMes = eventosFormatados.filter(e => e.mes === mesAtivo);
 
-  
   const eventosLiturgiaFormatados = useMemo(() => {
     return eventosIgreja.map(e => {
       const parts = e.data.split('-');
@@ -156,60 +153,47 @@ export default function CalendarioPage() {
 
   const eventosLiturgiaDoMes = eventosLiturgiaFormatados.filter(e => e.mes === mesAtivo);
 
-  if (!isMounted) return <div className="min-h-[100dvh] bg-background" />;
-
-  
-  const isDark = modoVisual === 'escuro';
-  const isSepia = modoVisual === 'leitura';
-
-  const wrapperClass = isDark ? "bg-slate-950" : isSepia ? "bg-[#FDF6E3]" : "bg-background";
-  const textMain = isDark ? "text-slate-100" : isSepia ? "text-[#4A3C31]" : "text-foreground";
-  const textMuted = isDark ? "text-slate-400" : isSepia ? "text-[#8C7B65]" : "text-muted";
-  const cardBg = isDark ? "bg-slate-900" : isSepia ? "bg-[#F4ECD8]" : "bg-card";
-  const borderColor = isDark ? "border-slate-800" : isSepia ? "border-[#E8DEC1]" : "border-border";
-  const headerBg = isDark ? "bg-slate-950/95" : isSepia ? "bg-[#FDF6E3]/95" : "bg-background/95";
-  const arrowHover = isDark ? "hover:bg-slate-800 text-slate-400 hover:text-slate-100" : isSepia ? "hover:bg-[#E8DEC1] text-[#8C7B65] hover:text-[#4A3C31]" : "hover:bg-slate-200 text-muted hover:text-foreground";
-  
-  const fontClass = tamanhoFonte === 'grande' ? 'text-readable' : 'text-base';
+  const fontClass = isMounted && tamanhoFonte === 'grande' ? 'text-readable' : 'text-base';
 
   const getBadgeStyle = (tipo: string) => {
+    // Usando as cores padrão do Tailwind com opacidade na cor de fundo
     switch (tipo) {
       case 'formacao': case 'reuniao': 
-        return isDark ? 'bg-blue-900/30 text-blue-400 border border-blue-800/50' : 'bg-blue-100 text-blue-700';
+        return 'bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/30';
       case 'oracao': case 'retiro': case 'vivencia': 
-        return isDark ? 'bg-purple-900/30 text-purple-400 border border-purple-800/50' : 'bg-purple-100 text-purple-700';
+        return 'bg-purple-500/20 text-purple-600 dark:text-purple-400 border border-purple-500/30';
       case 'missa': case 'solenidade': 
-        return isDark ? 'bg-amber-900/30 text-amber-400 border border-amber-800/50' : 'bg-amber-100 text-amber-700';
+        return 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30';
       case 'festivo': case 'social': 
-        return isDark ? 'bg-emerald-900/30 text-emerald-400 border border-emerald-800/50' : 'bg-emerald-100 text-emerald-700';
+        return 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30';
       default: 
-        return isDark ? 'bg-slate-800 text-slate-400 border border-slate-700' : 'bg-slate-200 text-slate-700';
+        return 'bg-slate-500/20 text-slate-600 dark:text-slate-400 border border-slate-500/30';
     }
   };
 
   return (
-    <div className={`min-h-[100dvh] flex flex-col font-sans pb-32 transition-colors duration-300 selection:bg-[#2F6BFF]/30 ${wrapperClass}`}>
+    <div className="min-h-[100dvh] flex flex-col font-sans pb-32 transition-colors duration-300 selection:bg-primary/30 bg-background">
       
-      <header className={`cabecalho-fixo z-50 backdrop-blur-md border-b px-4 sm:px-6 py-4 flex flex-col gap-4 max-w-[800px] mx-auto w-full transition-colors duration-300 ${headerBg} ${borderColor}`}>
+      <header className="cabecalho-fixo z-50 backdrop-blur-md border-b px-4 sm:px-6 py-4 flex flex-col gap-4 max-w-[800px] mx-auto w-full transition-colors duration-300 bg-background/90 border-border">
         <div className="flex items-center justify-between w-full">
           <Link 
             href="/jornada"
-            className={`flex items-center justify-center w-10 h-10 rounded-full active:scale-95 shrink-0 transition-colors ${arrowHover}`}
+            className="flex items-center justify-center w-10 h-10 rounded-full active:scale-95 shrink-0 transition-colors text-muted hover:bg-muted/20 hover:text-foreground"
           >
             <span className="material-symbols-rounded text-[26px]">arrow_back</span>
           </Link>
-          <h1 className={`font-extrabold tracking-tight ${textMain} ${tamanhoFonte === 'grande' ? 'text-xl' : 'text-lg'}`}>Calendário</h1>
+          <h1 className={`font-extrabold tracking-tight text-foreground ${isMounted && tamanhoFonte === 'grande' ? 'text-xl' : 'text-lg'}`}>Calendário</h1>
           <div className="w-10 h-10"></div>
         </div>
 
         {/* SELETOR DE ABAS */}
-        <div className={`flex p-1.5 rounded-2xl w-full max-w-[400px] mx-auto border shadow-inner ${borderColor} ${isDark ? 'bg-slate-950/50' : isSepia ? 'bg-[#E8DEC1]/30' : 'bg-slate-200/50'}`}>
+        <div className="flex p-1.5 rounded-2xl w-full max-w-[400px] mx-auto border shadow-inner border-border bg-muted/10">
           <button 
             onClick={() => setAbaAtiva('grupo')}
             className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 ${
               abaAtiva === 'grupo' 
-                ? `${cardBg} text-[#2F6BFF] shadow-sm` 
-                : `${textMuted} hover:brightness-90`
+                ? `bg-card text-primary shadow-sm` 
+                : `text-muted hover:text-foreground`
             }`}
           >
             Ágape
@@ -218,8 +202,8 @@ export default function CalendarioPage() {
             onClick={() => setAbaAtiva('liturgia')}
             className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 ${
               abaAtiva === 'liturgia' 
-                ? `${cardBg} text-[#6E3AA5] shadow-sm` 
-                : `${textMuted} hover:brightness-90`
+                ? `bg-card text-primary shadow-sm` 
+                : `text-muted hover:text-foreground`
             }`}
           >
             Litúrgico
@@ -231,30 +215,25 @@ export default function CalendarioPage() {
         
         {/* TÍTULO DA ABA */}
         <div className="flex flex-col items-center text-center mb-8">
-          <div className={`w-16 h-16 rounded-[1.25rem] flex items-center justify-center mb-4 shadow-inner ${
-            abaAtiva === 'grupo' 
-              ? isDark ? 'text-[#2F6BFF] bg-blue-900/20' : isSepia ? 'text-[#2F6BFF] bg-[#E8DEC1]' : 'text-[#2F6BFF] bg-[#2F6BFF]/10'
-              : isDark ? 'text-[#6E3AA5] bg-purple-900/20' : isSepia ? 'text-[#6E3AA5] bg-[#E8DEC1]' : 'text-[#6E3AA5] bg-[#6E3AA5]/10'
-          }`}>
+          <div className="w-16 h-16 rounded-[1.25rem] flex items-center justify-center mb-4 shadow-inner text-primary bg-primary/10">
             <span className="material-symbols-rounded text-[32px]">
               {abaAtiva === 'grupo' ? 'calendar_month' : 'church'}
             </span>
           </div>
-          <h2 className={`text-3xl font-extrabold tracking-tight mb-1 ${textMain}`}>
+          <h2 className="text-3xl font-extrabold tracking-tight mb-1 text-foreground">
             {abaAtiva === 'grupo' ? 'Nosso Grupo' : 'Calendário Litúrgico'}
           </h2>
-          <p className={`font-medium text-sm ${textMuted}`}>
+          <p className="font-medium text-sm text-muted">
             {abaAtiva === 'grupo' ? 'Eventos e encontros pastorais.' : 'Solenidades, Festas e Memórias de 2026.'}
           </p>
         </div>
 
-        {/* O SEU CARROSSEL DE MESES INTOCADO */}
+        {/* O CARROSSEL DE MESES */}
         <div className="mb-10 -mx-5 px-5 overflow-x-auto no-scrollbar">
           <div className="flex gap-2 pb-2">
             {mesesNomes.map((nome, index) => {
               const numMes = index + 1;
               const isSelected = mesAtivo === numMes;
-              const corAtiva = abaAtiva === 'grupo' ? 'bg-[#2F6BFF]' : 'bg-[#6E3AA5]';
 
               return (
                 <button 
@@ -262,8 +241,8 @@ export default function CalendarioPage() {
                   onClick={() => setMesAtivo(numMes)}
                   className={`px-5 py-3 rounded-[1rem] font-extrabold text-sm whitespace-nowrap transition-all active:scale-95 ${
                     isSelected 
-                      ? isDark ? `${corAtiva} text-white shadow-md` : `${corAtiva} text-white shadow-md`
-                      : `${cardBg} ${textMuted} border ${borderColor} hover:brightness-95`
+                      ? `bg-primary text-white shadow-md`
+                      : `bg-card text-muted border border-border hover:brightness-95`
                   }`}
                 >
                   {nome}
@@ -274,22 +253,22 @@ export default function CalendarioPage() {
         </div>
 
         {/* TIMELINE */}
-        <section className={`rounded-[2rem] p-6 shadow-soft border transition-colors duration-300 ${cardBg} ${borderColor}`}>
+        <section className="rounded-[2rem] p-6 shadow-soft border transition-colors duration-300 bg-card border-border">
           
           {abaAtiva === 'grupo' && (
             eventosDoMes.length === 0 ? (
-              <div className={`text-center py-8 font-medium ${textMuted}`}>Nenhum evento do grupo agendado para este mês.</div>
+              <div className="text-center py-8 font-medium text-muted">Nenhum evento do grupo agendado para este mês.</div>
             ) : (
               <div className="flex flex-col gap-6">
                 {eventosDoMes.map((evento, i) => (
                   <div key={i} className="flex gap-4 items-start group">
                     <div className="flex flex-col items-center min-w-[40px] shrink-0 pt-1">
-                      <span className="text-2xl font-black text-[#2F6BFF] leading-none">
+                      <span className="text-2xl font-black text-primary leading-none">
                         {String(evento.dia).padStart(2, '0')}
                       </span>
                     </div>
-                    <div className={`flex-1 pb-6 border-b group-last:border-0 group-last:pb-0 ${borderColor}`}>
-                      <h3 className={`font-extrabold leading-tight mb-2 ${textMain} ${fontClass}`}>
+                    <div className="flex-1 pb-6 border-b group-last:border-0 group-last:pb-0 border-border">
+                      <h3 className={`font-extrabold leading-tight mb-2 text-foreground ${fontClass}`}>
                         {evento.titulo}
                       </h3>
                       <span className={`inline-block px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase tracking-widest ${getBadgeStyle(evento.tipo)}`}>
@@ -304,7 +283,7 @@ export default function CalendarioPage() {
 
           {abaAtiva === 'liturgia' && (
             eventosLiturgiaDoMes.length === 0 ? (
-              <div className={`text-center py-8 font-medium ${textMuted}`}>Nenhuma celebração litúrgica em destaque neste mês.</div>
+              <div className="text-center py-8 font-medium text-muted">Nenhuma celebração litúrgica em destaque neste mês.</div>
             ) : (
               <div className="flex flex-col gap-6">
                 {eventosLiturgiaDoMes.map((evento, i) => (
@@ -315,11 +294,11 @@ export default function CalendarioPage() {
                         {String(evento.dia).padStart(2, '0')}
                       </div>
                     </div>
-                    <div className={`flex-1 pb-6 border-b group-last:border-0 group-last:pb-0 ${borderColor}`}>
-                      <h3 className={`font-extrabold leading-tight mb-1 ${textMain} ${fontClass}`}>
+                    <div className="flex-1 pb-6 border-b group-last:border-0 group-last:pb-0 border-border">
+                      <h3 className={`font-extrabold leading-tight mb-1 text-foreground ${fontClass}`}>
                         {evento.titulo}
                       </h3>
-                      <p className={`text-sm font-serif italic ${textMuted}`}>
+                      <p className="text-sm font-serif italic text-muted">
                         {evento.descricao}
                       </p>
                     </div>

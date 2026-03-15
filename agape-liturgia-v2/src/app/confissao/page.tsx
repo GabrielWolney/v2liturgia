@@ -65,85 +65,38 @@ export default function ConfissaoPage() {
     exameConsciencia,
     togglePecado,
     limparExame,
-    modoVisual,
     tamanhoFonte,
   } = useUserStore();
 
   useEffect(() => {
+    // Mantemos isMounted apenas para hidratação segura das marcações e da fonte
     const mountTimer = setTimeout(() => setIsMounted(true), 0);
     trackEvent("page_view", { page_name: "confissao_tematizada" });
     return () => clearTimeout(mountTimer);
   }, []);
 
-  if (!isMounted) return <div className="min-h-[100dvh] bg-background" />;
-
-  
-  const isDark = modoVisual === "escuro";
-  const isSepia = modoVisual === "leitura";
-
-  const wrapperClass = isDark
-    ? "bg-slate-950"
-    : isSepia
-      ? "bg-[#FDF6E3]"
-      : "bg-background";
-  const textMain = isDark
-    ? "text-slate-100"
-    : isSepia
-      ? "text-[#4A3C31]"
-      : "text-foreground";
-  const textMuted = isDark
-    ? "text-slate-400"
-    : isSepia
-      ? "text-[#8C7B65]"
-      : "text-muted";
-  const cardBg = isDark ? "bg-slate-900" : isSepia ? "bg-[#F4ECD8]" : "bg-card";
-  const borderColor = isDark
-    ? "border-slate-800"
-    : isSepia
-      ? "border-[#E8DEC1]"
-      : "border-border";
-  const headerBg = isDark
-    ? "bg-slate-950/90"
-    : isSepia
-      ? "bg-[#FDF6E3]/90"
-      : "bg-background/90";
-
-  const arrowHover = isDark
-    ? "hover:bg-slate-800 text-slate-400 hover:text-slate-100"
-    : isSepia
-      ? "hover:bg-[#E8DEC1] text-[#8C7B65] hover:text-[#4A3C31]"
-      : "hover:bg-slate-200 text-muted hover:text-foreground";
-  const itemHover = isDark
-    ? "hover:bg-slate-800/80"
-    : isSepia
-      ? "hover:bg-[#E8DEC1]/50"
-      : "hover:bg-background";
-
-  
-  const fontBody =
-    tamanhoFonte === "grande" ? "text-base sm:text-lg" : "text-sm";
-  const fontHeader =
-    tamanhoFonte === "grande" ? "text-lg sm:text-xl" : "text-base";
+  const fontBody = isMounted && tamanhoFonte === "grande" ? "text-base sm:text-lg" : "text-sm";
+  const fontHeader = isMounted && tamanhoFonte === "grande" ? "text-lg sm:text-xl" : "text-base";
 
   const quantidadePecados = Object.keys(exameConsciencia).length;
 
   return (
     <div
-      className={`min-h-[100dvh] flex flex-col font-sans pb-32 transition-colors duration-300 selection:bg-[#6E3AA5]/30 ${wrapperClass}`}
+      className="min-h-[100dvh] flex flex-col font-sans pb-32 transition-colors duration-300 selection:bg-[#6E3AA5]/30 bg-background"
     >
       <header
-        className={`sticky top-0 z-50 backdrop-blur-md border-b px-4 sm:px-6 py-4 flex items-center justify-between max-w-[800px] mx-auto w-full transition-colors duration-300 ${headerBg} ${borderColor}`}
+        className="sticky top-0 z-50 backdrop-blur-md border-b px-4 sm:px-6 py-4 flex items-center justify-between max-w-[800px] mx-auto w-full transition-colors duration-300 bg-background/90 border-border"
       >
         <button
           onClick={() => router.back()}
-          className={`flex items-center justify-center w-10 h-10 rounded-full active:scale-95 shrink-0 transition-colors ${arrowHover}`}
+          className="flex items-center justify-center w-10 h-10 rounded-full active:scale-95 shrink-0 transition-colors text-muted hover:bg-muted/20 hover:text-foreground"
         >
           <span className="material-symbols-rounded text-[26px]">
             arrow_back
           </span>
         </button>
         <h1
-          className={`font-extrabold tracking-tight ${textMain} ${fontHeader}`}
+          className={`font-extrabold tracking-tight text-foreground ${fontHeader}`}
         >
           Confissão
         </h1>
@@ -176,11 +129,11 @@ export default function ConfissaoPage() {
             </svg>
           </div>
           <h2
-            className={`text-3xl font-extrabold tracking-tight mb-2 ${textMain}`}
+            className="text-3xl font-extrabold tracking-tight mb-2 text-foreground"
           >
             Exame de Consciência
           </h2>
-          <p className={`font-medium text-sm max-w-[300px] ${textMuted}`}>
+          <p className="font-medium text-sm max-w-[300px] text-muted">
             Marque as suas faltas. Tudo fica guardado{" "}
             <strong>apenas neste celular</strong>.
           </p>
@@ -188,14 +141,14 @@ export default function ConfissaoPage() {
 
         {/* OS 5 PASSOS - O CAMINHO DA GRAÇA */}
         <section
-          className={`rounded-[2rem] p-6 sm:p-8 shadow-soft border mb-10 transition-colors duration-300 ${cardBg} ${borderColor}`}
+          className="rounded-[2rem] p-6 sm:p-8 shadow-soft border mb-10 transition-colors duration-300 bg-card border-border"
         >
           <div className="text-center mb-6">
             <h3 className="text-[#6E3AA5] font-extrabold text-xl mb-1">
               O Caminho da Graça
             </h3>
             <p
-              className={`text-xs font-bold uppercase tracking-widest ${textMuted}`}
+              className="text-xs font-bold uppercase tracking-widest text-muted"
             >
               5 Passos para a Confissão
             </p>
@@ -203,7 +156,7 @@ export default function ConfissaoPage() {
 
           <div className="flex flex-col gap-3">
             <div
-              className={`flex items-center gap-4 p-3 rounded-xl border transition-colors ${isDark ? "bg-slate-950/50 border-slate-800" : isSepia ? "bg-[#E8DEC1]/20 border-[#E8DEC1]" : "bg-slate-50/50 border-slate-100"}`}
+              className="flex items-center gap-4 p-3 rounded-xl border transition-colors bg-muted/10 border-border/50"
             >
               <div className="w-12 h-12 rounded-xl bg-[#6E3AA5]/10 text-[#6E3AA5] flex items-center justify-center shrink-0">
                 <span className="material-symbols-rounded text-[24px]">
@@ -211,14 +164,14 @@ export default function ConfissaoPage() {
                 </span>
               </div>
               <div>
-                <h4 className={`font-bold text-sm ${textMain}`}>1. Exame</h4>
-                <p className={`text-xs ${textMuted} leading-snug`}>
+                <h4 className="font-bold text-sm text-foreground">1. Exame</h4>
+                <p className="text-xs text-muted leading-snug">
                   Refletir onde errei contra Deus.
                 </p>
               </div>
             </div>
             <div
-              className={`flex items-center gap-4 p-3 rounded-xl border transition-colors ${isDark ? "bg-slate-950/50 border-slate-800" : isSepia ? "bg-[#E8DEC1]/20 border-[#E8DEC1]" : "bg-slate-50/50 border-slate-100"}`}
+              className="flex items-center gap-4 p-3 rounded-xl border transition-colors bg-muted/10 border-border/50"
             >
               <div className="w-12 h-12 rounded-xl bg-[#6E3AA5]/10 text-[#6E3AA5] flex items-center justify-center shrink-0">
                 <span className="material-symbols-rounded text-[24px]">
@@ -226,16 +179,16 @@ export default function ConfissaoPage() {
                 </span>
               </div>
               <div>
-                <h4 className={`font-bold text-sm ${textMain}`}>
+                <h4 className="font-bold text-sm text-foreground">
                   2. Arrependimento
                 </h4>
-                <p className={`text-xs ${textMuted} leading-snug`}>
+                <p className="text-xs text-muted leading-snug">
                   Dor sincera no coração.
                 </p>
               </div>
             </div>
             <div
-              className={`flex items-center gap-4 p-3 rounded-xl border transition-colors ${isDark ? "bg-slate-950/50 border-slate-800" : isSepia ? "bg-[#E8DEC1]/20 border-[#E8DEC1]" : "bg-slate-50/50 border-slate-100"}`}
+              className="flex items-center gap-4 p-3 rounded-xl border transition-colors bg-muted/10 border-border/50"
             >
               <div className="w-12 h-12 rounded-xl bg-[#6E3AA5]/10 text-[#6E3AA5] flex items-center justify-center shrink-0">
                 <span className="material-symbols-rounded text-[24px]">
@@ -243,16 +196,16 @@ export default function ConfissaoPage() {
                 </span>
               </div>
               <div>
-                <h4 className={`font-bold text-sm ${textMain}`}>
+                <h4 className="font-bold text-sm text-foreground">
                   3. Propósito
                 </h4>
-                <p className={`text-xs ${textMuted} leading-snug`}>
+                <p className="text-xs text-muted leading-snug">
                   Decidir não pecar mais.
                 </p>
               </div>
             </div>
             <div
-              className={`flex items-center gap-4 p-3 rounded-xl border transition-colors ${isDark ? "bg-slate-950/50 border-slate-800" : isSepia ? "bg-[#E8DEC1]/20 border-[#E8DEC1]" : "bg-slate-50/50 border-slate-100"}`}
+              className="flex items-center gap-4 p-3 rounded-xl border transition-colors bg-muted/10 border-border/50"
             >
               <div className="w-12 h-12 rounded-xl bg-[#6E3AA5]/10 text-[#6E3AA5] flex items-center justify-center shrink-0">
                 <span className="material-symbols-rounded text-[24px]">
@@ -260,16 +213,16 @@ export default function ConfissaoPage() {
                 </span>
               </div>
               <div>
-                <h4 className={`font-bold text-sm ${textMain}`}>
+                <h4 className="font-bold text-sm text-foreground">
                   4. Confissão
                 </h4>
-                <p className={`text-xs ${textMuted} leading-snug`}>
+                <p className="text-xs text-muted leading-snug">
                   Dizer os pecados ao padre.
                 </p>
               </div>
             </div>
             <div
-              className={`flex items-center gap-4 p-3 rounded-xl border transition-colors ${isDark ? "bg-slate-950/50 border-slate-800" : isSepia ? "bg-[#E8DEC1]/20 border-[#E8DEC1]" : "bg-slate-50/50 border-slate-100"}`}
+              className="flex items-center gap-4 p-3 rounded-xl border transition-colors bg-muted/10 border-border/50"
             >
               <div className="w-12 h-12 rounded-xl bg-[#6E3AA5]/10 text-[#6E3AA5] flex items-center justify-center shrink-0">
                 <span className="material-symbols-rounded text-[24px]">
@@ -277,10 +230,10 @@ export default function ConfissaoPage() {
                 </span>
               </div>
               <div>
-                <h4 className={`font-bold text-sm ${textMain}`}>
+                <h4 className="font-bold text-sm text-foreground">
                   5. Penitência
                 </h4>
-                <p className={`text-xs ${textMuted} leading-snug`}>
+                <p className="text-xs text-muted leading-snug">
                   Cumprir o ato reparador.
                 </p>
               </div>
@@ -293,32 +246,32 @@ export default function ConfissaoPage() {
           {categoriasPecados.map((cat, catIndex) => (
             <details
               key={catIndex}
-              className={`group rounded-[1.5rem] shadow-soft border overflow-hidden [&_summary::-webkit-details-marker]:hidden transition-colors duration-300 ${cardBg} ${borderColor}`}
+              className="group rounded-[1.5rem] shadow-soft border overflow-hidden [&_summary::-webkit-details-marker]:hidden transition-colors duration-300 bg-card border-border"
             >
               <summary
-                className={`flex items-center justify-between p-5 cursor-pointer outline-none transition-colors ${itemHover}`}
+                className="flex items-center justify-between p-5 cursor-pointer outline-none transition-colors hover:bg-muted/10"
               >
-                <span className={`font-extrabold ${textMain} ${fontHeader}`}>
+                <span className={`font-extrabold text-foreground ${fontHeader}`}>
                   {cat.titulo}
                 </span>
                 <span
-                  className={`material-symbols-rounded group-open:rotate-180 transition-transform duration-300 rounded-full p-1 shrink-0 ${isDark ? "bg-slate-800 text-slate-400" : isSepia ? "bg-[#E8DEC1] text-[#8C7B65]" : "bg-background text-muted"}`}
+                  className="material-symbols-rounded group-open:rotate-180 transition-transform duration-300 rounded-full p-1 shrink-0 text-muted bg-muted/20"
                 >
                   expand_more
                 </span>
               </summary>
 
               <div
-                className={`p-5 pt-2 border-t flex flex-col gap-2 ${borderColor} ${isDark ? "bg-slate-950/50" : isSepia ? "bg-[#E8DEC1]/20" : "bg-background/50"}`}
+                className="p-5 pt-2 border-t flex flex-col gap-2 border-border bg-muted/5"
               >
                 {cat.pecados.map((pecado, pecIndex) => {
                   const idPecado = `${catIndex}-${pecIndex}`;
-                  const isChecked = !!exameConsciencia[idPecado];
+                  const isChecked = isMounted && !!exameConsciencia[idPecado];
 
                   return (
                     <label
                       key={pecIndex}
-                      className={`flex items-start gap-4 cursor-pointer group/item p-3 rounded-xl transition-all ${isChecked ? `shadow-sm border border-[#6E3AA5]/30 ${cardBg}` : `border border-transparent ${itemHover}`}`}
+                      className={`flex items-start gap-4 cursor-pointer group/item p-3 rounded-xl transition-all ${isChecked ? `shadow-sm border border-[#6E3AA5]/30 bg-card` : `border border-transparent hover:bg-muted/10`}`}
                     >
                       <div className="relative mt-0.5 shrink-0">
                         <input
@@ -331,7 +284,7 @@ export default function ConfissaoPage() {
                           className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${
                             isChecked
                               ? "bg-[#6E3AA5] border-[#6E3AA5]"
-                              : `${isDark ? "border-slate-700 bg-slate-800" : isSepia ? "border-[#D9CFB3] bg-[#F4ECD8]" : "border-border bg-card"} group-hover/item:border-[#6E3AA5]/50`
+                              : "border-border bg-card group-hover/item:border-[#6E3AA5]/50"
                           }`}
                         >
                           <span
@@ -342,7 +295,7 @@ export default function ConfissaoPage() {
                         </div>
                       </div>
                       <span
-                        className={`leading-relaxed transition-colors select-none ${fontBody} ${isChecked ? "text-[#6E3AA5] font-bold" : `font-medium ${textMain}`}`}
+                        className={`leading-relaxed transition-colors select-none ${fontBody} ${isChecked ? "text-[#6E3AA5] font-bold" : `font-medium text-foreground`}`}
                       >
                         {pecado}
                       </span>
@@ -364,7 +317,7 @@ export default function ConfissaoPage() {
               </span>
             </div>
             <p
-              className={`font-serif italic leading-relaxed text-white/95 mb-8 ${tamanhoFonte === "grande" ? "text-xl" : "text-lg"}`}
+              className={`font-serif italic leading-relaxed text-white/95 mb-8 ${isMounted && tamanhoFonte === "grande" ? "text-xl" : "text-lg"}`}
             >
               &quot;Meu Deus, eu me arrependo de todo o coração de vos ter
               ofendido, porque sois tão bom e amável. Prometo, com a vossa
@@ -379,14 +332,14 @@ export default function ConfissaoPage() {
         </section>
 
         {/* BARRA DE AÇÕES FLUTUANTE (Aparece se houver pecados marcados) */}
-        {quantidadePecados > 0 && (
+        {isMounted && quantidadePecados > 0 && (
           <div className="fixed bottom-6 left-0 right-0 z-50 px-5 pointer-events-none animate-fade-in flex justify-center">
-            <div className={`pointer-events-auto flex items-center justify-between gap-4 p-4 rounded-full shadow-2xl border backdrop-blur-md ${isDark ? 'bg-slate-900/90 border-slate-700' : isSepia ? 'bg-[#F4ECD8]/95 border-[#D9CFB3]' : 'bg-white/95 border-slate-200'} max-w-[400px] w-full`}>
+            <div className="pointer-events-auto flex items-center justify-between gap-4 p-4 rounded-full shadow-2xl border backdrop-blur-md bg-card/95 border-border max-w-[400px] w-full">
               <div className="flex items-center gap-3 pl-2">
                 <div className="w-8 h-8 rounded-full bg-[#6E3AA5] text-white font-black flex items-center justify-center text-sm shadow-inner">
                   {quantidadePecados}
                 </div>
-                <span className={`font-bold text-sm ${textMain}`}>
+                <span className="font-bold text-sm text-foreground">
                   {quantidadePecados === 1 ? 'Falta anotada' : 'Faltas anotadas'}
                 </span>
               </div>

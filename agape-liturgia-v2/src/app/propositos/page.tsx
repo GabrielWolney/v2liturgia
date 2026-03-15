@@ -13,7 +13,7 @@ export default function PropositosPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [proposito, setProposito] = useState<Proposito | null>(null);
   
-  const { modoVisual, tamanhoFonte } = useUserStore();
+  const { tamanhoFonte } = useUserStore();
 
   useEffect(() => {
     const timer = setTimeout(() => setIsMounted(true), 0);
@@ -27,33 +27,20 @@ export default function PropositosPage() {
     };
   }, []);
 
-  if (!isMounted) return <div className="min-h-screen bg-background" />;
-
-  // --- CLASSES DO TEMA ---
-  const isDark = modoVisual === 'escuro';
-  const isSepia = modoVisual === 'leitura';
-
-  const wrapperClass = isDark ? "bg-slate-950" : isSepia ? "bg-[#FDF6E3]" : "bg-background";
-  const textMain = isDark ? "text-slate-100" : isSepia ? "text-[#4A3C31]" : "text-foreground";
-  const textMuted = isDark ? "text-slate-400" : isSepia ? "text-[#8C7B65]" : "text-muted";
-  const cardBg = isDark ? "bg-slate-900" : isSepia ? "bg-[#F4ECD8]" : "bg-card";
-  const borderColor = isDark ? "border-slate-800" : isSepia ? "border-[#E8DEC1]" : "border-border";
-  const headerBg = isDark ? "bg-slate-950/90" : isSepia ? "bg-[#FDF6E3]/90" : "bg-background/90";
-  const arrowHover = isDark ? "hover:bg-slate-800 text-slate-400 hover:text-slate-100" : isSepia ? "hover:bg-[#E8DEC1] text-[#8C7B65] hover:text-[#4A3C31]" : "hover:bg-slate-200 text-muted hover:text-foreground";
-
-  const fontClass = tamanhoFonte === 'grande' ? 'text-lg' : 'text-base';
-  const fontTitle = tamanhoFonte === 'grande' ? 'text-3xl' : 'text-2xl';
+  const fontClass = isMounted && tamanhoFonte === 'grande' ? 'text-lg' : 'text-base';
+  const fontTitle = isMounted && tamanhoFonte === 'grande' ? 'text-3xl' : 'text-2xl';
+  const fontText = isMounted && tamanhoFonte === 'grande' ? 'text-xl' : 'text-lg';
 
   const hasProposito = proposito?.ativo === true || String(proposito?.ativo) === "true";
 
   return (
-    <div className={`min-h-[100dvh] flex flex-col font-sans pb-32 transition-colors duration-300 selection:bg-primary/30 ${wrapperClass}`}>
+    <div className="min-h-[100dvh] flex flex-col font-sans pb-32 transition-colors duration-300 selection:bg-primary/30 bg-background">
       
-      <header className={`sticky top-0 z-50 backdrop-blur-md border-b px-4 sm:px-6 py-4 flex items-center justify-between max-w-[800px] mx-auto w-full transition-colors duration-300 ${headerBg} ${borderColor}`}>
-        <button onClick={() => router.back()} className={`flex items-center justify-center w-10 h-10 rounded-full active:scale-95 shrink-0 transition-colors ${arrowHover}`}>
+      <header className="sticky top-0 z-50 backdrop-blur-md border-b px-4 sm:px-6 py-4 flex items-center justify-between max-w-[800px] mx-auto w-full transition-colors duration-300 bg-background/90 border-border">
+        <button onClick={() => router.back()} className="flex items-center justify-center w-10 h-10 rounded-full active:scale-95 shrink-0 transition-colors text-muted hover:bg-muted/20 hover:text-foreground">
           <span className="material-symbols-rounded text-[26px]">arrow_back</span>
         </button>
-        <h1 className={`font-extrabold tracking-tight ${textMain} ${fontClass}`}>Missão Ágape</h1>
+        <h1 className={`font-extrabold tracking-tight text-foreground ${fontClass}`}>Missão Ágape</h1>
         <div className="w-10 h-10"></div>
       </header>
 
@@ -63,14 +50,14 @@ export default function PropositosPage() {
           <div className="w-20 h-20 bg-primary/10 rounded-[1.5rem] flex items-center justify-center text-primary mb-5 shadow-inner">
             <span className="material-symbols-rounded text-[40px]">flag</span>
           </div>
-          <h2 className={`text-3xl font-extrabold tracking-tight mb-2 ${textMain}`}>Propósito</h2>
-          <p className={`font-medium text-sm ${textMuted}`}>O foco espiritual da nossa comunidade.</p>
+          <h2 className="text-3xl font-extrabold tracking-tight mb-2 text-foreground">Propósito</h2>
+          <p className="font-medium text-sm text-muted">O foco espiritual da nossa comunidade.</p>
         </div>
 
         {!hasProposito ? (
-          <div className={`text-center py-16 border-2 border-dashed rounded-[2rem] flex flex-col items-center justify-center ${borderColor} ${cardBg}`}>
-             <span className={`material-symbols-rounded text-[48px] mb-3 opacity-20 ${textMain}`}>hourglass_empty</span>
-             <p className={`font-medium ${textMuted}`}>Nenhum propósito ativo no momento.</p>
+          <div className="text-center py-16 border-2 border-dashed rounded-[2rem] flex flex-col items-center justify-center border-border bg-card">
+             <span className="material-symbols-rounded text-[48px] mb-3 opacity-20 text-foreground">hourglass_empty</span>
+             <p className="font-medium text-muted">Nenhum propósito ativo no momento.</p>
           </div>
         ) : (
           <section className="bg-gradient-to-br from-primary to-[#1E4BCC] text-white p-8 rounded-[2rem] shadow-lg relative overflow-hidden">
@@ -83,7 +70,7 @@ export default function PropositosPage() {
                 <span className="text-xs font-bold uppercase tracking-widest">Comunidade</span>
               </div>
               <h3 className={`font-black mb-4 leading-tight ${fontTitle}`}>{proposito?.tema}</h3>
-              <p className={`font-serif italic leading-relaxed text-white/95 ${tamanhoFonte === 'grande' ? 'text-xl' : 'text-lg'}`}>
+              <p className={`font-serif italic leading-relaxed text-white/95 ${fontText}`}>
                 &quot;{proposito?.texto}&quot;
               </p>
             </div>
