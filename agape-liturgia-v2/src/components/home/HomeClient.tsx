@@ -33,6 +33,20 @@ const formatarNomeLiturgia = (texto: string) => {
   return formatado;
 };
 
+const getNomeFormalCor = (cor: string) => {
+  if (!cor) return 'Cor Litúrgica'; 
+  
+  switch(cor.toLowerCase().trim()) {
+    case 'branco': return 'Branco';
+    case 'verde': return 'Verde';
+    case 'roxo': return 'Roxo';
+    case 'vermelho': return 'Vermelho';
+    case 'rosa': return 'Rosa';
+    case 'preto': return 'Preto'; 
+    default: return 'Cor Litúrgica';
+  }
+};
+
 export function HomeClient({ liturgiaServer }: HomeClientProps) {
   const [isMounted, setIsMounted] = useState(false);
   const [saudacaoTempo, setSaudacaoTempo] = useState("Olá");
@@ -47,18 +61,17 @@ export function HomeClient({ liturgiaServer }: HomeClientProps) {
 
   useEffect(() => {
     const mountTimer = setTimeout(() => {
-      setIsMounted(true);
-      
-      const hora = new Date().getHours();
-      if (hora >= 5 && hora < 12) setSaudacaoTempo("Bom dia");
-      else if (hora >= 12 && hora < 18) setSaudacaoTempo("Boa tarde");
-      else setSaudacaoTempo("Boa noite");
+        setIsMounted(true);
+        const hora = new Date().getHours();
+        if (hora >= 5 && hora < 12) setSaudacaoTempo("Bom dia");
+        else if (hora >= 12 && hora < 18) setSaudacaoTempo("Boa tarde");
+        else setSaudacaoTempo("Boa noite");
 
-      const formatter = new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
-      const rawDate = formatter.format(new Date());
-      setDataAtual(rawDate.charAt(0).toUpperCase() + rawDate.slice(1));
+        const formatter = new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+        const rawDate = formatter.format(new Date());
+        setDataAtual(rawDate.charAt(0).toUpperCase() + rawDate.slice(1));
 
-      verificarStreak();
+        verificarStreak();
     }, 0);
 
     trackEvent("page_view", { page_name: "portal_v2_premium" });
@@ -101,8 +114,10 @@ export function HomeClient({ liturgiaServer }: HomeClientProps) {
   const corDia = liturgiaServer ? getCorLiturgica(liturgiaServer.liturgia, liturgiaServer.cor) : "verde";
   const imagemLiturgica = getImagemPorCor(corDia);
 
+  // AJUSTE: Lógica de Gradientes do Banner
   const getBannerGradient = (cor: string) => {
     switch(cor) {
+      case 'branco': return isDark ? 'from-slate-700 to-slate-900' : 'from-slate-50 to-slate-200'; // Gradiente suave para o Branco
       case 'verde': return 'from-emerald-400 to-emerald-600';
       case 'roxo': return 'from-[#6E3AA5] to-[#4A2673]';
       case 'vermelho': return 'from-red-500 to-red-700';
@@ -111,8 +126,10 @@ export function HomeClient({ liturgiaServer }: HomeClientProps) {
     }
   };
 
+  // AJUSTE: Lógica do Ponto de Cor
   const getDotColor = (cor: string) => {
     switch(cor) {
+      case 'branco': return isDark ? 'bg-white border border-slate-300' : 'bg-white border border-slate-200';
       case 'verde': return 'bg-emerald-500';
       case 'roxo': return 'bg-[#6E3AA5]';
       case 'vermelho': return 'bg-red-500';
@@ -121,8 +138,10 @@ export function HomeClient({ liturgiaServer }: HomeClientProps) {
     }
   };
 
+  // AJUSTE: Mapeamento de cor do texto do crachá para o BRANCO
   const getBadgeTextColor = (cor: string) => {
     switch(cor) {
+      case 'branco': return 'text-slate-900 dark:text-white'; // Texto escuro no modo claro, branco no modo escuro
       case 'verde': return 'text-emerald-700 dark:text-emerald-400';
       case 'roxo': return 'text-purple-700 dark:text-purple-400';
       case 'vermelho': return 'text-red-700 dark:text-red-400';
@@ -156,7 +175,7 @@ export function HomeClient({ liturgiaServer }: HomeClientProps) {
         </div>
       )}
 
-      <header className="flex items-center justify-between transition-colors duration-300 p-4 sm:p-5 max-w-[600px] mx-auto w-full">
+      <header className="flex items-center justify-between transition-colors duration-300 p-4 sm:p-5 max-w-[600px] mx-auto w-full relative z-20">
         <div className="flex items-center gap-3">
           <img src="/icon-192x192.png" alt="Logo" className="w-10 h-10 rounded-xl border shadow-sm" />
           <div className="flex flex-col justify-center">
@@ -203,16 +222,28 @@ export function HomeClient({ liturgiaServer }: HomeClientProps) {
             </div>
           </div>
         ) : (
-          <div className={`rounded-[2.5rem] p-4 sm:p-5 shadow-soft border w-full mb-8 transition-colors duration-300 ${cardBg} ${borderColor}`}>
+          <div className={`rounded-[2.5rem] p-4 sm:p-5 shadow-soft border w-full mb-8 transition-colors duration-300 relative ${cardBg} ${borderColor}`}>
+            {/* AJUSTE: Container da Imagem Refatorado para flutuação e tamanho melhores */}
             <div className={`w-full h-44 sm:h-52 rounded-[2rem] mb-6 relative overflow-hidden bg-gradient-to-tr flex items-end justify-center shadow-inner ${getBannerGradient(corDia)}`}>
-              <div className="relative w-full h-[90%] z-10 animate-float flex items-end justify-center">
-                <Image src={imagemLiturgica} alt="Liturgia" width={165} height={220} style={{ width: 'auto', height: 'auto' }} className="object-contain drop-shadow-[0_15px_15px_rgba(0,0,0,0.4)]" priority />
+              {/* AJUSTE: Wrapper de animação ocupa altura total e alinha a imagem na base */}
+              <div className="relative animate-float z-10 flex items-end justify-center h-full">
+                {/* AJUSTE: Container relativo da Imagem com proporção e altura otimizadas */}
+                <div className="relative w-auto aspect-[165/220] h-[85%] mb-2">
+                  <Image 
+                    src={imagemLiturgica} 
+                    alt="Liturgia" 
+                    fill 
+                    className="object-contain drop-shadow-[0_15px_15px_rgba(0,0,0,0.4)]" 
+                    priority 
+                  />
+                </div>
               </div>
               
+              {/* AJUSTE: Crachá Litúrgico Refatorado */}
               <div className={`absolute top-4 left-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-2 border ${borderColor} shadow-sm z-20`}>
-                <div className={`w-2 h-2 rounded-full ${getDotColor(corDia)} shadow-inner`}></div>
-                <span className={`text-[10px] font-black uppercase tracking-tighter ${getBadgeTextColor(corDia)}`}>
-                  {corDia === 'branco' ? 'Festivo' : corDia}
+                <div className={`w-2.5 h-2.5 rounded-full ${getDotColor(corDia)} shadow-inner`}></div>
+                <span className={`text-[10px] font-black uppercase tracking-widest ${getBadgeTextColor(corDia)}`}>
+                  {getNomeFormalCor(corDia)}
                 </span>
               </div>
             </div>
