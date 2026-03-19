@@ -10,6 +10,26 @@ import { useUserStore } from "@/store/useUserStore";
 
 type Aba = 'agora' | 'breve' | 'fim';
 
+const formatarDataBR = (dataString: string) => {
+  if (!dataString) return "";
+  
+  
+  const partes = dataString.replace(/\//g, '-').split('-');
+  
+  
+  if (partes.length === 3) {
+    return `${partes[2]}/${partes[1]}`;
+  }
+  
+  
+  if (partes.length === 2) {
+    
+    return `${partes[1]}/${partes[0]}`;
+  }
+  
+  return dataString; 
+};
+
 export default function NovenasPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [abaAtiva, setAbaAtiva] = useState<Aba>('agora');
@@ -85,7 +105,8 @@ export default function NovenasPage() {
                   <h3 className={`font-extrabold mb-1 text-foreground ${ tamanhoFonte === 'grande' ? 'text-lg' : 'text-base'}`}>{n.nome}</h3>
                   <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-muted">
                     <span className="material-symbols-rounded text-[16px]">date_range</span>
-                    {n.inicio.replace('-', '/')} a {n.fim.replace('-', '/')}
+                    {/* UTILIZANDO A NOVA FUNÇÃO DE FORMATAÇÃO DE DATA */}
+                    {formatarDataBR(n.inicio)} a {formatarDataBR(n.fim)}
                   </div>
                 </div>
                 

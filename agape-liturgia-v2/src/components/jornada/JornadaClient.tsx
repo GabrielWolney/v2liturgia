@@ -100,26 +100,26 @@ export function JornadaClient({ liturgiaServer }: { liturgiaServer: LiturgiaDiar
       const win = window as AgapeWindow;
       win.__IS_MOUNTED__ = true;
       setIsMounted(true);
+      
+      verificarStreak();
+      
+      if (liturgiaServer) {
+          setLiturgia(liturgiaServer);
+      } else {
+          getLiturgiaDoDia().then(setLiturgia);
+      }
     }, 0);
     
-    verificarStreak();
-    getLiturgiaDoDia().then(setLiturgia);
     trackEvent("page_view", { page_name: "jornada_v2_fiel" });
     
     return () => clearTimeout(mountTimer);
-  }, [verificarStreak]);
+  }, [verificarStreak, liturgiaServer]);
 
   if (!isMounted) return <div className="min-h-screen bg-background transition-colors duration-300" />;
 
   const isDark = modoVisual === "escuro";
   const isSepia = modoVisual === "leitura";
 
-  
-  
-  
-  
-  
-  
   const ringBgColor = isDark ? "#1e293b" : isSepia ? "#e2d1b1" : "#F1F5F9";
   const flagBorderColor = isDark ? "#020617" : isSepia ? "#FDF6E3" : "#F5F7FA";
   const arrowHover = isDark ? "hover:bg-slate-800 text-slate-400 hover:text-slate-100" : isSepia ? "hover:bg-[#E8DEC1] text-[#8C7B65] hover:text-[#4A3C31]" : "hover:bg-slate-200 text-muted hover:text-foreground";
@@ -173,12 +173,26 @@ export function JornadaClient({ liturgiaServer }: { liturgiaServer: LiturgiaDiar
   const jaRezouTerco = !!tercosConcluidos[dataHojeISO];
 
   let tempoInfo = null;
-  let hexColor = "#10B981";
+  let hexColor = "#10B981"; // verde padrão
 
   if (liturgia) {
     tempoInfo = calcularProgressoTempo(liturgia.liturgia);
     const corDia = getCorLiturgica(liturgia.liturgia, liturgia.cor);
-    hexColor = corDia === "roxo" ? "#6E3AA5" : corDia === "vermelho" ? "#EF4444" : corDia === "rosa" ? "#F472B6" : corDia === "branco" ? "#F59E0B" : "#10B981";
+    
+    // CORREÇÃO: Blindagem da cor do círculo litúrgico
+    if (!corDia) {
+      hexColor = "#10B981";
+    } else {
+      switch(corDia.toLowerCase().trim()) {
+        // Branco Prata (modo claro) para contraste no cartão branco / Branco Puro (modo escuro)
+        case 'branco': hexColor = isDark ? "#F8FAFC" : "#CBD5E1"; break;
+        case 'roxo': hexColor = "#6E3AA5"; break;
+        case 'vermelho': hexColor = "#EF4444"; break;
+        case 'rosa': hexColor = "#F472B6"; break;
+        case 'preto': hexColor = isDark ? "#334155" : "#0F172A"; break;
+        default: hexColor = "#10B981"; // verde
+      }
+    }
   }
 
   return (

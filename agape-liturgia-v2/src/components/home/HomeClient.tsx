@@ -34,7 +34,7 @@ const formatarNomeLiturgia = (texto: string) => {
 };
 
 const getNomeFormalCor = (cor: string) => {
-  if (!cor) return 'Cor Litúrgica'; 
+  if (!cor) return 'Cor Litúrgica';
   
   switch(cor.toLowerCase().trim()) {
     case 'branco': return 'Branco';
@@ -42,7 +42,7 @@ const getNomeFormalCor = (cor: string) => {
     case 'roxo': return 'Roxo';
     case 'vermelho': return 'Vermelho';
     case 'rosa': return 'Rosa';
-    case 'preto': return 'Preto'; 
+    case 'preto': return 'Preto';
     default: return 'Cor Litúrgica';
   }
 };
@@ -114,38 +114,48 @@ export function HomeClient({ liturgiaServer }: HomeClientProps) {
   const corDia = liturgiaServer ? getCorLiturgica(liturgiaServer.liturgia, liturgiaServer.cor) : "verde";
   const imagemLiturgica = getImagemPorCor(corDia);
 
-  // AJUSTE: Lógica de Gradientes do Banner
+  
   const getBannerGradient = (cor: string) => {
-    switch(cor) {
-      case 'branco': return isDark ? 'from-slate-700 to-slate-900' : 'from-slate-50 to-slate-200'; // Gradiente suave para o Branco
+    if (!cor) return 'from-amber-400 to-amber-600';
+
+    switch(cor.toLowerCase().trim()) {
+      case 'branco': return 'from-white to-slate-100'; 
       case 'verde': return 'from-emerald-400 to-emerald-600';
       case 'roxo': return 'from-[#6E3AA5] to-[#4A2673]';
       case 'vermelho': return 'from-red-500 to-red-700';
       case 'rosa': return 'from-pink-400 to-pink-600';
+      case 'preto': return 'from-slate-800 to-black'; 
       default: return 'from-amber-400 to-amber-600';
     }
   };
 
-  // AJUSTE: Lógica do Ponto de Cor
   const getDotColor = (cor: string) => {
-    switch(cor) {
-      case 'branco': return isDark ? 'bg-white border border-slate-300' : 'bg-white border border-slate-200';
+    if (!cor) return 'bg-amber-500';
+
+    switch(cor.toLowerCase().trim()) {
+      
+      case 'branco': return 'bg-white border border-slate-200';
       case 'verde': return 'bg-emerald-500';
       case 'roxo': return 'bg-[#6E3AA5]';
       case 'vermelho': return 'bg-red-500';
       case 'rosa': return 'bg-pink-500';
+      case 'preto': return 'bg-slate-950 border border-slate-700';
       default: return 'bg-amber-500'; 
     }
   };
 
-  // AJUSTE: Mapeamento de cor do texto do crachá para o BRANCO
+  
   const getBadgeTextColor = (cor: string) => {
-    switch(cor) {
-      case 'branco': return 'text-slate-900 dark:text-white'; // Texto escuro no modo claro, branco no modo escuro
+    if (!cor) return 'text-amber-700 dark:text-amber-400';
+
+    switch(cor.toLowerCase().trim()) {
+      
+      case 'branco': return 'text-white'; 
       case 'verde': return 'text-emerald-700 dark:text-emerald-400';
       case 'roxo': return 'text-purple-700 dark:text-purple-400';
       case 'vermelho': return 'text-red-700 dark:text-red-400';
       case 'rosa': return 'text-pink-700 dark:text-pink-400';
+      case 'preto': return 'text-white';
       default: return 'text-amber-700 dark:text-amber-400'; 
     }
   };
@@ -175,21 +185,23 @@ export function HomeClient({ liturgiaServer }: HomeClientProps) {
         </div>
       )}
 
-      <header className="flex items-center justify-between transition-colors duration-300 p-4 sm:p-5 max-w-[600px] mx-auto w-full relative z-20">
-        <div className="flex items-center gap-3">
-          <img src="/icon-192x192.png" alt="Logo" className="w-10 h-10 rounded-xl border shadow-sm" />
-          <div className="flex flex-col justify-center">
-            <span className="font-black text-base tracking-tighter text-[#2F6BFF] leading-none">Liturgia</span>
-            <span className={`text-[8px] font-black uppercase tracking-widest mt-0.5 opacity-90 ${textMuted}`}>Ágape de jovens</span>
+      <header className="cabecalho-fixo z-50 backdrop-blur-md border-b px-4 sm:px-6 py-4 max-w-[600px] mx-auto w-full transition-colors duration-300 ${wrapperClass} ${borderColor}">
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-center gap-3">
+            <img src="/icon-192x192.png" alt="Logo" className="w-10 h-10 rounded-xl border shadow-sm" />
+            <div className="flex flex-col justify-center">
+              <span className="font-black text-base tracking-tighter text-[#2F6BFF] leading-none">Liturgia</span>
+              <span className={`text-[8px] font-black uppercase tracking-widest mt-0.5 opacity-90 ${textMuted}`}>Ágape de jovens</span>
+            </div>
           </div>
+          <Link href="/progresso" className={`flex items-center gap-1 px-3 py-1.5 rounded-full border shadow-sm transition-colors active:scale-95 ${foguinhoClass}`}>
+            <span className="material-symbols-rounded text-[18px]">local_fire_department</span>
+            <span className="font-extrabold text-sm">{streak}</span>
+          </Link>
         </div>
-        <Link href="/progresso" className={`flex items-center gap-1 px-3 py-1.5 rounded-full border shadow-sm transition-colors active:scale-95 ${foguinhoClass}`}>
-          <span className="material-symbols-rounded text-[18px]">local_fire_department</span>
-          <span className="font-extrabold text-sm">{streak}</span>
-        </Link>
       </header>
 
-      <main className="relative z-10 flex-1 flex flex-col px-6 max-w-[600px] mx-auto w-full justify-center">
+      <main className="relative z-10 flex-1 flex flex-col px-6 max-w-[600px] mx-auto w-full justify-center mt-24">
         
         {isInstallable && (
           <div className="mb-6 animate-fade-in">
@@ -223,11 +235,9 @@ export function HomeClient({ liturgiaServer }: HomeClientProps) {
           </div>
         ) : (
           <div className={`rounded-[2.5rem] p-4 sm:p-5 shadow-soft border w-full mb-8 transition-colors duration-300 relative ${cardBg} ${borderColor}`}>
-            {/* AJUSTE: Container da Imagem Refatorado para flutuação e tamanho melhores */}
+            {/* AJUSTE FINAL: Container da Imagem com Gradiente Blindado */}
             <div className={`w-full h-44 sm:h-52 rounded-[2rem] mb-6 relative overflow-hidden bg-gradient-to-tr flex items-end justify-center shadow-inner ${getBannerGradient(corDia)}`}>
-              {/* AJUSTE: Wrapper de animação ocupa altura total e alinha a imagem na base */}
               <div className="relative animate-float z-10 flex items-end justify-center h-full">
-                {/* AJUSTE: Container relativo da Imagem com proporção e altura otimizadas */}
                 <div className="relative w-auto aspect-[165/220] h-[85%] mb-2">
                   <Image 
                     src={imagemLiturgica} 
@@ -239,7 +249,7 @@ export function HomeClient({ liturgiaServer }: HomeClientProps) {
                 </div>
               </div>
               
-              {/* AJUSTE: Crachá Litúrgico Refatorado */}
+              {/* AJUSTE FINAL: Crachá Litúrgico com Texto Escuro para o Branco */}
               <div className={`absolute top-4 left-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-2 border ${borderColor} shadow-sm z-20`}>
                 <div className={`w-2.5 h-2.5 rounded-full ${getDotColor(corDia)} shadow-inner`}></div>
                 <span className={`text-[10px] font-black uppercase tracking-widest ${getBadgeTextColor(corDia)}`}>
