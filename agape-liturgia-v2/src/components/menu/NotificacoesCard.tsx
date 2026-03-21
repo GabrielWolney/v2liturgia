@@ -35,34 +35,36 @@ export function NotificacoesCard() {
   }, []);
 
   const registrarOuAtualizarToken = async () => {
-    if (!('Notification' in window) || !messaging) return;
+    if (!('serviceWorker' in navigator) || !messaging) return;
     
     setLoading(true);
     try {
-      // 1. LIMPEZA DE FANTASMAS: Remove todos os Service Workers antigos
       const registrations = await navigator.serviceWorker.getRegistrations();
       for (const registration of registrations) {
         await registration.unregister();
-        console.log("SW Antigo removido.");
+        console.log("Registro antigo removido.");
       }
 
-      // 2. PEDIR PERMISSÃO NOVAMENTE
+      // Pequena pausa para o iOS respirar
+      await new Promise(resolve => setTimeout(resolve, 800));
+
+      // --- PASSO B: NOVO REGISTRO ---
       const resultado = await Notification.requestPermission();
       setPermission(resultado);
       
       if (resultado === 'granted') {
-        // 3. GERAR TOKEN NOVO (Isso força o registro do SW atualizado da pasta public)
+        // O getToken vai baixar o novo sw.js silencioso que criámos no Passo 1
         const token = await getToken(messaging, {
           vapidKey: "BDRVdc4K5TpdNyBv9S5RAs01wgk0TVJCjf7D17m4LiUfUBii3W3tRHTSSijB5biqcohVbLmqP7OuRDHxSAE_dDg"
         });
 
         if (token) {
           await salvarTokenNotificacao(token, nomeUsuario);
-          alert("Sincronização completa! Os fantasmas foram removidos. 🕊️");
+          alert("Sincronização completa! Fantasmas removidos e dados preservados. 🕊️");
         }
       }
     } catch (erro) {
-      console.error("Erro ao limpar/registrar:", erro);
+      console.error("Erro ao sincronizar:", erro);
       alert("Erro na sincronização.");
     } finally {
       setLoading(false);
