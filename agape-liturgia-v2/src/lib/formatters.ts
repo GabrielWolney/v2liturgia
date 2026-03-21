@@ -1,6 +1,4 @@
-/**
- * Estilo idêntico ao da aba Bíblia
- */
+
 const CLASSE_VERSICULO = "font-sans font-bold text-[#2F6BFF] text-[0.65em] align-super mr-1.5 ml-1 select-none";
 
 export function formatarTextoLiturgico(texto: string): string {
@@ -13,8 +11,8 @@ export function formatarTextoLiturgico(texto: string): string {
 
   
   
-  html = html.replace(/(?<![a-zA-Záàâãéèêíïóôõöúç\d])(\d+)(?!\d|[:\-])/g, (match, numero) => {
-    return `<sup class="${CLASSE_VERSICULO}">${numero}</sup>`;
+  html = html.replace(/(^|[^a-zA-Záàâãéèêíïóôõöúç\d])(\d+)(?!\d|[:\-])/g, (match, prefixo, numero) => {
+    return `${prefixo}<sup class="${CLASSE_VERSICULO}">${numero}</sup>`;
   });
 
   
@@ -29,8 +27,8 @@ export function formatarSalmo(texto: string, refrao: string): string {
   let html = texto.replace(new RegExp(`(—|R\\.|R:)?\\s*${refrao.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'gi'), '');
   
   
-  html = html.replace(/(?<![a-zA-Záàâãéèêíïóôõöúç\d])(\d+)(?!\d|[:\-])/g, (match, numero) => {
-    return `<sup class="${CLASSE_VERSICULO}">${numero}</sup>`;
+  html = html.replace(/(^|[^a-zA-Záàâãéèêíïóôõöúç\d])(\d+)(?!\d|[:\-])/g, (match, prefixo, numero) => {
+    return `${prefixo}<sup class="${CLASSE_VERSICULO}">${numero}</sup>`;
   });
 
   html = html.replace(/\n/g, '<br />');
