@@ -185,7 +185,7 @@ export function HomeClient({ liturgiaServer }: HomeClientProps) {
         </div>
       )}
 
-      <header className="cabecalho-fixo z-50 backdrop-blur-md border-b px-4 sm:px-6 py-4 max-w-[600px] mx-auto w-full transition-colors duration-300 ${wrapperClass} ${borderColor}">
+      <header className="flex items-center justify-between transition-colors duration-300 p-4 sm:p-5 max-w-[600px] mx-auto w-full relative z-20">
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-3">
             <img src="/icon-192x192.png" alt="Logo" className="w-10 h-10 rounded-xl border shadow-sm" />
@@ -201,7 +201,7 @@ export function HomeClient({ liturgiaServer }: HomeClientProps) {
         </div>
       </header>
 
-      <main className="relative z-10 flex-1 flex flex-col px-6 max-w-[600px] mx-auto w-full justify-center mt-24">
+      <main className="relative z-10 flex-1 flex flex-col px-6 max-w-[600px] mx-auto w-full justify-center">
         
         {isInstallable && (
           <div className="mb-6 animate-fade-in">
