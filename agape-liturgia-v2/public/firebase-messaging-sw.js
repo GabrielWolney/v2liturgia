@@ -1,4 +1,3 @@
-// VERSÃO 2.0 - LIMPEZA DE DUPLICIDADE
 importScripts('https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging-compat.js');
 
@@ -14,7 +13,6 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
-
 messaging.onBackgroundMessage((payload) => {
-  console.log('Mensagem recebida no fundo. O sistema cuidará da exibição.', payload);
+  console.log('Mensagem recebida. O iOS cuidará da exibição nativa.', payload);
 });

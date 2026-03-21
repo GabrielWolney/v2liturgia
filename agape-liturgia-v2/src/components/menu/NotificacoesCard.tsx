@@ -39,22 +39,31 @@ export function NotificacoesCard() {
     
     setLoading(true);
     try {
+      // 1. LIMPEZA DE FANTASMAS: Remove todos os Service Workers antigos
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      for (const registration of registrations) {
+        await registration.unregister();
+        console.log("SW Antigo removido.");
+      }
+
+      // 2. PEDIR PERMISSÃO NOVAMENTE
       const resultado = await Notification.requestPermission();
       setPermission(resultado);
       
       if (resultado === 'granted') {
+        // 3. GERAR TOKEN NOVO (Isso força o registro do SW atualizado da pasta public)
         const token = await getToken(messaging, {
           vapidKey: "BDRVdc4K5TpdNyBv9S5RAs01wgk0TVJCjf7D17m4LiUfUBii3W3tRHTSSijB5biqcohVbLmqP7OuRDHxSAE_dDg"
         });
 
         if (token) {
           await salvarTokenNotificacao(token, nomeUsuario);
-          alert("Conexão com o servidor atualizada! 🕊️");
+          alert("Sincronização completa! Os fantasmas foram removidos. 🕊️");
         }
       }
     } catch (erro) {
-      console.error("Erro ao registrar:", erro);
-      alert("Erro ao sincronizar. Verifique a internet.");
+      console.error("Erro ao limpar/registrar:", erro);
+      alert("Erro na sincronização.");
     } finally {
       setLoading(false);
     }
