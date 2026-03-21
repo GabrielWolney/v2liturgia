@@ -39,38 +39,32 @@ export function NotificacoesCard() {
     
     setLoading(true);
     try {
+
       const registrations = await navigator.serviceWorker.getRegistrations();
       for (const registration of registrations) {
         await registration.unregister();
-        console.log("Registro antigo removido.");
       }
 
-      // Pequena pausa para o iOS respirar
-      await new Promise(resolve => setTimeout(resolve, 800));
+      const newRegistration = await navigator.serviceWorker.register(
+        `/firebase-messaging-sw.js?v=${Date.now()}`
+      );
 
-      // --- PASSO B: NOVO REGISTRO ---
-      const resultado = await Notification.requestPermission();
-      setPermission(resultado);
-      
-      if (resultado === 'granted') {
-        // O getToken vai baixar o novo sw.js silencioso que criámos no Passo 1
-        const token = await getToken(messaging, {
-          vapidKey: "BDRVdc4K5TpdNyBv9S5RAs01wgk0TVJCjf7D17m4LiUfUBii3W3tRHTSSijB5biqcohVbLmqP7OuRDHxSAE_dDg"
-        });
+      const token = await getToken(messaging, {
+        serviceWorkerRegistration: newRegistration,
+        vapidKey: "BDRVdc4K5TpdNyBv9S5RAs01wgk0TVJCjf7D17m4LiUfUBii3W3tRHTSSijB5biqcohVbLmqP7OuRDHxSAE_dDg"
+      });
 
-        if (token) {
-          await salvarTokenNotificacao(token, nomeUsuario);
-          alert("Sincronização completa! Fantasmas removidos e dados preservados. 🕊️");
-        }
+      if (token) {
+        await salvarTokenNotificacao(token, nomeUsuario);
+        alert("Sincronização completa! Notificações duplicadas resolvidas. 🕊️");
       }
     } catch (erro) {
-      console.error("Erro ao sincronizar:", erro);
-      alert("Erro na sincronização.");
+      console.error("Erro na sincronização:", erro);
+      alert("Houve um erro ao sincronizar. Tenta novamente.");
     } finally {
       setLoading(false);
     }
   };
-
   if (!isMounted) return null;
 
   const isDark = modoVisual === 'escuro';
