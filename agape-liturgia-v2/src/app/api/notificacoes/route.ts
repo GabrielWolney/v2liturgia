@@ -1,35 +1,36 @@
 import { NextResponse } from "next/server";
-import { adminDb, adminMessaging } from "@/lib/firebase-admin";
+import { getFirebaseAdmin } from "@/lib/firebase-admin";
+
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { titulo, mensagem, paginaDestino } = body;
 
-    // 1. Busca todos os tokens salvos na sua coleção 'fcm_tokens'
+    
+    const { adminDb, adminMessaging } = getFirebaseAdmin();
+
     const tokensSnapshot = await adminDb.collection("fcm_tokens").get();
     
     if (tokensSnapshot.empty) {
       return NextResponse.json({ message: "Nenhum token encontrado no banco." }, { status: 200 });
     }
 
-    // 2. Extrai apenas as strings dos tokens
     const tokens = tokensSnapshot.docs.map(doc => doc.data().token);
 
-    // 3. Monta a carga da notificação
     const payload = {
       notification: {
         title: titulo,
         body: mensagem,
       },
-      // Dados extras para o celular saber qual página abrir ao clicar
       data: {
         url: paginaDestino || "/",
       },
       tokens: tokens,
     };
 
-    // 4. Faz o envio em massa (Multicast)
     const response = await adminMessaging.sendEachForMulticast(payload);
 
     return NextResponse.json({ 
