@@ -58,10 +58,26 @@ export default function AdminPageCrua() {
 
   const handleSalvarAviso = async () => {
     if (!novoAvisoTexto || !novoAvisoData) return alert("Preencha texto e data!");
+    
     await adicionarAviso(novoAvisoTexto, novoAvisoData);
+  
+    try {
+      await fetch('/api/notificacoes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          titulo: "⚠️ Novo Aviso da Coordenação",
+          mensagem: novoAvisoTexto,
+          paginaDestino: "/" 
+        })
+      });
+    } catch (err) {
+      console.error("Falha ao enviar notificação:", err);
+    }
+
     setNovoAvisoTexto(""); 
     setNovoAvisoData("");
-    alert("Aviso salvo!");
+    alert("Aviso salvo e notificação enviada!");
   };
 
   const handleSalvarPropositos = async () => {

@@ -38,3 +38,19 @@ export async function atualizarContador(dataIso: string, tipo: 'leitura' | 'terc
   const docRef = doc(db, "estatisticas", `${tipo}_${dataIso}`);
   await setDoc(docRef, { contador: increment(somar ? 1 : -1), ultimaAtualizacao: new Date() }, { merge: true });
 }
+
+export async function salvarTokenNotificacao(token: string, nomeUsuario: string) {
+  try {
+    const docRef = doc(db, "fcm_tokens", token);
+    await setDoc(docRef, {
+      token,
+      nomeUsuario: nomeUsuario || "Jovem Anônimo",
+      dataRegistro: new Date().toISOString(),
+      ativo: true
+    }, { merge: true });
+    
+    console.log("Token salvo no cofre com sucesso!");
+  } catch (error) {
+    console.error("Erro ao salvar token de notificação:", error);
+  }
+}

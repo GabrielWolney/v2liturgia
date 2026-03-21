@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useUserStore } from "@/store/useUserStore";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
+import { NotificacoesCard } from "@/components/menu/NotificacoesCard";
 
 export default function ConfigPage() {
   const router = useRouter();
@@ -97,6 +98,7 @@ export default function ConfigPage() {
               </div>
             </div>
 
+
             <div>
               <p className="font-bold text-sm mb-3 text-foreground">Tamanho do Texto Bíblico</p>
               <div className="flex gap-3">
@@ -109,6 +111,11 @@ export default function ConfigPage() {
               </div>
             </div>
           </div>
+        </section>
+
+
+            <section className="mb-8">
+          <NotificacoesCard />
         </section>
 
         <section className="mb-8">

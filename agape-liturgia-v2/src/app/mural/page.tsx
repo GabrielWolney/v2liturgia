@@ -27,8 +27,30 @@ export default function MuralPage() {
   const handleEnviar = async () => { 
     if (!texto.trim()) return; 
     setIsSubmitting(true);
+    
     const id = await adicionarPedido(nome, texto);
-    if (id) { addMeuPedido(id); setTexto(""); setNome(""); }
+    
+    if (id) { 
+      addMeuPedido(id); 
+      
+      try {
+        const nomeNotificacao = nome ? nome.trim() : "Um jovem";
+        await fetch('/api/notificacoes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            titulo: "🙏 Novo Pedido de Oração",
+            mensagem: `${nomeNotificacao} acabou de deixar um pedido no Mural. Venha interceder!`,
+            paginaDestino: "/mural" 
+          })
+        });
+      } catch (err) {
+        console.error("Falha ao notificar mural:", err);
+      }
+
+      setTexto(""); 
+      setNome(""); 
+    }
     setIsSubmitting(false);
   };
 
