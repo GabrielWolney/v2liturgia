@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { getFirebaseAdmin } from "@/lib/firebase-admin";
 
+
+
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {

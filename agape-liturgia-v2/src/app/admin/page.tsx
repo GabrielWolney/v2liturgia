@@ -24,6 +24,8 @@ export default function AdminPageCrua() {
 
   const { tamanhoFonte } = useUserStore();
 
+  const [enviando, setEnviando] = useState(false);
+
   useEffect(() => {
     const unsubAuth = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -56,38 +58,35 @@ export default function AdminPageCrua() {
   };
 
   const handleSalvarAviso = async () => {
-    if (!novoAvisoTexto || !novoAvisoData) return alert("Preencha texto e data!");
-    
-    await adicionarAviso(novoAvisoTexto, novoAvisoData);
-    
-    try {
-      const res = await fetch('/api/notificacoes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          titulo: "⚠️ Novo Aviso",
-          mensagem: novoAvisoTexto,
-          paginaDestino: "/" 
-        })
-      });
-      
-      const data = await res.json();
-      
-      // NOSSO RAIO-X PARA O TESTE
-      if (data.success) {
-        alert(`Aviso salvo! \n🔔 Enviados com sucesso: ${data.enviados} \n❌ Falhas (Tokens expirados): ${data.falhas}`);
-      } else {
-        alert(`Erro na API: ${data.error || data.message}`);
-      }
+  if (!novoAvisoTexto || !novoAvisoData) return alert("Preencha texto e data!");
+  if (enviando) return; // Se já estiver enviando, ignora o clique!
 
-    } catch (err) {
-      console.error("Falha ao enviar notificação:", err);
-      alert("Aviso salvo localmente, mas houve um erro no servidor de notificações.");
-    }
+  setEnviando(true); // Trava o botão
 
+  await adicionarAviso(novoAvisoTexto, novoAvisoData);
+
+  try {
+    const res = await fetch('/api/notificacoes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        titulo: "⚠️ Novo Aviso da Coordenação",
+        mensagem: novoAvisoTexto,
+        paginaDestino: "/" 
+      })
+    });
+
+    const data = await res.json();
+    alert(`Aviso salvo! \n🔔 Enviados: ${data.enviados}`);
+
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setEnviando(false); // Destrava o botão
     setNovoAvisoTexto(""); 
     setNovoAvisoData("");
-  };
+  }
+};
 
   // ESTA FUNÇÃO REAPARECEU PARA CURAR O ERRO:
   const handleSalvarPropositos = async () => {
@@ -155,7 +154,13 @@ export default function AdminPageCrua() {
             <div className="flex flex-col gap-3">
               <input type="text" placeholder="Texto do aviso..." value={novoAvisoTexto} onChange={e => setNovoAvisoTexto(e.target.value)} className="w-full border rounded-xl px-4 py-3 bg-background border-border text-foreground" />
               <input type="date" value={novoAvisoData} onChange={e => setNovoAvisoData(e.target.value)} className="w-fit border rounded-xl px-4 py-3 bg-background border-border text-foreground" />
-              <button onClick={handleSalvarAviso} className="w-fit mt-2 px-8 py-3 bg-amber-500 text-white font-bold rounded-xl hover:brightness-105 transition-all active:scale-95">Salvar Aviso</button>
+              <button 
+  onClick={handleSalvarAviso} 
+  disabled={enviando}
+  className={`w-fit mt-2 px-8 py-3 bg-amber-500 text-white font-bold rounded-xl ${enviando ? 'opacity-50' : 'active:scale-95'}`}
+>
+  {enviando ? "Enviando..." : "Salvar Aviso"}
+</button>
             </div>
             <h4 className="mt-10 mb-4 font-black uppercase text-xs tracking-widest text-muted">Avisos Ativos:</h4>
             <ul className="space-y-3">
