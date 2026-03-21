@@ -26,6 +26,8 @@ export default function AdminPageCrua() {
 
   const [enviando, setEnviando] = useState(false);
 
+  const [carregando, setCarregando] = useState(false);
+
   useEffect(() => {
     const unsubAuth = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -59,12 +61,11 @@ export default function AdminPageCrua() {
 
   const handleSalvarAviso = async () => {
   if (!novoAvisoTexto || !novoAvisoData) return alert("Preencha texto e data!");
-  if (enviando) return; // Se já estiver enviando, ignora o clique!
+  if (carregando) return; // Se já estiver enviando, ignora o clique!
 
-  setEnviando(true); // Trava o botão
-
+  setCarregando(true);
   await adicionarAviso(novoAvisoTexto, novoAvisoData);
-
+  
   try {
     const res = await fetch('/api/notificacoes', {
       method: 'POST',
@@ -75,14 +76,14 @@ export default function AdminPageCrua() {
         paginaDestino: "/" 
       })
     });
-
+    
     const data = await res.json();
-    alert(`Aviso salvo! \n🔔 Enviados: ${data.enviados}`);
+    alert(`Aviso enviado! 🔔 Total: ${data.enviados}`);
 
   } catch (err) {
     console.error(err);
   } finally {
-    setEnviando(false); // Destrava o botão
+    setCarregando(false); // Destrava o botão
     setNovoAvisoTexto(""); 
     setNovoAvisoData("");
   }
