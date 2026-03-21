@@ -41,11 +41,12 @@ export async function atualizarContador(dataIso: string, tipo: 'leitura' | 'terc
 
 export async function salvarTokenNotificacao(token: string, nomeUsuario: string) {
   try {
-    const docRef = doc(db, "fcm_tokens", token);
+    
+    const docRef = doc(db, "tokens_notificacao", token);
     await setDoc(docRef, {
       token,
       nomeUsuario: nomeUsuario || "Jovem Anônimo",
-      dataRegistro: new Date().toISOString(),
+      ultimoAcesso: new Date().toISOString(), 
       ativo: true
     }, { merge: true });
     

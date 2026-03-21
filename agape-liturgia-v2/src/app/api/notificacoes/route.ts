@@ -12,7 +12,7 @@ export async function POST(req: Request) {
     
     const { adminDb, adminMessaging } = getFirebaseAdmin();
 
-    const tokensSnapshot = await adminDb.collection("fcm_tokens").get();
+    const tokensSnapshot = await adminDb.collection("tokens_notificacao").get();
     
     if (tokensSnapshot.empty) {
       return NextResponse.json({ message: "Nenhum token encontrado no banco." }, { status: 200 });
