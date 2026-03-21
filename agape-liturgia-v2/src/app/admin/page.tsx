@@ -65,7 +65,7 @@ export default function AdminPageCrua() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          titulo: "⚠️ Novo Aviso da Coordenação",
+          titulo: "⚠️ Novo Aviso",
           mensagem: novoAvisoTexto,
           paginaDestino: "/" 
         })
