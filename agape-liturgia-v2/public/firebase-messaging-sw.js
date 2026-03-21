@@ -1,22 +1,19 @@
-// Importa os scripts do Firebase para o Service Worker
 importScripts('https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging-compat.js');
 
-// ATENÇÃO: Substitua pelos mesmos dados do seu firebaseConfig!
 const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
-  authDomain: "SEU_AUTH_DOMAIN",
-  projectId: "SEU_PROJECT_ID",
-  storageBucket: "SEU_STORAGE_BUCKET",
-  messagingSenderId: "SEU_MESSAGING_SENDER_ID",
-  appId: "SEU_APP_ID"
+  apiKey: "AIzaSyA8HrJeZ-QHGQHHGTn5-N7L_2CpSUd42gM",
+  authDomain: "agape-avisos.firebaseapp.com",
+  projectId: "agape-avisos",
+  storageBucket: "agape-avisos.firebasestorage.app",
+  messagingSenderId: "556421268172",
+  appId: "1:556421268172:web:b9cb0955e3e95dd8e8f869"
 };
 
-// Inicializa o app do Firebase no background
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
-// Lida com as notificações quando o app está em segundo plano
+
 messaging.onBackgroundMessage((payload) => {
   console.log('[firebase-messaging-sw.js] Notificação recebida em background ', payload);
   
@@ -24,7 +21,8 @@ messaging.onBackgroundMessage((payload) => {
   const notificationOptions = {
     body: payload.notification.body,
     icon: '/icon-192x192.png',
-    badge: '/icon-192x192.png'
+    badge: '/icon-192x192.png',
+    data: payload.data
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);
