@@ -1,8 +1,8 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-
-import { getMessaging, isSupported, Messaging } from "firebase/messaging";
 import { getAuth } from "firebase/auth";
+import { getMessaging, isSupported as isMessagingSupported, Messaging } from "firebase/messaging";
+import { getAnalytics, isSupported as isAnalyticsSupported, Analytics } from "firebase/analytics";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -21,11 +21,22 @@ const auth = getAuth(app);
 
 let messaging: Messaging | null = null;
 if (typeof window !== "undefined") {
-  isSupported().then((supported) => {
+  isMessagingSupported().then((supported) => {
     if (supported) {
       messaging = getMessaging(app);
     }
   });
 }
 
-export { app, db, auth, messaging };
+
+let analytics: Analytics | null = null;
+if (typeof window !== "undefined") {
+  isAnalyticsSupported().then((supported) => {
+    if (supported) {
+      analytics = getAnalytics(app);
+    }
+  });
+}
+
+
+export { app, db, auth, messaging, analytics };
