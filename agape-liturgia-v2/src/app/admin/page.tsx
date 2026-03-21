@@ -22,7 +22,6 @@ export default function AdminPageCrua() {
   const [propTema, setPropTema] = useState("");
   const [propTexto, setPropTexto] = useState("");
 
-  // Removemos o modoVisual daqui, o CSS agora faz o trabalho pesado!
   const { tamanhoFonte } = useUserStore();
 
   useEffect(() => {
@@ -60,9 +59,9 @@ export default function AdminPageCrua() {
     if (!novoAvisoTexto || !novoAvisoData) return alert("Preencha texto e data!");
     
     await adicionarAviso(novoAvisoTexto, novoAvisoData);
-  
+    
     try {
-      await fetch('/api/notificacoes', {
+      const res = await fetch('/api/notificacoes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -71,15 +70,26 @@ export default function AdminPageCrua() {
           paginaDestino: "/" 
         })
       });
+      
+      const data = await res.json();
+      
+      // NOSSO RAIO-X PARA O TESTE
+      if (data.success) {
+        alert(`Aviso salvo! \n🔔 Enviados com sucesso: ${data.enviados} \n❌ Falhas (Tokens expirados): ${data.falhas}`);
+      } else {
+        alert(`Erro na API: ${data.error || data.message}`);
+      }
+
     } catch (err) {
       console.error("Falha ao enviar notificação:", err);
+      alert("Aviso salvo localmente, mas houve um erro no servidor de notificações.");
     }
 
     setNovoAvisoTexto(""); 
     setNovoAvisoData("");
-    alert("Aviso salvo e notificação enviada!");
   };
 
+  // ESTA FUNÇÃO REAPARECEU PARA CURAR O ERRO:
   const handleSalvarPropositos = async () => {
     await updateProposito({ 
       ativo: propAtivo, tema: propTema, texto: propTexto
@@ -92,8 +102,6 @@ export default function AdminPageCrua() {
   if (!user) {
     return (
       <div className={`min-h-screen flex flex-col transition-colors duration-300 bg-background text-foreground ${fontClass}`}>
-        
-        {/* CABEÇALHO COM SETA DE VOLTAR */}
         <header className="sticky top-0 z-50 backdrop-blur-md border-b px-4 sm:px-6 py-4 flex items-center justify-between max-w-[800px] mx-auto w-full transition-colors duration-300 bg-background/90 border-border">
           <button onClick={() => router.back()} className="flex items-center justify-center w-10 h-10 rounded-full active:scale-95 shrink-0 transition-colors text-muted hover:bg-muted/20 hover:text-foreground">
             <span className="material-symbols-rounded text-[26px]">arrow_back</span>
@@ -126,8 +134,6 @@ export default function AdminPageCrua() {
 
   return (
     <div className={`min-h-screen flex flex-col transition-colors duration-300 bg-background text-foreground ${fontClass}`}>
-      
-      {/* CABEÇALHO ADMIN COM SETA DE VOLTAR E BOTÃO SAIR */}
       <header className="sticky top-0 z-50 backdrop-blur-md border-b px-4 sm:px-6 py-4 flex items-center justify-between max-w-[800px] mx-auto w-full transition-colors duration-300 bg-background/90 border-border">
         <button onClick={() => router.back()} className="flex items-center justify-center w-10 h-10 rounded-full active:scale-95 shrink-0 transition-colors text-muted hover:bg-muted/20 hover:text-foreground">
           <span className="material-symbols-rounded text-[26px]">arrow_back</span>
@@ -141,19 +147,18 @@ export default function AdminPageCrua() {
       <main className="flex-1 w-full max-w-[800px] mx-auto px-5 pt-8 pb-32 animate-fade-in">
         <div className="grid grid-cols-1 gap-8">
           
-          {/* AVISOS */}
+          {/* SEÇÃO AVISOS */}
           <section className="border-2 p-6 rounded-[2rem] transition-colors bg-card border-border">
             <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
               <span className="material-symbols-rounded text-amber-500">campaign</span> Adicionar Novo Aviso
             </h3>
             <div className="flex flex-col gap-3">
-              <input type="text" placeholder="Texto do aviso (Aparece no Pop-up)..." value={novoAvisoTexto} onChange={e => setNovoAvisoTexto(e.target.value)} className="w-full border rounded-xl px-4 py-3 bg-background border-border text-foreground" />
+              <input type="text" placeholder="Texto do aviso..." value={novoAvisoTexto} onChange={e => setNovoAvisoTexto(e.target.value)} className="w-full border rounded-xl px-4 py-3 bg-background border-border text-foreground" />
               <input type="date" value={novoAvisoData} onChange={e => setNovoAvisoData(e.target.value)} className="w-fit border rounded-xl px-4 py-3 bg-background border-border text-foreground" />
               <button onClick={handleSalvarAviso} className="w-fit mt-2 px-8 py-3 bg-amber-500 text-white font-bold rounded-xl hover:brightness-105 transition-all active:scale-95">Salvar Aviso</button>
             </div>
             <h4 className="mt-10 mb-4 font-black uppercase text-xs tracking-widest text-muted">Avisos Ativos:</h4>
             <ul className="space-y-3">
-              {avisos.length === 0 && <p className="italic text-sm text-muted">Nenhum aviso no momento.</p>}
               {avisos.map(a => (
                 <li key={a.id} className="flex justify-between items-center p-4 rounded-2xl border border-border bg-background/50">
                   <span className="text-sm"><strong className="text-amber-500">[{a.dataExpiracao}]</strong> {a.texto}</span>
@@ -163,7 +168,7 @@ export default function AdminPageCrua() {
             </ul>
           </section>
 
-          {/* PROPÓSITO ÚNICO (MENSAL/COMUNIDADE) */}
+          {/* SEÇÃO PROPÓSITO */}
           <section className="border-2 p-6 rounded-[2rem] border-primary/30 transition-colors bg-card">
             <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-primary">
               <span className="material-symbols-rounded">flag</span> Propósito da Comunidade
@@ -173,7 +178,7 @@ export default function AdminPageCrua() {
               <span className="font-bold">Ativar Propósito no App</span>
             </label>
             <div className="flex flex-col gap-4 mb-4">
-              <input type="text" placeholder="Tema (ex: Mês das Vocações)" value={propTema} onChange={e => setPropTema(e.target.value)} className="w-full border rounded-xl px-4 py-3 bg-background border-border text-foreground" />
+              <input type="text" placeholder="Tema..." value={propTema} onChange={e => setPropTema(e.target.value)} className="w-full border rounded-xl px-4 py-3 bg-background border-border text-foreground" />
               <textarea placeholder="Texto do propósito..." value={propTexto} onChange={e => setPropTexto(e.target.value)} className="w-full h-32 border rounded-xl px-4 py-3 resize-none bg-background border-border text-foreground" />
             </div>
 
