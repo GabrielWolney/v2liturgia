@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { formatarTextoLiturgico, formatarSalmo } from "@/lib/formatters";
@@ -25,45 +25,84 @@ interface LiturgiaClientProps {
 
 export function LiturgiaClient({ liturgiaServer }: LiturgiaClientProps) {
   const router = useRouter();
-  const [liturgia, setLiturgia] = useState<LiturgiaDiaria | null>(null);
   
-  const [steps, setSteps] = useState<Step[]>([]);
+  // Estados para gerenciar a liturgia atual e a de vigília
+  const [liturgia, setLiturgia] = useState<LiturgiaDiaria | null>(null);
+  const [liturgiaDomingo, setLiturgiaDomingo] = useState<LiturgiaDiaria | null>(null);
+  const [abaAtiva, setAbaAtiva] = useState<'hoje' | 'vigilia'>('hoje');
+  const [isSabadoTarde, setIsSabadoTarde] = useState(false);
+
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
   const [erroApi, setErroApi] = useState(false);
 
   const { marcarLeituraConcluida, tamanhoFonte, registrarAtividade, leiturasConcluidas } = useUserStore();
 
+  // 1. Ao abrir: Verificar o horário e buscar a Liturgia de Domingo se for o caso
   useEffect(() => {
     const mountTimer = setTimeout(() => {
-      
-      if (liturgiaServer) {
-        setLiturgia(liturgiaServer);
-        const newSteps: Step[] = [];
-
-        newSteps.push({ id: '0', titulo: 'Visão Geral', referencia: 'Prepare a sua Bíblia', texto: '', isOverview: true });
-
-        if (liturgiaServer.primeiraLeitura) {
-          newSteps.push({ id: '1', titulo: 'Primeira Leitura', referencia: liturgiaServer.primeiraLeitura.referencia, texto: liturgiaServer.primeiraLeitura.texto });
-        }
-        if (liturgiaServer.salmo) {
-          newSteps.push({ id: '2', titulo: 'Salmo', referencia: liturgiaServer.salmo.referencia, texto: liturgiaServer.salmo.texto, refrao: liturgiaServer.salmo.refrao });
-        }
-        if (liturgiaServer.segundaLeitura && typeof liturgiaServer.segundaLeitura !== 'string') {
-          newSteps.push({ id: '3', titulo: 'Segunda Leitura', referencia: liturgiaServer.segundaLeitura.referencia, texto: liturgiaServer.segundaLeitura.texto });
-        }
-        if (liturgiaServer.evangelho) {
-          newSteps.push({ id: '4', titulo: 'Evangelho', referencia: liturgiaServer.evangelho.referencia, texto: liturgiaServer.evangelho.texto });
-        }
-        setSteps(newSteps);
-      } else {
+      if (!liturgiaServer) {
         setErroApi(true);
+        return;
+      }
+      
+      setLiturgia(liturgiaServer);
+
+      // O "Pulo do Gato": Verificar se é Sábado (6) e se passou das 17h no celular do jovem
+      const hoje = new Date();
+      if (hoje.getDay() === 6 && hoje.getHours() >= 17) {
+        setIsSabadoTarde(true);
+        
+        // Busca a liturgia de domingo silenciosamente direto da API
+        const amanha = new Date(hoje);
+        amanha.setDate(amanha.getDate() + 1);
+        const dia = String(amanha.getDate()).padStart(2, '0');
+        const mes = String(amanha.getMonth() + 1).padStart(2, '0');
+        
+        fetch(`https://liturgia.up.railway.app/?dia=${dia}&mes=${mes}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data) setLiturgiaDomingo(data);
+          })
+          .catch(err => console.error("Erro ao buscar liturgia de domingo:", err));
       }
     }, 0);
 
     trackEvent("page_view", { page_name: "liturgia_aula" });
     return () => clearTimeout(mountTimer);
   }, [liturgiaServer]);
+
+  // 2. A MAGIA DO USEMEMO: O React calcula as telas "on the fly" sem precisar de useEffect!
+  const steps = useMemo(() => {
+    if (!liturgia) return [];
+
+    const newSteps: Step[] = [];
+    newSteps.push({ id: '0', titulo: 'Visão Geral', referencia: 'Prepare a sua Bíblia', texto: '', isOverview: true });
+
+    if (liturgia.primeiraLeitura) {
+      newSteps.push({ id: '1', titulo: 'Primeira Leitura', referencia: liturgia.primeiraLeitura.referencia, texto: liturgia.primeiraLeitura.texto });
+    }
+    if (liturgia.salmo) {
+      newSteps.push({ id: '2', titulo: 'Salmo', referencia: liturgia.salmo.referencia, texto: liturgia.salmo.texto, refrao: liturgia.salmo.refrao });
+    }
+    if (liturgia.segundaLeitura && typeof liturgia.segundaLeitura !== 'string') {
+      newSteps.push({ id: '3', titulo: 'Segunda Leitura', referencia: liturgia.segundaLeitura.referencia, texto: liturgia.segundaLeitura.texto });
+    }
+    if (liturgia.evangelho) {
+      newSteps.push({ id: '4', titulo: 'Evangelho', referencia: liturgia.evangelho.referencia, texto: liturgia.evangelho.texto });
+    }
+    
+    return newSteps;
+  }, [liturgia]);
+
+  const handleTrocarAba = (aba: 'hoje' | 'vigilia') => {
+    setAbaAtiva(aba);
+    if (aba === 'hoje' && liturgiaServer) setLiturgia(liturgiaServer);
+    if (aba === 'vigilia' && liturgiaDomingo) setLiturgia(liturgiaDomingo);
+    
+    // O Index agora é zerado exatamente no momento do clique, que é o correto no React!
+    setCurrentStepIndex(0); 
+  };
 
   const handleNextStep = () => {
     if (currentStepIndex < steps.length - 1) {
@@ -81,7 +120,15 @@ export function LiturgiaClient({ liturgiaServer }: LiturgiaClientProps) {
     }
   };
 
-  const fontReading =  tamanhoFonte === 'grande' ? 'text-xl leading-[2.1]' : 'text-base leading-[1.8]';
+  // NOVA FUNÇÃO: Voltar para a leitura anterior
+  const handlePrevStep = () => {
+    if (currentStepIndex > 0) {
+      setCurrentStepIndex(prev => prev - 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const fontReading = tamanhoFonte === 'grande' ? 'text-xl leading-[2.1]' : 'text-base leading-[1.8]';
 
   if (erroApi) {
     return (
@@ -107,7 +154,6 @@ export function LiturgiaClient({ liturgiaServer }: LiturgiaClientProps) {
     );
   }
 
-  
   if (steps.length === 0) return <div className="h-[100dvh] bg-background"></div>;
 
   if (isFinished) {
@@ -161,6 +207,29 @@ export function LiturgiaClient({ liturgiaServer }: LiturgiaClientProps) {
 
         {currentStep.isOverview ? (
           <div className="flex flex-col gap-3 animate-fade-in">
+            
+            {/* O NOVO MENU MÁGICO (Aparece no Sábado após as 17h) */}
+            {isSabadoTarde && liturgiaDomingo && (
+              <div className="flex p-1.5 rounded-2xl w-full border shadow-inner border-border bg-muted/10 mb-4 animate-fade-in">
+                <button 
+                  onClick={() => handleTrocarAba('hoje')}
+                  className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 ${
+                    abaAtiva === 'hoje' ? 'bg-card text-primary shadow-sm' : 'text-muted hover:text-foreground'
+                  }`}
+                >
+                  Sábado
+                </button>
+                <button 
+                  onClick={() => handleTrocarAba('vigilia')}
+                  className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 ${
+                    abaAtiva === 'vigilia' ? 'bg-card text-primary shadow-sm' : 'text-muted hover:text-foreground'
+                  }`}
+                >
+                  Domingo (Vigília)
+                </button>
+              </div>
+            )}
+
             <p className="font-medium text-sm mb-4 text-muted">Se preferir acompanhar as leituras de hoje na sua própria Bíblia, procure as seguintes passagens:</p>
 
             {liturgia?.primeiraLeitura && (
@@ -221,10 +290,22 @@ export function LiturgiaClient({ liturgiaServer }: LiturgiaClientProps) {
       </main>
 
       <footer className="fixed bottom-0 left-0 w-full bg-gradient-to-t from-background from-70% to-transparent pt-12 pb-6 px-5 z-50">
-        <div className="max-w-[800px] mx-auto">
+        <div className="max-w-[800px] mx-auto flex gap-3">
+          {/* BOTÃO VOLTAR: Só aparece se não estiver na primeira tela (Visão Geral) */}
+          {currentStepIndex > 0 && (
+            <button 
+              onClick={handlePrevStep}
+              className="flex items-center justify-center px-5 font-bold rounded-[1.5rem] border-2 border-border bg-card text-muted hover:text-foreground transition-all active:translate-y-[4px] shadow-[0_4px_0_var(--border)] active:shadow-none"
+              aria-label="Voltar para a leitura anterior"
+            >
+              <span className="material-symbols-rounded">arrow_back</span>
+            </button>
+          )}
+
+          {/* BOTÃO AVANÇAR / CONCLUIR */}
           <button 
             onClick={handleNextStep}
-            className={`w-full font-bold py-5 rounded-[1.5rem] transition-all active:translate-y-[8px] flex items-center justify-center gap-2 ${currentStep.titulo === 'Evangelho' ? 'bg-emerald-500 text-white shadow-[0_8px_0_#059669] active:shadow-none' : 'bg-primary text-white shadow-[0_8px_0_var(--primary-light)] active:shadow-none'} hover:brightness-105 ${ tamanhoFonte === 'grande' ? 'text-lg' : 'text-base'}`}
+            className={`flex-1 font-bold py-5 rounded-[1.5rem] transition-all active:translate-y-[8px] flex items-center justify-center gap-2 ${currentStep.titulo === 'Evangelho' ? 'bg-emerald-500 text-white shadow-[0_8px_0_#059669] active:shadow-none' : 'bg-primary text-white shadow-[0_8px_0_var(--primary-light)] active:shadow-none'} hover:brightness-105 ${ tamanhoFonte === 'grande' ? 'text-lg' : 'text-base'}`}
           >
             {currentStep.isOverview ? 'INICIAR LEITURA' : currentStep.titulo === 'Evangelho' ? 'CONCLUIR' : 'CONTINUAR'}
           </button>

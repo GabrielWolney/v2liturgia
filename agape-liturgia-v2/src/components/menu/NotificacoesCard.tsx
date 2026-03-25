@@ -87,14 +87,18 @@ export function NotificacoesCard() {
       </div>
 
       <div className="mt-4">
-        {permission === 'granted' ? (
+        {permission === 'unsupported' ? (
+          <div className="p-4 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 text-xs flex flex-col gap-2 items-center text-center">
+            <span className="material-symbols-rounded text-2xl opacity-50">phonelink_erase</span>
+            <span>O seu sistema atual não suporta notificações nativas. Atualize o seu iOS para usar este recurso.</span>
+          </div>
+        ) : permission === 'granted' ? (
           <div className="space-y-4">
             <div className="flex items-center gap-2 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold text-sm">
               <span className="material-symbols-rounded">verified</span>
               Lembretes Ativos
             </div>
             
-            {/* NOVO BOTÃO PARA FORÇAR A GRAVAÇÃO NO BANCO */}
             <button 
               onClick={registrarOuAtualizarToken}
               disabled={loading}
@@ -114,7 +118,7 @@ export function NotificacoesCard() {
           </button>
         ) : (
           <div className="p-4 rounded-xl bg-amber-50 border border-amber-100 text-amber-800 text-xs">
-            Instale o App e acesse as configurações para ativar os lembretes.
+            Instale o App (Adicionar à Tela de Início) para poder ativar os lembretes.
           </div>
         )}
       </div>
