@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { getCorLiturgica, getImagemPorCor } from "@/lib/date-utils";
+import { getCorLiturgica, getImagemPorCor, isDiaDeJejum } from "@/lib/date-utils";
 import { LiturgiaDiaria } from "@/types/liturgia";
 import { trackEvent } from "@/lib/analytics";
 import { useUserStore } from "@/store/useUserStore";
@@ -113,8 +113,8 @@ export function HomeClient({ liturgiaServer }: HomeClientProps) {
 
   const corDia = liturgiaServer ? getCorLiturgica(liturgiaServer.liturgia, liturgiaServer.cor) : "verde";
   const imagemLiturgica = getImagemPorCor(corDia);
+  const diaDeJejum = liturgiaServer ? isDiaDeJejum(liturgiaServer.liturgia) : false;
 
-  
   const getBannerGradient = (cor: string) => {
     if (!cor) return 'from-amber-400 to-amber-600';
 
@@ -133,7 +133,6 @@ export function HomeClient({ liturgiaServer }: HomeClientProps) {
     if (!cor) return 'bg-amber-500';
 
     switch(cor.toLowerCase().trim()) {
-      
       case 'branco': return 'bg-white border border-slate-200';
       case 'verde': return 'bg-emerald-500';
       case 'roxo': return 'bg-[#6E3AA5]';
@@ -144,12 +143,10 @@ export function HomeClient({ liturgiaServer }: HomeClientProps) {
     }
   };
 
-  
   const getBadgeTextColor = (cor: string) => {
     if (!cor) return 'text-amber-700 dark:text-amber-400';
 
     switch(cor.toLowerCase().trim()) {
-      
       case 'branco': return 'text-white'; 
       case 'verde': return 'text-emerald-700 dark:text-emerald-400';
       case 'roxo': return 'text-purple-700 dark:text-purple-400';
@@ -225,6 +222,21 @@ export function HomeClient({ liturgiaServer }: HomeClientProps) {
           <p className={`font-medium ${textMuted} ${tamanhoFonte === 'grande' ? 'text-base' : 'text-sm'}`}>{dataAtual}</p>
         </div>
 
+        {/* ALERTA DE JEJUM ADICIONADO AQUI, SEM MUDAR O RESTO DO LAYOUT */}
+        {diaDeJejum && (
+          <div className="mb-6 animate-in slide-in-from-top duration-700">
+            <div className="bg-red-500/10 border-2 border-red-500/30 rounded-[1.5rem] p-4 flex items-center gap-4 text-red-600 dark:text-red-400 shadow-md">
+              <div className="w-12 h-12 bg-red-600 text-white rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-red-600/30">
+                <span className="material-symbols-rounded text-[28px]">restaurant_menu</span>
+              </div>
+              <div className="flex-1">
+                <p className="font-black text-sm uppercase tracking-tight leading-none mb-1">Dia de Jejum e Abstinência</p>
+                <p className="text-[10px] font-bold leading-tight opacity-90">Hoje a Igreja pede o jejum e a abstinência de carne em sinal de penitência e união com a Paixão.</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {!liturgiaServer ? (
           <div className={`rounded-[2.5rem] p-4 sm:p-5 shadow-soft border w-full mb-8 ${cardBg} ${borderColor} animate-pulse`}>
             <div className={`w-full h-44 sm:h-52 rounded-[2rem] mb-6 flex items-end justify-center ${isDark ? 'bg-slate-800' : isSepia ? 'bg-[#E8DEC1]/50' : 'bg-slate-200'}`}></div>
@@ -235,7 +247,7 @@ export function HomeClient({ liturgiaServer }: HomeClientProps) {
           </div>
         ) : (
           <div className={`rounded-[2.5rem] p-4 sm:p-5 shadow-soft border w-full mb-8 transition-colors duration-300 relative ${cardBg} ${borderColor}`}>
-            {/* AJUSTE FINAL: Container da Imagem com Gradiente Blindado */}
+            
             <div className={`w-full h-44 sm:h-52 rounded-[2rem] mb-6 relative overflow-hidden bg-gradient-to-tr flex items-end justify-center shadow-inner ${getBannerGradient(corDia)}`}>
               <div className="relative animate-float z-10 flex items-end justify-center h-full">
                 <div className="relative w-auto aspect-[165/220] h-[85%] mb-2">
@@ -249,7 +261,6 @@ export function HomeClient({ liturgiaServer }: HomeClientProps) {
                 </div>
               </div>
               
-              {/* AJUSTE FINAL: Crachá Litúrgico com Texto Escuro para o Branco */}
               <div className={`absolute top-4 left-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-2 border ${borderColor} shadow-sm z-20`}>
                 <div className={`w-2.5 h-2.5 rounded-full ${getDotColor(corDia)} shadow-inner`}></div>
                 <span className={`text-[10px] font-black uppercase tracking-widest ${getBadgeTextColor(corDia)}`}>

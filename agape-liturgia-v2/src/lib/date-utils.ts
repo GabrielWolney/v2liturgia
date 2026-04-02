@@ -25,7 +25,11 @@ export function getCorLiturgica(tituloLiturgia: string, corApi: string): string 
 
 export function isDiaDeJejum(tituloLiturgia: string): boolean {
   const titulo = (tituloLiturgia || "").toLowerCase();
-  return (titulo.includes("cinzas") && titulo.includes("quarta")) || titulo.includes("paixão do senhor");
+  
+  const ehCinzas = titulo.includes("cinzas") && titulo.includes("quarta");
+  const ehSextaSanta = titulo.includes("paixão") || titulo.includes("sexta-feira santa") || titulo.includes("sexta santa");
+  
+  return ehCinzas || ehSextaSanta;
 }
 
 
