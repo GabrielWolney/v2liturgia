@@ -85,8 +85,7 @@ export function calcularProgressoTempo(tituloLiturgia: string) {
   const hoje = new Date();
   const anoAtual = hoje.getFullYear();
 
-  
-  
+  // Cálculo da Páscoa (Algoritmo de Meeus/Jones/Butcher)
   const a = anoAtual % 19;
   const b = Math.floor(anoAtual / 100);
   const c = anoAtual % 100;
@@ -103,14 +102,17 @@ export function calcularProgressoTempo(tituloLiturgia: string) {
   const day = ((h + l - 7 * m + 114) % 31) + 1;
   const pascoa = new Date(anoAtual, month, day);
 
-  
+  // Quarta-feira de Cinzas
   const cinzas = new Date(pascoa);
   cinzas.setDate(pascoa.getDate() - 46); 
+
+  // Início do Tríduo Pascal (Quinta-feira Santa)
+  const quintaSanta = new Date(pascoa);
+  quintaSanta.setDate(pascoa.getDate() - 3);
 
   const pentecostes = new Date(pascoa);
   pentecostes.setDate(pascoa.getDate() + 49); 
 
-  
   const natal = new Date(anoAtual, 11, 25);
   const offset = natal.getDay() === 0 ? 7 : natal.getDay(); 
   const advento = new Date(natal);
@@ -118,46 +120,43 @@ export function calcularProgressoTempo(tituloLiturgia: string) {
 
   const batismoAnt = new Date(anoAtual, 0, 13); 
 
-  
   let nome = "Tempo Comum";
   let diaAtual = 1;
   let totalDias = 238;
 
-  if (hoje >= cinzas && hoje < pascoa) {
-    
+  // LÓGICA ATUALIZADA
+  if (hoje >= cinzas && hoje < quintaSanta) {
     nome = "Quaresma";
-    totalDias = 46; 
+    totalDias = 43; // 46 dias da quaresma menos os 3 dias do Tríduo
     diaAtual = diffDias(cinzas, hoje) + 1;
   } 
+  else if (hoje >= quintaSanta && hoje < pascoa) {
+    nome = "Tríduo Pascal";
+    totalDias = 3;
+    diaAtual = diffDias(quintaSanta, hoje) + 1;
+  }
   else if (hoje >= pascoa && hoje <= pentecostes) {
-    
     nome = "Páscoa";
     totalDias = 50;
     diaAtual = diffDias(pascoa, hoje) + 1;
   } 
   else if (hoje >= advento && hoje < natal) {
-    
     nome = "Advento";
     totalDias = diffDias(advento, natal);
     diaAtual = diffDias(advento, hoje) + 1;
   } 
   else if (hoje >= natal || hoje <= batismoAnt) {
-    
     nome = "Natal";
     totalDias = 20; 
     const refNatal = hoje >= natal ? natal : new Date(anoAtual - 1, 11, 25);
     diaAtual = diffDias(refNatal, hoje) + 1;
   } 
   else {
-    
     nome = "Tempo Comum";
     totalDias = 238; 
-    
-    
     if (hoje > batismoAnt && hoje < cinzas) {
         diaAtual = diffDias(batismoAnt, hoje) + 1;
     } 
-    
     else if (hoje > pentecostes && hoje < advento) {
         const diasBloco1 = diffDias(batismoAnt, cinzas);
         const diasBloco2 = diffDias(pentecostes, hoje);
@@ -165,11 +164,9 @@ export function calcularProgressoTempo(tituloLiturgia: string) {
     }
   }
 
-  
   if (diaAtual > totalDias) diaAtual = totalDias;
   if (diaAtual < 1) diaAtual = 1;
 
-  
   const dasharray = 263.89;
   const progresso = diaAtual / totalDias;
   const dashoffset = dasharray - (dasharray * progresso);

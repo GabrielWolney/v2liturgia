@@ -1,4 +1,3 @@
-
 export interface Leitura {
   referencia: string;
   titulo: string;
@@ -13,8 +12,9 @@ export interface LiturgiaDiaria {
   dia: string;
   oferendas: string;
   comunhao: string;
-  primeiraLeitura: Leitura;
+  primeiraLeitura?: Leitura;
   segundaLeitura?: Leitura | string; 
-  salmo: Leitura;
-  evangelho: Leitura;
+  salmo?: Leitura;
+  evangelho?: Leitura;
+  [key: string]: Leitura | string | undefined; 
 }

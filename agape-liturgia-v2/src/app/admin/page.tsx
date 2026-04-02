@@ -22,10 +22,12 @@ export default function AdminPageCrua() {
   const [propTema, setPropTema] = useState("");
   const [propTexto, setPropTexto] = useState("");
 
+  // Estado para recuperar foguinhos
+  const [foguinhosRecuperar, setFoguinhosRecuperar] = useState("");
+
   const { tamanhoFonte } = useUserStore();
 
   const [enviando, setEnviando] = useState(false);
-
   const [carregando, setCarregando] = useState(false);
 
   useEffect(() => {
@@ -60,41 +62,56 @@ export default function AdminPageCrua() {
   };
 
   const handleSalvarAviso = async () => {
-  if (!novoAvisoTexto || !novoAvisoData) return alert("Preencha texto e data!");
-  if (carregando) return; // Se já estiver enviando, ignora o clique!
+    if (!novoAvisoTexto || !novoAvisoData) return alert("Preencha texto e data!");
+    if (carregando) return;
 
-  setCarregando(true);
-  await adicionarAviso(novoAvisoTexto, novoAvisoData);
-  
-  try {
-    const res = await fetch('/api/notificacoes', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        titulo: "⚠️ Novo Aviso da Coordenação",
-        mensagem: novoAvisoTexto,
-        paginaDestino: "/" 
-      })
-    });
+    setCarregando(true);
+    await adicionarAviso(novoAvisoTexto, novoAvisoData);
     
-    const data = await res.json();
-    alert(`Aviso enviado! 🔔 Total: ${data.enviados}`);
+    try {
+      const res = await fetch('/api/notificacoes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          titulo: "⚠️ Novo Aviso da Coordenação",
+          mensagem: novoAvisoTexto,
+          paginaDestino: "/" 
+        })
+      });
+      
+      const data = await res.json();
+      alert(`Aviso enviado! 🔔 Total: ${data.enviados}`);
 
-  } catch (err) {
-    console.error(err);
-  } finally {
-    setCarregando(false); // Destrava o botão
-    setNovoAvisoTexto(""); 
-    setNovoAvisoData("");
-  }
-};
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setCarregando(false);
+      setNovoAvisoTexto(""); 
+      setNovoAvisoData("");
+    }
+  };
 
-  // ESTA FUNÇÃO REAPARECEU PARA CURAR O ERRO:
   const handleSalvarPropositos = async () => {
     await updateProposito({ 
       ativo: propAtivo, tema: propTema, texto: propTexto
     });
     alert("Propósito atualizado com sucesso!");
+  };
+
+  // NOVA FUNÇÃO: Recuperar Foguinhos perdidos
+  const handleRecuperarFoguinhos = () => {
+    const valor = parseInt(foguinhosRecuperar);
+    if (isNaN(valor) || valor < 0) {
+      return alert("Por favor, insira um número válido!");
+    }
+
+    useUserStore.setState({
+      streak: valor,
+      ultimaAtividade: new Date().toLocaleDateString("en-CA") // Acende o foguinho hoje
+    });
+
+    alert(`🔥 Sucesso! A sua ofensiva foi recuperada para ${valor} dias!`);
+    setFoguinhosRecuperar("");
   };
 
   const fontClass = tamanhoFonte === 'grande' ? 'text-lg' : 'text-base';
@@ -156,12 +173,12 @@ export default function AdminPageCrua() {
               <input type="text" placeholder="Texto do aviso..." value={novoAvisoTexto} onChange={e => setNovoAvisoTexto(e.target.value)} className="w-full border rounded-xl px-4 py-3 bg-background border-border text-foreground" />
               <input type="date" value={novoAvisoData} onChange={e => setNovoAvisoData(e.target.value)} className="w-fit border rounded-xl px-4 py-3 bg-background border-border text-foreground" />
               <button 
-  onClick={handleSalvarAviso} 
-  disabled={enviando}
-  className={`w-fit mt-2 px-8 py-3 bg-amber-500 text-white font-bold rounded-xl ${enviando ? 'opacity-50' : 'active:scale-95'}`}
->
-  {enviando ? "Enviando..." : "Salvar Aviso"}
-</button>
+                onClick={handleSalvarAviso} 
+                disabled={carregando}
+                className={`w-fit mt-2 px-8 py-3 bg-amber-500 text-white font-bold rounded-xl ${carregando ? 'opacity-50' : 'active:scale-95'}`}
+              >
+                {carregando ? "Enviando..." : "Salvar Aviso"}
+              </button>
             </div>
             <h4 className="mt-10 mb-4 font-black uppercase text-xs tracking-widest text-muted">Avisos Ativos:</h4>
             <ul className="space-y-3">
@@ -191,6 +208,31 @@ export default function AdminPageCrua() {
             <button onClick={handleSalvarPropositos} className="w-full mt-6 py-4 bg-primary text-white font-black rounded-xl shadow-lg active:scale-95 transition-transform hover:brightness-105">
               GUARDAR PROPÓSITO
             </button>
+          </section>
+
+          {/* SEÇÃO RECUPERAR FOGUINHOS */}
+          <section className="border-2 p-6 rounded-[2rem] border-orange-500/30 transition-colors bg-card">
+            <h3 className="text-xl font-bold mb-2 flex items-center gap-2 text-orange-500">
+              <span className="material-symbols-rounded">local_fire_department</span> Recuperar Foguinhos
+            </h3>
+            <p className="text-xs text-muted mb-4">
+              Defina manualmente a sua ofensiva espiritual. Atenção: Esta ação altera apenas os dados locais <strong>deste dispositivo</strong>.
+            </p>
+            <div className="flex gap-3">
+              <input 
+                type="number" 
+                placeholder="Ex: 45" 
+                value={foguinhosRecuperar} 
+                onChange={e => setFoguinhosRecuperar(e.target.value)} 
+                className="flex-1 w-full border rounded-xl px-4 py-3 bg-background border-border text-foreground" 
+              />
+              <button 
+                onClick={handleRecuperarFoguinhos} 
+                className="px-6 py-3 bg-orange-500 text-white font-black rounded-xl shadow-lg active:scale-95 transition-transform hover:brightness-105"
+              >
+                RECUPERAR
+              </button>
+            </div>
           </section>
 
         </div>
