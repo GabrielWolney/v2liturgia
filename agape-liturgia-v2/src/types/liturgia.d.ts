@@ -1,20 +1,33 @@
-export interface Leitura {
-  referencia: string;
-  titulo: string;
+export interface LeituraV2 {
+  referencia?: string;
+  titulo?: string;
   texto: string;
-  refrao?: string; 
+  refrao?: string;
+  tipo?: string; 
 }
 
 export interface LiturgiaDiaria {
   data: string;
   liturgia: string;
   cor: string;
-  dia: string;
-  oferendas: string;
-  comunhao: string;
-  primeiraLeitura?: Leitura;
-  segundaLeitura?: Leitura | string; 
-  salmo?: Leitura;
-  evangelho?: Leitura;
-  [key: string]: Leitura | string | undefined; 
+  dia?: string;
+  oracoes?: {
+    coleta?: string;
+    oferendas?: string;
+    comunhao?: string;
+    extras?: { titulo: string; texto: string; }[];
+  };
+  leituras?: {
+    primeiraLeitura?: LeituraV2[];
+    salmo?: LeituraV2[];
+    segundaLeitura?: LeituraV2[];
+    evangelho?: LeituraV2[];
+    extras?: LeituraV2[];
+  };
+  antifonas?: {
+    entrada?: string;
+    comunhao?: string;
+  };
+
+  [key: string]: unknown; 
 }
