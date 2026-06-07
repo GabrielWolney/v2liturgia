@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useUserStore } from "@/store/useUserStore";
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
@@ -14,13 +15,39 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   // Aplica o tema e o tamanho da fonte nativamente no HTML
   useEffect(() => {
     const root = document.documentElement;
-    if (modoVisual === 'escuro') root.setAttribute("data-theme", "dark");
-    else if (modoVisual === 'leitura') root.setAttribute("data-theme", "sepia");
-    else root.removeAttribute("data-theme");
+    let themeColor = "#f1f5f9"; // claro
+    
+    if (modoVisual === 'escuro') {
+      root.setAttribute("data-theme", "dark");
+      themeColor = "#020617";
+    }
+    else if (modoVisual === 'leitura') {
+      root.setAttribute("data-theme", "sepia");
+      themeColor = "#FDF6E3";
+    }
+    else {
+      root.removeAttribute("data-theme");
+    }
     
     root.classList.remove('text-sm', 'text-base', 'text-readable', 'text-lg');
     if (tamanhoFonte === 'grande') root.classList.add('text-readable');
     else root.classList.add('text-base');
+
+    // Atualiza TODAS as meta tags de theme-color para PWAs nativos sem remover nenhuma.
+    // Remover tags criadas pelo Next.js com el.remove() causa "Cannot read properties of null (reading 'removeChild')" no React 19.
+    const allMetaColors = document.querySelectorAll('meta[name="theme-color"]');
+    if (allMetaColors.length > 0) {
+      allMetaColors.forEach((el) => {
+        (el as HTMLMetaElement).content = themeColor;
+        el.removeAttribute('media');
+      });
+    } else {
+      const metaThemeColor = document.createElement('meta');
+      metaThemeColor.name = 'theme-color';
+      metaThemeColor.content = themeColor;
+      document.head.appendChild(metaThemeColor);
+    }
+
   }, [modoVisual, tamanhoFonte]);
 
   useEffect(() => {
@@ -52,10 +79,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         >
           <div className="flex flex-col items-center animate-float w-full max-w-[220px]">
             <div className="relative mb-6">
-              <div className="absolute inset-0 bg-primary blur-2xl opacity-20 rounded-full animate-pulse"></div>
-              <img 
+              <Image 
                 src="/icon-192x192.png" 
                 alt="Logo Ágape" 
+                width={112}
+                height={112}
                 className="relative w-28 h-28 rounded-[2rem] shadow-2xl transition-colors duration-300 border border-border" 
               />
             </div>

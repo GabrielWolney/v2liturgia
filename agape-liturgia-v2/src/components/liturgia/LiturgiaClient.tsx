@@ -9,6 +9,9 @@ import { useUserStore } from "@/store/useUserStore";
 import { getDataIso } from "@/lib/date-utils";
 import { trackEvent } from "@/lib/analytics";
 import { atualizarContador } from "@/services/db-home";
+import { useSound } from "@/hooks/useSound";
+import { useHaptics } from "@/hooks/useHaptics";
+import { set, get } from "idb-keyval";
 
 type Step = {
   id: string;
@@ -36,16 +39,30 @@ export function LiturgiaClient({ liturgiaServer }: LiturgiaClientProps) {
   const [erroApi, setErroApi] = useState(false);
 
   const { marcarLeituraConcluida, tamanhoFonte, registrarAtividade, leiturasConcluidas } = useUserStore();
+  const { playPop, playSuccess, playClick } = useSound();
+  const { triggerHaptic } = useHaptics();
 
   useEffect(() => {
-    const mountTimer = setTimeout(() => {
-      if (!liturgiaServer) {
-        setErroApi(true);
-        return;
-      }
-      
-      setLiturgia(liturgiaServer);
+    const initLiturgia = async () => {
+      const dataHoje = getDataIso();
+      const cacheKey = `liturgia-${dataHoje}`;
 
+      if (liturgiaServer) {
+        // Online: Salva no cache e usa o servidor
+        await set(cacheKey, liturgiaServer);
+        setLiturgia(liturgiaServer);
+      } else {
+        // Offline: Tenta resgatar do cache
+        const cached = await get<LiturgiaDiaria>(cacheKey);
+        if (cached) {
+          setLiturgia(cached);
+          setErroApi(false); // Ignora o erro se tiver cache
+        } else {
+          setErroApi(true);
+        }
+      }
+
+      // Lógica de Sábado
       const hoje = new Date();
       if (hoje.getDay() === 6 && hoje.getHours() >= 17) {
         setIsSabadoTarde(true);
@@ -54,13 +71,29 @@ export function LiturgiaClient({ liturgiaServer }: LiturgiaClientProps) {
         const dia = String(amanha.getDate()).padStart(2, '0');
         const mes = String(amanha.getMonth() + 1).padStart(2, '0');
         
-        fetch(`https://liturgia.up.railway.app/v2/?dia=${dia}&mes=${mes}`)
-          .then(res => res.json())
-          .then(data => {
-            if (data) setLiturgiaDomingo(data);
-          })
-          .catch(err => console.error("Erro ao buscar liturgia de domingo:", err));
+        const vigiliaKey = `liturgia-vigilia-${dia}-${mes}`;
+        
+        // Tenta buscar a de domingo da nuvem
+        if (navigator.onLine) {
+          fetch(`https://liturgia.up.railway.app/v2/?dia=${dia}&mes=${mes}`)
+            .then(res => res.json())
+            .then(async data => {
+              if (data) {
+                await set(vigiliaKey, data);
+                setLiturgiaDomingo(data);
+              }
+            })
+            .catch(err => console.error("Erro ao buscar liturgia de domingo:", err));
+        } else {
+          // Tenta puxar do cache
+          const cachedDomingo = await get<LiturgiaDiaria>(vigiliaKey);
+          if (cachedDomingo) setLiturgiaDomingo(cachedDomingo);
+        }
       }
+    };
+
+    const mountTimer = setTimeout(() => {
+      initLiturgia();
     }, 0);
 
     trackEvent("page_view", { page_name: "liturgia_aula" });
@@ -152,9 +185,11 @@ export function LiturgiaClient({ liturgiaServer }: LiturgiaClientProps) {
 
   const handleNextStep = () => {
     if (currentStepIndex < steps.length - 1) {
+      playPop();
       setCurrentStepIndex(prev => prev + 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
+      playSuccess();
       const dataHoje = getDataIso();
       if (!leiturasConcluidas[dataHoje]) {
         atualizarContador(dataHoje, 'leitura', true);
@@ -168,6 +203,7 @@ export function LiturgiaClient({ liturgiaServer }: LiturgiaClientProps) {
 
   const handlePrevStep = () => {
     if (currentStepIndex > 0) {
+      playClick();
       setCurrentStepIndex(prev => prev - 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -212,7 +248,7 @@ export function LiturgiaClient({ liturgiaServer }: LiturgiaClientProps) {
         </div>
         <h1 className="text-3xl font-extrabold tracking-tight mb-2 text-foreground">Palavra Concluída!</h1>
         <p className="font-medium mb-12 text-muted">A sua jornada espiritual de hoje está fortificada.</p>
-        <button onClick={() => router.push('/jornada')} className="w-full max-w-[400px] bg-primary text-white font-bold py-5 rounded-[1.5rem] shadow-[0_8px_0_var(--primary-light)] active:translate-y-[8px] active:shadow-none transition-all hover:brightness-105">
+        <button onClick={() => { playSuccess(); triggerHaptic('success'); router.push('/jornada'); }} className="w-full max-w-[400px] bg-primary text-white font-bold py-5 rounded-[1.5rem] shadow-[0_8px_0_var(--primary-light)] active:translate-y-[8px] active:shadow-none transition-all hover:brightness-105">
           VOLTAR À PEQUENA VIA
         </button>
       </div>
@@ -231,7 +267,7 @@ export function LiturgiaClient({ liturgiaServer }: LiturgiaClientProps) {
   return (
     <div className="min-h-[100dvh] flex flex-col font-sans pb-40 selection:bg-primary/30 transition-colors bg-background">
       <header className="sticky top-0 z-50 backdrop-blur-md border-b px-5 py-4 flex items-center gap-4 max-w-[800px] mx-auto w-full transition-colors bg-background/95 border-border">
-        <button onClick={() => router.push('/jornada')} className="transition-colors flex items-center justify-center w-8 h-8 rounded-full active:scale-95 shrink-0 text-muted hover:bg-muted/20 hover:text-foreground">
+        <button onClick={() => { playPop(); triggerHaptic('light'); router.push('/jornada'); }} className="transition-colors flex items-center justify-center w-8 h-8 rounded-full active:scale-95 shrink-0 text-muted hover:bg-muted/20 hover:text-foreground">
           <span className="material-symbols-rounded text-[28px]">close</span>
         </button>
         <div className="flex-1 h-3.5 rounded-full overflow-hidden shadow-inner bg-muted/20">
@@ -255,7 +291,7 @@ export function LiturgiaClient({ liturgiaServer }: LiturgiaClientProps) {
             {isSabadoTarde && liturgiaDomingo && (
               <div className="flex p-1.5 rounded-2xl w-full border shadow-inner border-border bg-muted/10 mb-4 animate-fade-in">
                 <button 
-                  onClick={() => handleTrocarAba('hoje')}
+                  onClick={() => { playPop(); triggerHaptic('light'); handleTrocarAba('hoje'); }}
                   className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 ${
                     abaAtiva === 'hoje' ? 'bg-card text-primary shadow-sm' : 'text-muted hover:text-foreground'
                   }`}
@@ -263,7 +299,7 @@ export function LiturgiaClient({ liturgiaServer }: LiturgiaClientProps) {
                   Sábado
                 </button>
                 <button 
-                  onClick={() => handleTrocarAba('vigilia')}
+                  onClick={() => { playPop(); triggerHaptic('light'); handleTrocarAba('vigilia'); }}
                   className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 ${
                     abaAtiva === 'vigilia' ? 'bg-card text-primary shadow-sm' : 'text-muted hover:text-foreground'
                   }`}
@@ -302,7 +338,7 @@ export function LiturgiaClient({ liturgiaServer }: LiturgiaClientProps) {
               </div>
             )}
             <article 
-              className={`font-serif text-foreground ${fontReading} text-left ${currentStep.titulo.toLowerCase().includes('evangelho') ? `p-6 md:p-8 rounded-3xl shadow-sm border bg-card border-border` : ''} ${currentStep.titulo.toLowerCase().includes('salmo') ? 'text-center italic' : ''}`}
+              className={`select-text font-serif text-foreground ${fontReading} text-left ${currentStep.titulo.toLowerCase().includes('evangelho') ? `p-6 md:p-8 rounded-3xl shadow-sm border bg-card border-border` : ''} ${currentStep.titulo.toLowerCase().includes('salmo') ? 'text-center italic' : ''}`}
               dangerouslySetInnerHTML={{ __html: textoFormatado }}
             />
           </div>
@@ -313,7 +349,7 @@ export function LiturgiaClient({ liturgiaServer }: LiturgiaClientProps) {
         <div className="max-w-[800px] mx-auto flex gap-3">
           {currentStepIndex > 0 && (
             <button 
-              onClick={handlePrevStep}
+              onClick={() => { playPop(); triggerHaptic('light'); handlePrevStep(); }}
               className="flex items-center justify-center px-5 font-bold rounded-[1.5rem] border-2 border-border bg-card text-muted hover:text-foreground transition-all active:translate-y-[4px] shadow-[0_4px_0_var(--border)] active:shadow-none"
               aria-label="Voltar para a leitura anterior"
             >
@@ -322,7 +358,7 @@ export function LiturgiaClient({ liturgiaServer }: LiturgiaClientProps) {
           )}
 
           <button 
-            onClick={handleNextStep}
+            onClick={() => { playPop(); triggerHaptic('light'); handleNextStep(); }}
             className={`flex-1 font-bold py-5 rounded-[1.5rem] transition-all active:translate-y-[8px] flex items-center justify-center gap-2 ${currentStep.titulo.toLowerCase().includes('evangelho') ? 'bg-emerald-500 text-white shadow-[0_8px_0_#059669] active:shadow-none' : 'bg-primary text-white shadow-[0_8px_0_var(--primary-light)] active:shadow-none'} hover:brightness-105 ${ tamanhoFonte === 'grande' ? 'text-lg' : 'text-base'}`}
           >
             {currentStep.isOverview ? 'INICIAR LEITURA' : currentStep.titulo.toLowerCase().includes('evangelho') ? 'CONCLUIR' : 'CONTINUAR'}

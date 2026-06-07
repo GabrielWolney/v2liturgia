@@ -1,4 +1,5 @@
 import { BibliaData, LivroBiblia, Capitulo } from "@/types/biblia";
+import { get, set } from "idb-keyval";
 
 export interface ResultadoBusca {
   livro: string;
@@ -11,8 +12,34 @@ const normalizar = (str: string) =>
   str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 
 export async function getBibliaData(): Promise<BibliaData> {
+  const isClient = typeof window !== "undefined";
+
+  if (isClient) {
+    try {
+      // Tenta carregar do IndexedDB local primeiro (super rápido, estruturado em memória)
+      const cachedData = await get<BibliaData>("biblia_cache");
+      if (cachedData) {
+        return cachedData;
+      }
+    } catch (error) {
+      console.warn("Falha ao ler Bíblia do IndexedDB, recorrendo ao JSON:", error);
+    }
+  }
+
+  // Se não existir (ou se estiver no servidor), faz o import dinâmico
   const modulo = await import("@/data/biblia.json");
-  return modulo.default as BibliaData; 
+  const data = modulo.default as BibliaData;
+  
+  if (isClient) {
+    // E guarda no IndexedDB para a próxima vez ser instantâneo
+    try {
+      await set("biblia_cache", data);
+    } catch (error) {
+      console.warn("Falha ao guardar Bíblia no IndexedDB:", error);
+    }
+  }
+
+  return data; 
 }
 
 export async function getTodosLivros(): Promise<LivroBiblia[]> {

@@ -13,19 +13,26 @@ export default function PropositosPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [proposito, setProposito] = useState<Proposito | null>(null);
   
-  const { tamanhoFonte } = useUserStore();
+  const { tamanhoFonte, comunidade } = useUserStore();
 
   useEffect(() => {
     const timer = setTimeout(() => setIsMounted(true), 0);
     trackEvent("page_view", { page_name: "proposito_comunidade" });
     
+    return () => {
+      clearTimeout(timer);
+    };
+  }, []);
+
+  useEffect(() => {
     const unsubProposito = subscribeToProposito(setProposito);
 
     return () => {
-      clearTimeout(timer);
       unsubProposito();
     };
   }, []);
+
+  if (!isMounted) return <div className="min-h-[100dvh] bg-background" />;
 
   const fontClass =  tamanhoFonte === 'grande' ? 'text-lg' : 'text-base';
   const fontTitle =  tamanhoFonte === 'grande' ? 'text-3xl' : 'text-2xl';
@@ -37,10 +44,10 @@ export default function PropositosPage() {
     <div className="min-h-[100dvh] flex flex-col font-sans pb-32 transition-colors duration-300 selection:bg-primary/30 bg-background">
       
       <header className="sticky top-0 z-50 backdrop-blur-md border-b px-4 sm:px-6 py-4 flex items-center justify-between max-w-[800px] mx-auto w-full transition-colors duration-300 bg-background/90 border-border">
-        <button onClick={() => router.back()} className="flex items-center justify-center w-10 h-10 rounded-full active:scale-95 shrink-0 transition-colors text-muted hover:bg-muted/20 hover:text-foreground">
+        <button onClick={() => router.push('/jornada')} className="flex items-center justify-center w-10 h-10 rounded-full active:scale-95 shrink-0 transition-colors text-muted hover:bg-muted/20 hover:text-foreground">
           <span className="material-symbols-rounded text-[26px]">arrow_back</span>
         </button>
-        <h1 className={`font-extrabold tracking-tight text-foreground ${fontClass}`}>Missão Ágape</h1>
+        <h1 className={`font-extrabold tracking-tight text-foreground ${fontClass}`}>Propósito Ágape</h1>
         <div className="w-10 h-10"></div>
       </header>
 
@@ -65,10 +72,6 @@ export default function PropositosPage() {
               <span className="material-symbols-rounded text-[140px]">group</span>
             </div>
             <div className="relative z-10">
-              <div className="inline-flex items-center gap-1.5 bg-white/20 px-3 py-1.5 rounded-full mb-6 border border-white/20 shadow-sm">
-                <span className="material-symbols-rounded text-[14px]">volunteer_activism</span>
-                <span className="text-xs font-bold uppercase tracking-widest">Comunidade</span>
-              </div>
               <h3 className={`font-black mb-4 leading-tight ${fontTitle}`}>{proposito?.tema}</h3>
               <p className={`font-serif italic leading-relaxed text-white/95 ${fontText}`}>
                 &quot;{proposito?.texto}&quot;

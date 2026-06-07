@@ -1,4 +1,4 @@
-import { db } from "@/lib/firebase";
+import { db, auth } from "@/lib/firebase";
 import { 
   collection, addDoc, query, orderBy, limit, 
   serverTimestamp, updateDoc, doc, increment, 
@@ -11,12 +11,13 @@ export interface PedidoOracao {
   texto: string;
   contagemOracoes: number;
   data: Date | null;
+  uid?: string;
 }
 
 const COLLECTION_NAME = "mural_oracoes";
 
 
-export function subscribeToPedidos(tipo: '24h' | 'todas', callback: (pedidos: PedidoOracao[]) => void) {
+export function subscribeToPedidos(tipo: '24h' | 'todas', limite: number = 15, callback: (pedidos: PedidoOracao[]) => void) {
   let q;
 
   if (tipo === '24h') {
@@ -25,11 +26,11 @@ export function subscribeToPedidos(tipo: '24h' | 'todas', callback: (pedidos: Pe
     q = query(
       collection(db, COLLECTION_NAME), 
       where("data", ">=", ontem), 
-      orderBy("data", "desc")
+      orderBy("data", "desc"),
+      limit(limite)
     );
   } else {
-    
-    q = query(collection(db, COLLECTION_NAME), orderBy("data", "desc"), limit(100));
+    q = query(collection(db, COLLECTION_NAME), orderBy("data", "desc"), limit(limite));
   }
 
   
@@ -47,7 +48,7 @@ export function subscribeToPedidos(tipo: '24h' | 'todas', callback: (pedidos: Pe
     });
     callback(pedidos);
   }, (error) => {
-    console.error("Erro ao ouvir o Mural:", error);
+    console.warn("Aviso (Mural):", error.message);
     callback([]);
   });
 }
@@ -55,12 +56,14 @@ export function subscribeToPedidos(tipo: '24h' | 'todas', callback: (pedidos: Pe
 
 export async function adicionarPedido(nome: string, texto: string): Promise<string | null> {
   try {
+    const user = auth.currentUser;
     const docRef = await addDoc(collection(db, COLLECTION_NAME), {
       nome: nome || "Anônimo",
       texto,
       data: serverTimestamp(),
       rezaram: 0,
-      contagemOracoes: 0
+      contagemOracoes: 0,
+      uid: user ? user.uid : null
     });
     return docRef.id;
   } catch (error) {

@@ -7,13 +7,13 @@ import { useUserStore } from "@/store/useUserStore";
 export default function AnotacoesPage() {
   
   const { minhasNotas, setNotas, tamanhoFonte } = useUserStore();
-  const [saveStatus, setSaveStatus] = useState<"ocioso" | "guardando" | "guardado">("ocioso");
+  const [saveStatus, setSaveStatus] = useState<"ocioso" | "salvando" | "salvo">("ocioso");
 
   const handleMudancaTexto = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setNotas(e.target.value);
-    setSaveStatus("guardando");
+    setSaveStatus("salvando");
     setTimeout(() => { 
-      setSaveStatus("guardado"); 
+      setSaveStatus("salvo"); 
       setTimeout(() => setSaveStatus("ocioso"), 2000); 
     }, 500);
   };
@@ -30,9 +30,9 @@ export default function AnotacoesPage() {
         <Link href="/jornada" className="flex items-center justify-center w-10 h-10 rounded-full active:scale-95 shrink-0 transition-colors text-muted hover:bg-muted/20 hover:text-foreground">
           <span className="material-symbols-rounded text-[26px]">arrow_back</span>
         </Link>
-        <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-extrabold uppercase tracking-widest transition-all duration-300 ${saveStatus === "guardando" ? "bg-amber-500/20 text-amber-500" : saveStatus === "guardado" ? "bg-emerald-500/20 text-emerald-500" : "bg-card border border-border text-muted"}`}>
-          <span className={`material-symbols-rounded text-[14px] ${saveStatus === "guardando" ? "animate-spin" : ""}`}>{saveStatus === "guardando" ? "sync" : "cloud_done"}</span>
-          {saveStatus === "guardando" ? "A guardar" : "Salvo"}
+        <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-extrabold uppercase tracking-widest transition-all duration-300 ${saveStatus === "salvando" ? "bg-amber-500/20 text-amber-500" : saveStatus === "salvo" ? "bg-emerald-500/20 text-emerald-500" : "bg-card border border-border text-muted"}`}>
+          <span className={`material-symbols-rounded text-[14px] ${saveStatus === "salvando" ? "animate-spin" : ""}`}>{saveStatus === "salvando" ? "sync" : "cloud_done"}</span>
+          {saveStatus === "salvando" ? "Salvando" : "Salvo"}
         </div>
       </header>
 

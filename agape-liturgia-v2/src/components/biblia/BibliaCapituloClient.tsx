@@ -39,7 +39,7 @@ export function BibliaCapituloClient({ nomeLivro, slug, numeroCapitulo, versicul
       </header>
 
       <main className="flex-1 w-full max-w-[800px] mx-auto px-5 pt-8 animate-fade-in">
-        <article className={`p-6 md:p-10 rounded-[2rem] shadow-soft border font-serif text-left mb-10 transition-colors duration-300 bg-card border-border text-foreground ${fontReading}`}> 
+        <article className={`select-text p-6 md:p-10 rounded-[2rem] shadow-soft border font-serif text-left mb-10 transition-colors duration-300 bg-card border-border text-foreground ${fontReading}`}> 
           {versiculos.map((v: Versiculo) => (
             <span key={v.versiculo} className="inline">
               <sup className="font-sans font-bold text-primary text-[0.65em] align-super mr-1.5 ml-1 select-none">

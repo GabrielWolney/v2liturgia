@@ -7,6 +7,8 @@ import { getNovenaStatus } from "@/lib/date-utils";
 import { NovenasData, NovenaCalendario } from "@/types/novena";
 import { trackEvent } from "@/lib/analytics";
 import { useUserStore } from "@/store/useUserStore";
+import { useSound } from "@/hooks/useSound";
+import { useHaptics } from "@/hooks/useHaptics";
 
 type Aba = 'agora' | 'breve' | 'fim';
 
@@ -36,8 +38,11 @@ export default function NovenasPage() {
   const db = novenasJson as NovenasData;
   
   const { tamanhoFonte } = useUserStore();
+  const { playPop, playClick } = useSound();
+  const { triggerHaptic } = useHaptics();
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const mountTimer = setTimeout(() => setIsMounted(true), 0);
     trackEvent("page_view", { page_name: "novenas_index_v2" });
     return () => clearTimeout(mountTimer);
@@ -55,6 +60,7 @@ export default function NovenasPage() {
       <header className="sticky top-0 z-50 backdrop-blur-md border-b px-4 sm:px-6 py-4 flex items-center justify-between max-w-[800px] mx-auto w-full transition-colors duration-300 bg-background/90 border-border">
         <Link 
           href="/jornada"
+          onClick={() => { playPop(); triggerHaptic('light'); }}
           className="flex items-center justify-center w-10 h-10 rounded-full active:scale-95 shrink-0 transition-colors text-muted hover:bg-muted/20 hover:text-foreground"
         >
           <span className="material-symbols-rounded text-[26px]">arrow_back</span>
@@ -78,7 +84,7 @@ export default function NovenasPage() {
             {(['agora', 'breve', 'fim'] as Aba[]).map((aba) => (
               <button 
                 key={aba}
-                onClick={() => setAbaAtiva(aba)} 
+                onClick={() => { playPop(); triggerHaptic('light'); setAbaAtiva(aba); }} 
                 className={`flex-1 sm:flex-none px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 whitespace-nowrap ${
                   abaAtiva === aba ? `bg-card text-primary shadow-sm` : `text-muted hover:text-foreground`
                 }`}
@@ -113,6 +119,7 @@ export default function NovenasPage() {
                 {temDetalhes ? (
                   <Link 
                     href={`/novenas/${n.id}`} 
+                    onClick={() => { playPop(); triggerHaptic('light'); }}
                     className="flex items-center justify-center gap-2 px-6 py-3 bg-primary/10 text-primary font-bold rounded-full hover:bg-primary/20 transition-colors active:scale-95 whitespace-nowrap"
                   >
                     Abrir Novena

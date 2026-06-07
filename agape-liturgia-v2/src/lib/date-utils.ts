@@ -85,7 +85,7 @@ function diffDias(dataMenor: Date, dataMaior: Date): number {
 
 
 
-export function calcularProgressoTempo(tituloLiturgia: string) {
+export function calcularProgressoTempo() {
   const hoje = new Date();
   const anoAtual = hoje.getFullYear();
 

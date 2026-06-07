@@ -1,9 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
+import { useSound } from '@/hooks/useSound';
+import { useHaptics } from '@/hooks/useHaptics';
 
 export function ScrollToTop() {
   const [isVisible, setIsVisible] = useState(false);
+  const pathname = usePathname();
+
+  // Força o scroll para o topo sempre que a rota mudar
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   useEffect(() => {
     const toggleVisibility = (e?: Event) => {
@@ -30,7 +39,12 @@ export function ScrollToTop() {
     };
   }, []);
 
+  const { playPop } = useSound();
+  const { triggerHaptic } = useHaptics();
+
   const scrollToTop = () => {
+    playPop();
+    triggerHaptic('light');
     window.scrollTo({ 
       top: 0, 
       behavior: "smooth" 

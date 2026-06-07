@@ -1,0 +1,158 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ==========================================
+    // FUNÇÕES DE UTILIDADE E RBAC
+    // ==========================================
+    function isSignedIn() {
+      // Exige que o usuário esteja logado E que o request venha de um app verificado (App Check)
+      return request.auth != null && request.app != null;
+    }
+    
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    function getUserData() {
+      // Use get() with a default empty map if not found to prevent errors
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    
+    function isMasterAdmin() {
+      let user = getUserData();
+      return user != null && user.permissoes.isMasterAdmin == true;
+    }
+    
+    function isCoordenadorComunidade(comunidade) {
+      let user = getUserData();
+      return user != null && user.permissoes.coordenadorComunidade == comunidade;
+    }
+
+    function isCoordenadorIntercessao() {
+      let user = getUserData();
+      return user != null && user.permissoes.isCoordenadorIntercessao == true;
+    }
+
+    function isCoordenadorLiturgia() {
+      let user = getUserData();
+      return user != null && user.permissoes.isCoordenadorLiturgia == true;
+    }
+
+    // ==========================================
+    // REGRAS DE USUÁRIOS (/users/{userId})
+    // ==========================================
+    match /users/{userId} {
+      // LER: Apenas o próprio utilizador, um Master Admin, ou o Coordenador da comunidade a que ele pertence
+      allow read: if isOwner(userId) || isMasterAdmin() || isCoordenadorComunidade(resource.data.comunidade);
+      
+      // CRIAR: O próprio usuário ao fazer sign-up
+      // ANTI-PRIVILEGE ESCALATION: Impede que o usuário crie a conta já com cargos de administrador
+      allow create: if isOwner(userId) && 
+        (!request.resource.data.keys().hasAny(['permissoes']) || 
+         (
+           request.resource.data.permissoes.get('isMasterAdmin', false) == false &&
+           request.resource.data.permissoes.get('isCoordenadorIntercessao', false) == false &&
+           request.resource.data.permissoes.get('isCoordenadorLiturgia', false) == false &&
+           request.resource.data.permissoes.get('coordenadorComunidade', null) == null
+         ));
+      
+      // ATUALIZAR: Regras estritas usando diff
+      allow update: if (
+        isMasterAdmin() || 
+        (
+          // O próprio usuário atualizando seus dados (ex: streak, nome)
+          isOwner(userId) && 
+          // Bloqueia qualquer tentativa de alterar 'permissoes'
+          (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['permissoes'])) &&
+          // Bloqueia tentativas de auto-aprovação ou de mudar de comunidade carregando o status 'aprovado'
+          (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['statusComunidade', 'comunidade'])) || 
+           request.resource.data.statusComunidade == 'pendente'
+        ) ||
+        (
+          // O Coordenador aprovando/rejeitando um membro de SUA comunidade
+          isCoordenadorComunidade(resource.data.comunidade) && 
+          // GARANTIA: O coordenador SÓ pode alterar o statusComunidade. Nada mais.
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['statusComunidade'])
+        )
+      );
+      
+      // DELETAR: Apenas Master Admin ou o próprio usuário
+      allow delete: if isOwner(userId) || isMasterAdmin();
+    }
+    
+    // ==========================================
+    // MURAL DE ORAÇÕES (/mural_oracoes/{pedidoId})
+    // ==========================================
+    match /mural_oracoes/{pedidoId} {
+      // LER: Todos
+      allow read: if true;
+      
+      // CRIAR: Qualquer jovem autenticado
+      allow create: if isSignedIn();
+      
+      // ATUALIZAR (Botão "Rezei")
+      allow update: if isSignedIn() && (
+        isMasterAdmin() || 
+        (
+          // Apenas permite alterar a contagem de orações
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['rezaram', 'contagemOracoes']) &&
+          // Garante que é um incremento (+1) ou decremento (-1) e não uma falsificação (matemática)
+          (
+            (request.resource.data.rezaram == resource.data.rezaram + 1 && request.resource.data.contagemOracoes == resource.data.contagemOracoes + 1) ||
+            (request.resource.data.rezaram == resource.data.rezaram - 1 && request.resource.data.contagemOracoes == resource.data.contagemOracoes - 1)
+          )
+        )
+      );
+      
+      // DELETAR: Apenas o autor original, MasterAdmin, ou Coordenador de Intercessão (Moderação)
+      allow delete: if isSignedIn() && (
+        isMasterAdmin() || 
+        isCoordenadorIntercessao() || 
+        (resource.data.uid == request.auth.uid)
+      );
+    }
+
+    // ==========================================
+    // ESTATÍSTICAS GLOBAIS (/estatisticas/{docId})
+    // ==========================================
+    match /estatisticas/{docId} {
+      allow read: if true;
+      // Impede sobreescrita arbitrária. Só permite incremento ou decremento de 1 no contador.
+      allow write: if isSignedIn() && (
+        isMasterAdmin() || 
+        (
+          // Se for novo documento
+          (resource == null && request.resource.data.contador in [1, -1]) ||
+          // Se for atualização
+          (resource != null && 
+           request.resource.data.diff(resource.data).affectedKeys().hasOnly(['contador', 'ultimaAtualizacao']) &&
+           (request.resource.data.contador == resource.data.contador + 1 || request.resource.data.contador == resource.data.contador - 1)
+          )
+        )
+      );
+    }
+    
+    // ==========================================
+    // CONFIGURAÇÕES GERAIS E AVISOS
+    // ==========================================
+    match /config_geral/{document=**} {
+      allow read: if true;
+      allow write: if isSignedIn() && isMasterAdmin();
+    }
+    
+    match /avisos_gerais/{avisoId} {
+      allow read: if true;
+      allow write: if isSignedIn() && isMasterAdmin();
+    }
+    
+    // ==========================================
+    // COMUNIDADES E SEUS AVISOS (/comunidades/{comunidadeId}/...)
+    // ==========================================
+    match /comunidades/{comunidadeId}/{collection}/{docId} {
+      allow read: if true;
+      allow write: if isSignedIn() && (isMasterAdmin() || isCoordenadorComunidade(comunidadeId));
+    }
+    
+  }
+}

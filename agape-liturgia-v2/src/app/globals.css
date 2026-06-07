@@ -51,6 +51,16 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  html, body {
+    overscroll-behavior-y: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  button, a {
+    touch-action: manipulation;
+  }
+
   body {
     background-color: var(--bg);
     color: var(--text);

@@ -2,9 +2,12 @@
 
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { eventos2026 } from "@/data/eventos-2026";
 import { trackEvent } from "@/lib/analytics";
 import { useUserStore } from "@/store/useUserStore";
+import { useSound } from "@/hooks/useSound";
+import { useHaptics } from "@/hooks/useHaptics";
 
 const mesesNomes = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
@@ -119,13 +122,32 @@ const eventosIgreja = [
 export default function CalendarioPage() {
   // Mantemos o isMounted para o mês ativo sincronizar corretamente com o relógio do cliente, sem quebrar.
   const [mesAtivo, setMesAtivo] = useState(1); // Inicia sempre em Janeiro no servidor
-  const [abaAtiva, setAbaAtiva] = useState<'grupo' | 'liturgia'>('grupo');
+  const { tamanhoFonte, isAgape } = useUserStore();
+  const { playPop, playClick } = useSound();
+  const { triggerHaptic } = useHaptics();
   
-  const { tamanhoFonte } = useUserStore();
+  // Se não for do Ágape, força liturgia
+  const [abaAtiva, setAbaAtiva] = useState<'grupo' | 'liturgia'>('grupo');
 
   useEffect(() => {
+    if (isAgape === false) {
+      setAbaAtiva('liturgia');
+    }
+  }, [isAgape]);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
     const timer = setTimeout(() => {
-      setMesAtivo(new Date().getMonth() + 1);
+      const mesAtual = new Date().getMonth() + 1;
+      setMesAtivo(mesAtual);
+      
+      // Fazer scroll suave para o mês atual assim que for definido
+      setTimeout(() => {
+        const el = document.getElementById(`mes-${mesAtual}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }
+      }, 50);
     }, 0);
 
     trackEvent("page_view", { page_name: "calendario_v2" });
@@ -174,44 +196,54 @@ export default function CalendarioPage() {
   return (
     <div className="min-h-[100dvh] flex flex-col font-sans pb-32 transition-colors duration-300 selection:bg-primary/30 bg-background">
       
-      <header className="cabecalho-fixo z-50 backdrop-blur-md border-b px-4 sm:px-6 py-4 flex flex-col gap-4 max-w-[800px] mx-auto w-full transition-colors duration-300 bg-background/90 border-border">
-        <div className="flex items-center justify-between w-full">
-          <Link 
-            href="/jornada"
-            className="flex items-center justify-center w-10 h-10 rounded-full active:scale-95 shrink-0 transition-colors text-muted hover:bg-muted/20 hover:text-foreground"
-          >
-            <span className="material-symbols-rounded text-[26px]">arrow_back</span>
-          </Link>
-          <h1 className={`font-extrabold tracking-tight text-foreground ${ tamanhoFonte === 'grande' ? 'text-xl' : 'text-lg'}`}>Calendário</h1>
-          <div className="w-10 h-10"></div>
-        </div>
-
-        {/* SELETOR DE ABAS */}
-        <div className="flex p-1.5 rounded-2xl w-full max-w-[400px] mx-auto border shadow-inner border-border bg-muted/10">
-          <button 
-            onClick={() => setAbaAtiva('grupo')}
-            className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 ${
-              abaAtiva === 'grupo' 
-                ? `bg-card text-primary shadow-sm` 
-                : `text-muted hover:text-foreground`
-            }`}
-          >
-            Ágape
-          </button>
-          <button 
-            onClick={() => setAbaAtiva('liturgia')}
-            className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 ${
-              abaAtiva === 'liturgia' 
-                ? `bg-card text-primary shadow-sm` 
-                : `text-muted hover:text-foreground`
-            }`}
-          >
-            Litúrgico
-          </button>
-        </div>
+      <header className="sticky top-0 z-50 backdrop-blur-md border-b px-4 sm:px-6 py-4 flex items-center justify-between max-w-[800px] mx-auto w-full transition-colors duration-300 bg-background/90 border-border">
+        <Link 
+          href="/jornada"
+          onClick={() => { playPop(); triggerHaptic('light'); }}
+          className="flex items-center justify-center w-10 h-10 rounded-full active:scale-95 shrink-0 transition-colors text-muted hover:bg-muted/20 hover:text-foreground"
+        >
+          <span className="material-symbols-rounded text-[26px]">arrow_back</span>
+        </Link>
+        <h1 className={`font-extrabold tracking-tight text-foreground ${ tamanhoFonte === 'grande' ? 'text-xl' : 'text-lg'}`}>
+          {isAgape === false ? 'Calendário Litúrgico' : 'Calendário'}
+        </h1>
+        <div className="w-10 h-10"></div>
       </header>
 
       <main className="flex-1 w-full max-w-[800px] mx-auto px-5 pt-8 animate-fade-in">
+        
+        {/* SELETOR DE ABAS (Só para Ágape) - NOVO ESTILO FOOLPROOF */}
+        {isAgape !== false && (
+          <div className="grid grid-cols-2 gap-4 mb-10 max-w-[400px] mx-auto">
+            <button 
+              type="button"
+              onClick={() => { playPop(); triggerHaptic('light'); setAbaAtiva('grupo'); }}
+              className={`flex flex-col items-center justify-center p-4 rounded-[1.5rem] border-2 transition-all duration-300 active:scale-95 ${
+                abaAtiva === 'grupo' 
+                  ? 'border-primary bg-primary/10 shadow-sm' 
+                  : 'border-border bg-card hover:border-primary/50 opacity-70'
+              }`}
+            >
+              <div className={`mb-2 pointer-events-none w-8 h-8 relative rounded-lg overflow-hidden transition-all ${abaAtiva === 'grupo' ? 'opacity-100 scale-110 shadow-sm' : 'opacity-40 grayscale saturate-0'}`}>
+                <Image src="/icon-192x192.png" alt="Ágape" fill className="object-cover" />
+              </div>
+              <span className={`font-extrabold text-sm pointer-events-none ${abaAtiva === 'grupo' ? 'text-primary' : 'text-foreground'}`}>Ágape</span>
+            </button>
+
+            <button 
+              type="button"
+              onClick={() => { playPop(); triggerHaptic('light'); setAbaAtiva('liturgia'); }}
+              className={`flex flex-col items-center justify-center p-4 rounded-[1.5rem] border-2 transition-all duration-300 active:scale-95 ${
+                abaAtiva === 'liturgia' 
+                  ? 'border-primary bg-primary/10 shadow-sm' 
+                  : 'border-border bg-card hover:border-primary/50 opacity-70'
+              }`}
+            >
+              <span className={`material-symbols-rounded text-3xl mb-2 pointer-events-none ${abaAtiva === 'liturgia' ? 'text-primary' : 'text-muted'}`}>church</span>
+              <span className={`font-extrabold text-sm pointer-events-none ${abaAtiva === 'liturgia' ? 'text-primary' : 'text-foreground'}`}>Litúrgico</span>
+            </button>
+          </div>
+        )}
         
         {/* TÍTULO DA ABA */}
         <div className="flex flex-col items-center text-center mb-8">
@@ -238,7 +270,8 @@ export default function CalendarioPage() {
               return (
                 <button 
                   key={numMes} 
-                  onClick={() => setMesAtivo(numMes)}
+                  id={`mes-${numMes}`}
+                  onClick={() => { playClick(); triggerHaptic('light'); setMesAtivo(numMes); }}
                   className={`px-5 py-3 rounded-[1rem] font-extrabold text-sm whitespace-nowrap transition-all active:scale-95 ${
                     isSelected 
                       ? `bg-primary text-white shadow-md`
@@ -252,49 +285,52 @@ export default function CalendarioPage() {
           </div>
         </div>
 
-        {/* TIMELINE */}
-        <section className="rounded-[2rem] p-6 shadow-soft border transition-colors duration-300 bg-card border-border">
-          
+        {/* LISTA DE EVENTOS */}
+        <div className="w-full">
           {abaAtiva === 'grupo' && (
             eventosDoMes.length === 0 ? (
-              <div className="text-center py-8 font-medium text-muted">Nenhum evento do grupo agendado para este mês.</div>
+              <div className="text-center py-12 text-muted font-medium">
+                <span className="material-symbols-rounded text-5xl mb-2 opacity-50 text-muted">event_busy</span>
+                <p className="text-muted">Nenhum evento do grupo agendado para este mês.</p>
+              </div>
             ) : (
-              <div className="flex flex-col gap-6">
+              <ul className="flex flex-col gap-4">
                 {eventosDoMes.map((evento, i) => (
-                  <div key={i} className="flex gap-4 items-start group">
-                    <div className="flex flex-col items-center min-w-[40px] shrink-0 pt-1">
+                  <li key={i} className="rounded-[1.5rem] p-5 shadow-soft border flex items-center gap-4 transition-all hover:shadow-md bg-card border-border">
+                    <div className="flex flex-col items-center justify-center w-14 h-14 shrink-0 bg-primary/10 rounded-2xl shadow-inner">
                       <span className="text-2xl font-black text-primary leading-none">
                         {String(evento.dia).padStart(2, '0')}
                       </span>
                     </div>
-                    <div className="flex-1 pb-6 border-b group-last:border-0 group-last:pb-0 border-border">
-                      <h3 className={`font-extrabold leading-tight mb-2 text-foreground ${fontClass}`}>
+                    <div className="flex-1">
+                      <h3 className={`font-extrabold leading-tight mb-1.5 text-foreground ${fontClass}`}>
                         {evento.titulo}
                       </h3>
                       <span className={`inline-block px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase tracking-widest ${getBadgeStyle(evento.tipo)}`}>
                         {evento.tipo}
                       </span>
                     </div>
-                  </div>
+                  </li>
                 ))}
-              </div>
+              </ul>
             )
           )}
 
           {abaAtiva === 'liturgia' && (
             eventosLiturgiaDoMes.length === 0 ? (
-              <div className="text-center py-8 font-medium text-muted">Nenhuma celebração litúrgica em destaque neste mês.</div>
+              <div className="text-center py-12 text-muted font-medium">
+                <span className="material-symbols-rounded text-5xl mb-2 opacity-50 text-muted">church</span>
+                <p className="text-muted">Nenhuma celebração litúrgica em destaque neste mês.</p>
+              </div>
             ) : (
-              <div className="flex flex-col gap-6">
+              <ul className="flex flex-col gap-4">
                 {eventosLiturgiaDoMes.map((evento, i) => (
-                  <div key={i} className="flex gap-4 items-start group">
+                  <li key={i} className="rounded-[1.5rem] p-5 shadow-soft border flex items-center gap-4 transition-all hover:shadow-md bg-card border-border">
                     {/* Data com Cor Litúrgica */}
-                    <div className="flex flex-col items-center min-w-[40px] shrink-0 pt-1">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-lg ${evento.cor}`}>
-                        {String(evento.dia).padStart(2, '0')}
-                      </div>
+                    <div className={`w-14 h-14 shrink-0 rounded-2xl flex items-center justify-center font-black text-2xl shadow-sm border-2 ${evento.cor}`}>
+                      {String(evento.dia).padStart(2, '0')}
                     </div>
-                    <div className="flex-1 pb-6 border-b group-last:border-0 group-last:pb-0 border-border">
+                    <div className="flex-1">
                       <h3 className={`font-extrabold leading-tight mb-1 text-foreground ${fontClass}`}>
                         {evento.titulo}
                       </h3>
@@ -302,13 +338,12 @@ export default function CalendarioPage() {
                         {evento.descricao}
                       </p>
                     </div>
-                  </div>
+                  </li>
                 ))}
-              </div>
+              </ul>
             )
           )}
-
-        </section>
+        </div>
 
       </main>
     </div>

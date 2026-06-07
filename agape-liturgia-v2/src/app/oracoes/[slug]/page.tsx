@@ -11,6 +11,7 @@ export default function OracaoLeituraPage({ params }: { params: Promise<{ slug: 
   const [isMounted, setIsMounted] = useState(false);
   const oracao = dbOracoes[slug];
 
+  const [isLatin, setIsLatin] = useState(false);
   const { tamanhoFonte } = useUserStore();
 
   useEffect(() => {
@@ -21,22 +22,37 @@ export default function OracaoLeituraPage({ params }: { params: Promise<{ slug: 
   if (!oracao) return notFound();
 
   const fontReading =  tamanhoFonte === 'grande' ? 'text-xl leading-[2.2]' : 'text-lg leading-[1.8]';
-  const htmlTexto = oracao.texto.replace(/\n/g, '<br />');
+  const textoParaMostrar = isLatin && oracao.la ? oracao.la : oracao.pt;
+  const htmlTexto = textoParaMostrar.replace(/\n/g, '<br />');
 
   return (
     <div className="min-h-[100dvh] flex flex-col font-sans pb-32 selection:bg-primary/30 transition-colors duration-300 bg-background">
       
       <header className="sticky top-0 z-50 backdrop-blur-md border-b px-4 sm:px-6 py-4 flex items-center justify-between max-w-[800px] mx-auto w-full transition-colors duration-300 bg-background/90 border-border">
-        <Link 
-          href="/oracoes"
-          className="flex items-center justify-center w-10 h-10 rounded-full active:scale-95 shrink-0 transition-colors text-muted hover:bg-muted/20 hover:text-foreground"
-        >
-          <span className="material-symbols-rounded text-[26px]">arrow_back</span>
-        </Link>
-        <span className="font-extrabold text-xs uppercase tracking-widest text-muted">
-          Oração
-        </span>
-        <div className="w-10 h-10"></div>
+        <div className="flex items-center gap-4">
+          <Link 
+            href="/oracoes"
+            className="flex items-center justify-center w-10 h-10 rounded-full active:scale-95 shrink-0 transition-colors text-muted hover:bg-muted/20 hover:text-foreground"
+          >
+            <span className="material-symbols-rounded text-[26px]">arrow_back</span>
+          </Link>
+          <span className="font-extrabold text-xs uppercase tracking-widest text-muted">
+            Oração
+          </span>
+        </div>
+        
+        {oracao.la && (
+          <button
+            onClick={() => setIsLatin(!isLatin)}
+            className={`px-3 py-1.5 rounded-xl border text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 ${
+              isLatin
+                ? "bg-primary border-primary text-white shadow-sm shadow-primary/20"
+                : "bg-card border-border text-muted"
+            }`}
+          >
+            {isLatin ? "LATIN" : "PT-BR"}
+          </button>
+        )}
       </header>
 
       <main className="flex-1 w-full max-w-[800px] mx-auto px-5 pt-8 animate-fade-in">
@@ -58,12 +74,12 @@ export default function OracaoLeituraPage({ params }: { params: Promise<{ slug: 
             </g>
           </svg>
           <h1 className="text-3xl md:text-4xl font-extrabold font-serif tracking-tight mb-6 px-4 text-foreground">
-            {oracao.titulo}
+            {isLatin && oracao.tituloLa ? oracao.tituloLa : oracao.titulo}
           </h1>
           <div className="w-16 h-1.5 bg-primary rounded-full"></div>
         </div>
 
-        <article className="p-8 md:p-12 rounded-[2rem] shadow-soft border transition-colors duration-300 bg-card border-border">
+        <article className="select-text p-8 md:p-12 rounded-[2rem] shadow-soft border transition-colors duration-300 bg-card border-border">
           <div 
             className={`font-serif text-center whitespace-pre-wrap text-foreground ${fontReading}`}
             dangerouslySetInnerHTML={{ __html: htmlTexto }}

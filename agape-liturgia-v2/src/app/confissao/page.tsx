@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/store/useUserStore";
+import { useAlertStore } from "@/store/useAlertStore";
 import { trackEvent } from "@/lib/analytics";
 
 const categoriasPecados = [
@@ -66,10 +67,16 @@ export default function ConfissaoPage() {
     limparExame,
     tamanhoFonte,
   } = useUserStore();
+  const { showAlert } = useAlertStore();
+
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
     trackEvent("page_view", { page_name: "confissao_tematizada" });
   }, []);
+
+  if (!isMounted) return <div className="min-h-[100dvh] bg-background" />;
 
   const fontBody = tamanhoFonte === "grande" ? "text-base sm:text-lg" : "text-sm";
   const fontHeader = tamanhoFonte === "grande" ? "text-lg sm:text-xl" : "text-base";
@@ -84,7 +91,7 @@ export default function ConfissaoPage() {
         className="sticky top-0 z-50 backdrop-blur-md border-b px-4 sm:px-6 py-4 flex items-center justify-between max-w-[800px] mx-auto w-full transition-colors duration-300 bg-background/90 border-border"
       >
         <button
-          onClick={() => router.back()}
+          onClick={() => router.push('/jornada')}
           className="flex items-center justify-center w-10 h-10 rounded-full active:scale-95 shrink-0 transition-colors text-muted hover:bg-muted/20 hover:text-foreground"
         >
           <span className="material-symbols-rounded text-[26px]">
@@ -128,7 +135,7 @@ export default function ConfissaoPage() {
             Exame de Consciência
           </h2>
           <p className="font-medium text-sm max-w-[300px] text-muted">
-            Marque as suas faltas. Tudo fica guardado{" "}
+            Marque as suas faltas. Tudo fica salvo{" "}
             <strong>apenas neste celular</strong>.
           </p>
         </div>
@@ -335,9 +342,13 @@ export default function ConfissaoPage() {
               </div>
               <button
                 onClick={() => {
-                  if(window.confirm("Deseja apagar todas as faltas marcadas?")) {
-                    limparExame();
-                  }
+                  showAlert(
+                    "Limpar Faltas",
+                    "Deseja apagar todas as faltas marcadas? Esta ação não pode ser desfeita.",
+                    "error",
+                    () => limparExame(),
+                    true // showCancel
+                  );
                 }}
                 className="flex items-center gap-1.5 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white px-4 py-2 rounded-full text-xs font-bold transition-all active:scale-95"
               >

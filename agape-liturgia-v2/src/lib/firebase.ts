@@ -1,8 +1,15 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import {
+  initializeFirestore,
+  getFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
+  type Firestore,
+} from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getMessaging, isSupported as isMessagingSupported, Messaging } from "firebase/messaging";
 import { getAnalytics, isSupported as isAnalyticsSupported, Analytics } from "firebase/analytics";
+import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "firebase/app-check";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -13,21 +20,58 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-const db = getFirestore(app);
 const auth = getAuth(app);
 
-
-let messaging: Messaging | null = null;
+// ─── Firebase App Check (Segurança contra Bots/Spam) ─────────────────────────
 if (typeof window !== "undefined") {
-  isMessagingSupported().then((supported) => {
-    if (supported) {
-      messaging = getMessaging(app);
-    }
+  // @ts-expect-error - Evita problemas de SSR e garante que corre apenas no cliente
+  self.FIREBASE_APPCHECK_DEBUG_TOKEN = process.env.NODE_ENV !== "production";
+  
+  initializeAppCheck(app, {
+    provider: new ReCaptchaEnterpriseProvider("6LdzxwItAAAAAHvKNK36pdYhjXdl7HUXn4MwWiAz"),
+    isTokenAutoRefreshEnabled: true
   });
 }
+// ─────────────────────────────────────────────────────────────────────────────
 
+// ─── Firestore com persistência offline ──────────────────────────────────────
+// initializeFirestore com localCache substitui o deprecated enableIndexedDbPersistence.
+// Configura persistência de forma síncrona, sem race condition.
+// persistentMultipleTabManager() evita o erro "failed-precondition" com múltiplas abas.
+// try/catch protege contra dupla inicialização durante HMR no Next.js dev.
+let db: Firestore;
+try {
+  db =
+    typeof window !== "undefined"
+      ? initializeFirestore(app, {
+          localCache: persistentLocalCache({
+            tabManager: persistentMultipleTabManager(),
+          }),
+        })
+      : initializeFirestore(app, {});
+} catch {
+  // Já inicializado (HMR reload) — recupera instância existente
+  db = getFirestore(app);
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ─── FCM: Lazy Singleton assíncrono ──────────────────────────────────────────
+// Exportamos uma função async em vez de uma variável null, eliminando a race
+// condition onde componentes liam `messaging` antes da Promise resolver.
+let _messagingPromise: Promise<Messaging | null> | null = null;
+
+export async function getMessagingInstance(): Promise<Messaging | null> {
+  if (typeof window === "undefined") return null;
+  if (!_messagingPromise) {
+    _messagingPromise = isMessagingSupported().then((supported) => {
+      if (!supported) return null;
+      return getMessaging(app);
+    });
+  }
+  return _messagingPromise;
+}
+// ─────────────────────────────────────────────────────────────────────────────
 
 let analytics: Analytics | null = null;
 if (typeof window !== "undefined") {
@@ -38,5 +82,4 @@ if (typeof window !== "undefined") {
   });
 }
 
-
-export { app, db, auth, messaging, analytics };
+export { app, db, auth, analytics };

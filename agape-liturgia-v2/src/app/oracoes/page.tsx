@@ -16,6 +16,7 @@ export default function OracoesPage() {
   const listaOracoes = Object.values(dbOracoes);
 
   useEffect(() => { 
+    window.scrollTo(0, 0);
     const mountTimer = setTimeout(() => setIsMounted(true), 0);
     trackEvent("page_view", { page_name: "oracoes_index" });
     return () => clearTimeout(mountTimer);
