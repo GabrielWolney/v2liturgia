@@ -64,31 +64,21 @@ export function useAuth() {
 
   const loginWithGoogle = async () => {
     try {
-      setLoading(true);
       const provider = new GoogleAuthProvider();
       
-      // No iOS Safari / PWA, o popup é severamente bloqueado se não for imediato,
-      // e às vezes o signInWithRedirect é mais seguro para PWAs mobile.
-      const isMobileOrPWA = typeof window !== 'undefined' && 
-        (window.innerWidth <= 768 || window.matchMedia('(display-mode: standalone)').matches || /iPhone|iPad|iPod/.test(navigator.userAgent));
+      // No iOS PWA, o signInWithRedirect quebra a sessão por conta do isolamento de cookies da Apple.
+      // signInWithPopup funciona perfeitamente desde que não haja 'await import' antes dele.
+      await signInWithPopup(auth, provider);
       
-      if (isMobileOrPWA) {
-        await signInWithRedirect(auth, provider);
-        // A promessa de redirect nunca "resolve" na mesma página, ela recarrega.
-      } else {
-        await signInWithPopup(auth, provider);
-      }
       // Sucesso: onAuthStateChanged vai cuidar de remover o loading após sincronizar o banco
     } catch (error) {
       console.error("Erro no login com Google", error);
-      setLoading(false);
       throw error;
     }
   };
 
   const loginWithEmail = async (email: string, pass: string) => {
     try {
-      setLoading(true);
       await signInWithEmailAndPassword(auth, email, pass);
       // Sucesso: onAuthStateChanged vai cuidar de remover o loading
     } catch (error: any) {
@@ -99,14 +89,12 @@ export function useAuth() {
       } else if (error.code === "auth/too-many-requests") {
         msg = "Muitas tentativas falhas. Tente novamente mais tarde.";
       }
-      setLoading(false);
       throw new Error(msg);
     }
   };
 
   const signUpWithEmail = async (name: string, email: string, pass: string) => {
     try {
-      setLoading(true);
       const credential = await createUserWithEmailAndPassword(auth, email, pass);
       await updateProfile(credential.user, { displayName: name });
       
@@ -127,7 +115,6 @@ export function useAuth() {
       } else if (error.code === "auth/invalid-email") {
         msg = "E-mail inválido.";
       }
-      setLoading(false);
       throw new Error(msg);
     }
   };
@@ -154,7 +141,6 @@ export function useAuth() {
 
   const resetPassword = async (email: string) => {
     try {
-      setLoading(true);
       await sendPasswordResetEmail(auth, email);
     } catch (error: any) {
       console.error("Erro ao resetar senha", error);
@@ -165,32 +151,24 @@ export function useAuth() {
         msg = "Não há nenhuma conta com este e-mail.";
       }
       throw new Error(msg);
-    } finally {
-      setLoading(false);
     }
   };
 
   const updateUserName = async (newName: string) => {
     try {
-      setLoading(true);
-      
       if (user) {
         await updateProfile(user, { displayName: newName });
       }
-      
       useUserStore.getState().setNomeUsuario(newName);
     } catch (error) {
       console.error("Erro ao atualizar nome", error);
       throw new Error("Não foi possível atualizar o nome. Tente novamente.");
-    } finally {
-      setLoading(false);
     }
   };
 
   const deleteAccount = async () => {
     if (!user) return;
     try {
-      setLoading(true);
       const { doc, deleteDoc, getDoc, getDocs, query, where, collection } = await import("firebase/firestore");
       const { db } = await import("@/lib/firebase");
       
@@ -227,7 +205,6 @@ export function useAuth() {
       useUserStore.getState().clearStore();
       try { await signOut(auth); } catch (e) { console.warn("Logout falhou ao deletar conta", e); }
       if (typeof window !== "undefined") { window.location.reload(); }
-      setLoading(false);
     }
   };
 
