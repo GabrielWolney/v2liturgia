@@ -65,21 +65,21 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
   const handleGoogle = async () => {
     try {
-      setErrorMsg("");
-      setIsSubmitting(true);
+      // NÃO SETAR ESTADOS DO REACT AQUI! Qualquer estado (como setIsSubmitting)
+      // vai quebrar a sincronicidade do clique e fazer o iOS Safari bloquear o popup do Firebase.
+      
       triggerHaptic("light");
       playPop();
+      
+      // Abre o popup imediatamente na mesma pilha do evento de clique:
       await loginWithGoogle();
-      // Em signInWithRedirect, a página descarrega aqui.
-      // Em signInWithPopup, prossegue:
+      
       triggerHaptic("success");
       playSuccess();
       router.replace("/");
     } catch (err: any) {
       triggerHaptic("error");
       setErrorMsg(err.message || "Erro no login com Google. Tente por e-mail ou use o Safari.");
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
