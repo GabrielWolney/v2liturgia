@@ -66,9 +66,14 @@ export function useAuth() {
     try {
       const provider = new GoogleAuthProvider();
       
-      // No iOS PWA, o signInWithRedirect quebra a sessão por conta do isolamento de cookies da Apple.
-      // signInWithPopup funciona perfeitamente desde que não haja 'await import' antes dele.
-      await signInWithPopup(auth, provider);
+      const isIOS = typeof window !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const isStandalone = typeof window !== 'undefined' && window.matchMedia('(display-mode: standalone)').matches;
+
+      if (isIOS || isStandalone) {
+        await signInWithRedirect(auth, provider);
+      } else {
+        await signInWithPopup(auth, provider);
+      }
       
       // Sucesso: onAuthStateChanged vai cuidar de remover o loading após sincronizar o banco
     } catch (error) {

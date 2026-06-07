@@ -65,14 +65,21 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
   const handleGoogle = async () => {
     try {
+      setErrorMsg("");
+      setIsSubmitting(true);
       triggerHaptic("light");
       playPop();
       await loginWithGoogle();
+      // Em signInWithRedirect, a página descarrega aqui.
+      // Em signInWithPopup, prossegue:
       triggerHaptic("success");
       playSuccess();
       router.replace("/");
-    } catch (err) {
+    } catch (err: any) {
       triggerHaptic("error");
+      setErrorMsg(err.message || "Erro no login com Google. Tente por e-mail ou use o Safari.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
