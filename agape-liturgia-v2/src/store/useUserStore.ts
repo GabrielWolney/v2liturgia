@@ -364,10 +364,19 @@ export const useUserStore = create<UserState>()(
                   onboardingCompleto: get().onboardingCompleto || false,
                   createdAt: new Date().toISOString()
                 };
-                await setDoc(docRef, defaultData);
+                
+                // Evita travamento na tela de carregamento setando hasSynced ANTES ou DURANTE a criação
+                set({ ...defaultData, hasSynced: true });
+                
+                await setDoc(docRef, defaultData).catch(err => {
+                   console.error("Erro ao criar documento padrão:", err);
+                   // Garante que não fique travado em caso de erro de rede
+                   set({ hasSynced: true });
+                });
               }
             }, (error) => {
                console.error("Erro no onSnapshot do usuário:", error);
+               set({ hasSynced: true }); // Destrava a tela em caso de falha de permissão ou rede
             });
 
             set({ unsubscribeSnapshot: unsub });
