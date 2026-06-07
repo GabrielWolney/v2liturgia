@@ -9,6 +9,9 @@ import { AppleSplashScreens } from "@/components/layout/AppleSplashScreens";
 import { NativeAlert } from "@/components/ui/NativeAlert";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
+const GOOGLE_CLIENT_ID = "556421268172-2hb0p8spuqv2ls6no8p063u3snqsp0j8.apps.googleusercontent.com";
 
 const montserrat = Montserrat({ subsets: ["latin"], variable: '--font-montserrat' });
 const lora = Lora({ subsets: ["latin"], variable: '--font-lora' });
@@ -31,7 +34,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "Ágape Liturgia | A Sua Jornada Espiritual",
-    description: "Liturgia Diária, Santo Terço, Bíblia e Orações num só lugar. Mergulhe na sua fé com a nossa app desenhada para si.",
+    description: "Liturgia Diária, Santo Terço, Bíblia e Orações num só lugar. Mergulhe na sua fé com nosso app.",
     url: "https://liturgia-agape.vercel.app",
     siteName: "Ágape Liturgia",
     images: [
@@ -92,17 +95,19 @@ export default function RootLayout({
       </head>
       <body className={`${montserrat.variable} ${lora.variable} font-sans antialiased selection:bg-[#2F6BFF]/30 selection:text-[#2F6BFF] bg-background`}>
         <OfflineIndicator />
-        <ThemeProvider>
-          <AuthGuard>
-            <main className="min-h-dvh w-full max-w-full">
-              {children}
-            </main>
-          </AuthGuard>
-          <ScrollToTop />
-          <NativeAlert />
-          <Analytics />
-          <SpeedInsights />
-        </ThemeProvider>
+        <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+          <ThemeProvider>
+            <AuthGuard>
+              <main className="min-h-dvh w-full max-w-full">
+                {children}
+              </main>
+            </AuthGuard>
+            <ScrollToTop />
+            <NativeAlert />
+            <Analytics />
+            <SpeedInsights />
+          </ThemeProvider>
+        </GoogleOAuthProvider>
       </body>
     </html>
   );

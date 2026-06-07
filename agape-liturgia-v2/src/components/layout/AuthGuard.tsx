@@ -8,6 +8,9 @@ import { useHaptics } from "@/hooks/useHaptics";
 import { useSound } from "@/hooks/useSound";
 import Image from "next/image";
 import { OnboardingCarousel } from "@/components/onboarding/OnboardingCarousel";
+import { useGoogleLogin } from '@react-oauth/google';
+import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 
 const COMUNIDADES_DISPONIVEIS = [
   "Emaús",
@@ -63,24 +66,37 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const handleGoogle = async () => {
-    try {
-      // NÃO SETAR ESTADOS DO REACT AQUI! Qualquer estado (como setIsSubmitting)
-      // vai quebrar a sincronicidade do clique e fazer o iOS Safari bloquear o popup do Firebase.
-      
-      triggerHaptic("light");
-      playPop();
-      
-      // Abre o popup imediatamente na mesma pilha do evento de clique:
-      await loginWithGoogle();
-      
-      triggerHaptic("success");
-      playSuccess();
-      router.replace("/");
-    } catch (err: any) {
+  const handleGoogleNative = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        setErrorMsg("");
+        setIsSubmitting(true);
+        triggerHaptic("light");
+        playPop();
+        
+        // Passa o token do Google nativo para o Firebase! Mágica absoluta.
+        const credential = GoogleAuthProvider.credential(null, tokenResponse.access_token);
+        await signInWithCredential(auth, credential);
+        
+        triggerHaptic("success");
+        playSuccess();
+        router.replace("/");
+      } catch (err: any) {
+        triggerHaptic("error");
+        setErrorMsg(err.message || "Erro ao conectar conta do Google no servidor.");
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    onError: () => {
       triggerHaptic("error");
-      setErrorMsg(err.message || "Erro no login com Google. Tente por e-mail ou use o Safari.");
+      setErrorMsg("O pop-up do Google foi fechado ou ocorreu um erro.");
     }
+  });
+
+  const handleGoogle = () => {
+    // Isso aciona o hook do Google nativamente:
+    handleGoogleNative();
   };
 
   const handleResetPassword = async () => {
