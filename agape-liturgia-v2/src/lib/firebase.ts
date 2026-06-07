@@ -12,12 +12,9 @@ import { getAnalytics, isSupported as isAnalyticsSupported, Analytics } from "fi
 import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "firebase/app-check";
 import { persistentSingleTabManager } from "firebase/firestore";
 
-const isProxyNeeded = typeof window !== "undefined" && 
-  (/iPad|iPhone|iPod/.test(navigator.userAgent) || window.matchMedia('(display-mode: standalone)').matches);
-
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: isProxyNeeded ? window.location.host : process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,

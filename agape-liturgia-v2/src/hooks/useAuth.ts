@@ -65,15 +65,7 @@ export function useAuth() {
   const loginWithGoogle = async () => {
     try {
       const provider = new GoogleAuthProvider();
-      
-      const isIOS = typeof window !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent);
-      const isStandalone = typeof window !== 'undefined' && window.matchMedia('(display-mode: standalone)').matches;
-
-      if (isIOS || isStandalone) {
-        await signInWithRedirect(auth, provider);
-      } else {
-        await signInWithPopup(auth, provider);
-      }
+      await signInWithPopup(auth, provider);
       // Sucesso: onAuthStateChanged vai cuidar de remover o loading após sincronizar o banco
     } catch (error) {
       console.error("Erro no login com Google", error);
