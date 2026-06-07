@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import Image from "next/image";
 import { getCorLiturgica, getImagemPorCor, isDiaDeJejum } from "@/lib/date-utils";
 import { LiturgiaDiaria } from "@/types/liturgia";
