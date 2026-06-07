@@ -2,6 +2,16 @@ import { useEffect, useState } from "react";
 import { 
   signOut, 
   onAuthStateChanged,
+  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
+  GoogleAuthProvider,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  sendEmailVerification,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+  deleteUser,
   User
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
@@ -12,6 +22,11 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Captura erros silenciosos de redirecionamento (caso o usuário volte do Google Auth com erro)
+    getRedirectResult(auth).catch((error) => {
+      console.error("Erro no retorno do login com Google", error);
+    });
+
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       const store = useUserStore.getState();
       
@@ -50,9 +65,19 @@ export function useAuth() {
   const loginWithGoogle = async () => {
     try {
       setLoading(true);
-      const { signInWithPopup, GoogleAuthProvider } = await import("firebase/auth");
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
+      
+      // No iOS Safari / PWA, o popup é severamente bloqueado se não for imediato,
+      // e às vezes o signInWithRedirect é mais seguro para PWAs mobile.
+      const isMobileOrPWA = typeof window !== 'undefined' && 
+        (window.innerWidth <= 768 || window.matchMedia('(display-mode: standalone)').matches || /iPhone|iPad|iPod/.test(navigator.userAgent));
+      
+      if (isMobileOrPWA) {
+        await signInWithRedirect(auth, provider);
+        // A promessa de redirect nunca "resolve" na mesma página, ela recarrega.
+      } else {
+        await signInWithPopup(auth, provider);
+      }
       // Sucesso: onAuthStateChanged vai cuidar de remover o loading após sincronizar o banco
     } catch (error) {
       console.error("Erro no login com Google", error);
@@ -64,7 +89,6 @@ export function useAuth() {
   const loginWithEmail = async (email: string, pass: string) => {
     try {
       setLoading(true);
-      const { signInWithEmailAndPassword } = await import("firebase/auth");
       await signInWithEmailAndPassword(auth, email, pass);
       // Sucesso: onAuthStateChanged vai cuidar de remover o loading
     } catch (error: any) {
@@ -83,7 +107,6 @@ export function useAuth() {
   const signUpWithEmail = async (name: string, email: string, pass: string) => {
     try {
       setLoading(true);
-      const { createUserWithEmailAndPassword, updateProfile, sendEmailVerification } = await import("firebase/auth");
       const credential = await createUserWithEmailAndPassword(auth, email, pass);
       await updateProfile(credential.user, { displayName: name });
       
@@ -132,7 +155,6 @@ export function useAuth() {
   const resetPassword = async (email: string) => {
     try {
       setLoading(true);
-      const { sendPasswordResetEmail } = await import("firebase/auth");
       await sendPasswordResetEmail(auth, email);
     } catch (error: any) {
       console.error("Erro ao resetar senha", error);
@@ -151,7 +173,6 @@ export function useAuth() {
   const updateUserName = async (newName: string) => {
     try {
       setLoading(true);
-      const { updateProfile } = await import("firebase/auth");
       
       if (user) {
         await updateProfile(user, { displayName: newName });
@@ -170,7 +191,6 @@ export function useAuth() {
     if (!user) return;
     try {
       setLoading(true);
-      const { deleteUser } = await import("firebase/auth");
       const { doc, deleteDoc, getDoc, getDocs, query, where, collection } = await import("firebase/firestore");
       const { db } = await import("@/lib/firebase");
       
