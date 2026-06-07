@@ -81,7 +81,7 @@ export default function ConfissaoPage() {
   const fontBody = tamanhoFonte === "grande" ? "text-base sm:text-lg" : "text-sm";
   const fontHeader = tamanhoFonte === "grande" ? "text-lg sm:text-xl" : "text-base";
 
-  const quantidadePecados = Object.keys(exameConsciencia).length;
+  const quantidadePecados = Object.keys(exameConsciencia || {}).length;
 
   return (
     <div

@@ -45,12 +45,12 @@ export default function ProgressoPage() {
   const mesAtual = dataAtual.getMonth() + 1;
   const anoAtual = dataAtual.getFullYear();
 
-  const leiturasEsteMes = Object.keys(leiturasConcluidas).filter(dataIso => {
+  const leiturasEsteMes = Object.keys(leiturasConcluidas || {}).filter(dataIso => {
     const [ano, mes] = dataIso.split('-').map(Number);
     return ano === anoAtual && mes === mesAtual;
   }).length;
 
-  const tercosEsteMes = Object.keys(tercosConcluidos).filter(dataIso => {
+  const tercosEsteMes = Object.keys(tercosConcluidos || {}).filter(dataIso => {
     const [ano, mes] = dataIso.split('-').map(Number);
     return ano === anoAtual && mes === mesAtual;
   }).length;
@@ -71,8 +71,8 @@ export default function ProgressoPage() {
     ultimos7Dias.push({
       diaSemana,
       dataIso,
-      leitura: !!leiturasConcluidas[dataIso],
-      terco: !!tercosConcluidos[dataIso],
+      leitura: !!(leiturasConcluidas && leiturasConcluidas[dataIso]),
+      terco: !!(tercosConcluidos && tercosConcluidos[dataIso]),
       oficio: !!(oficiosConcluidos && oficiosConcluidos[dataIso])
     });
   }
