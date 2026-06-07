@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { trackEvent } from "@/lib/analytics";
 import { useUserStore } from "@/store/useUserStore";
 import { useSound } from "@/hooks/useSound";
@@ -16,6 +16,7 @@ interface AgapeWindow extends Window {
 }
 
 export function JornadaClient({ liturgiaServer }: { liturgiaServer: LiturgiaDiaria | null }) {
+  const router = useRouter();
   const [isMounted, setIsMounted] = useState(() => {
     if (typeof window !== 'undefined') return (window as AgapeWindow).__IS_MOUNTED__ || false;
     return false;
@@ -181,14 +182,14 @@ export function JornadaClient({ liturgiaServer }: { liturgiaServer: LiturgiaDiar
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-1 sm:gap-3">
-          <Link href="/progresso" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border shadow-sm transition-colors active:scale-95 ${foguinhoClass}`}>
+        <div className="flex items-center gap-1 sm:gap-3 cursor-pointer">
+          <button onClick={() => { playPop(); triggerHaptic('light'); router.push('/progresso'); }} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border shadow-sm transition-colors active:scale-95 ${foguinhoClass}`}>
             <span className="material-symbols-rounded text-[18px]">local_fire_department</span>
             <span className="font-extrabold text-sm">{streak}</span>
-          </Link>
-          <Link href="/menu" className={`w-9 h-9 flex items-center justify-center rounded-full transition-colors ${arrowHover}`}>
+          </button>
+          <button onClick={() => { playPop(); triggerHaptic('light'); router.push('/menu'); }} className={`w-9 h-9 flex items-center justify-center rounded-full transition-colors ${arrowHover}`}>
             <span className="material-symbols-rounded text-[24px]">settings</span>
-          </Link>
+          </button>
         </div>
       </header>
 

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { getCorLiturgica, getImagemPorCor, isDiaDeJejum } from "@/lib/date-utils";
 import { LiturgiaDiaria } from "@/types/liturgia";
@@ -56,6 +56,7 @@ export function HomeClient({ liturgiaServer }: HomeClientProps) {
   const [dataAtual, setDataAtual] = useState("");
   const [avisoAtual, setAvisoAtual] = useState<Aviso | null>(null);
   
+  const router = useRouter();
   const { nomeUsuario, modoVisual, tamanhoFonte, streak, ultimaAtividade, verificarStreak, avisosLidos, marcarAvisoLido, isAgape } = useUserStore();
   const { playPop } = useSound();
   const { triggerHaptic } = useHaptics();
@@ -213,14 +214,14 @@ export function HomeClient({ liturgiaServer }: HomeClientProps) {
               <span className={`text-[8px] font-black uppercase tracking-widest mt-0.5 opacity-90 ${textMuted}`}>Ágape de jovens</span>
             </div>
           </div>
-          <div className="flex items-center gap-1 sm:gap-3">
-            <Link href="/progresso" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border shadow-sm transition-colors active:scale-95 ${foguinhoClass}`}>
+          <div className="flex items-center gap-1 sm:gap-3 cursor-pointer">
+            <button onClick={() => { playPop(); triggerHaptic('light'); router.push('/progresso'); }} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border shadow-sm transition-colors active:scale-95 ${foguinhoClass}`}>
               <span className="material-symbols-rounded text-[18px]">local_fire_department</span>
               <span className="font-extrabold text-sm">{streak}</span>
-            </Link>
-            <Link href="/menu" className={`w-9 h-9 flex items-center justify-center rounded-full transition-colors hover:bg-black/5 active:bg-black/10 text-muted hover:text-foreground`}>
+            </button>
+            <button onClick={() => { playPop(); triggerHaptic('light'); router.push('/menu'); }} className={`w-9 h-9 flex items-center justify-center rounded-full transition-colors hover:bg-black/5 active:bg-black/10 text-muted hover:text-foreground`}>
               <span className="material-symbols-rounded text-[24px]">settings</span>
-            </Link>
+            </button>
           </div>
         </div>
       </header>
