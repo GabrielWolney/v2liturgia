@@ -138,7 +138,7 @@ service cloud.firestore {
     // ==========================================
     match /config_geral/{document=**} {
       allow read: if true;
-      allow write: if isSignedIn() && isMasterAdmin();
+      allow write: if isSignedIn() && (isMasterAdmin() || isCoordenadorIntercessao());
     }
     
     match /avisos_gerais/{avisoId} {

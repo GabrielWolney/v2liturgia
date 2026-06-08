@@ -8,22 +8,33 @@ export function useSound() {
 
   const getAudioContext = () => {
     if (typeof window === "undefined") return null;
-    if (!audioCtxRef.current) {
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-      if (AudioContextClass) {
-        audioCtxRef.current = new AudioContextClass();
+    try {
+      if (!audioCtxRef.current) {
+        const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+        if (AudioContextClass) {
+          audioCtxRef.current = new AudioContextClass();
+        }
       }
+      return audioCtxRef.current;
+    } catch (e) {
+      console.warn("AudioContext bloqueado:", e);
+      return null;
     }
-    return audioCtxRef.current;
   };
 
   const checkEnabled = () => {
-    const { somAtivado } = useUserStore.getState();
-    if (!somAtivado) return false;
-    const ctx = getAudioContext();
-    if (!ctx) return false;
-    if (ctx.state === "suspended") ctx.resume();
-    return ctx;
+    try {
+      const { somAtivado } = useUserStore.getState();
+      if (!somAtivado) return false;
+      const ctx = getAudioContext();
+      if (!ctx) return false;
+      if (ctx.state === "suspended") {
+        ctx.resume().catch(() => {});
+      }
+      return ctx;
+    } catch (e) {
+      return false;
+    }
   };
 
   // Cria um nó de som básico com envelope ADSR suave

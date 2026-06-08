@@ -235,21 +235,33 @@ export default function AdminPage() {
 
   const handleSalvarPropositos = async () => {
     setCarregando(true);
-    await updateProposito({ ativo: propAtivo, tema: propTema, texto: propTexto });
-    setCarregando(false);
-    showAlert("Atualizado", "Propósito Global atualizado com sucesso!", "success");
+    try {
+      await updateProposito({ ativo: propAtivo, tema: propTema, texto: propTexto });
+      showAlert("Atualizado", "Propósito Global atualizado com sucesso!", "success");
+    } catch (error: any) {
+      console.error(error);
+      showAlert("Erro", "Erro ao atualizar Propósito Global: " + error.message, "error");
+    } finally {
+      setCarregando(false);
+    }
   };
 
   const handleSalvarConfigComunidade = async () => {
     if (!activeComunidadeName) return;
     setCarregando(true);
-    await updateConfigComunidade(activeComunidadeName, {
-      propositoLocal: propLocalTexto,
-      dataVivencia: dataVivencia,
-      localVivencia: localVivencia
-    });
-    showAlert("Atualizado", "Configurações da comunidade atualizadas!", "success");
-    setCarregando(false);
+    try {
+      await updateConfigComunidade(activeComunidadeName, {
+        propositoLocal: propLocalTexto,
+        dataVivencia: dataVivencia,
+        localVivencia: localVivencia
+      });
+      showAlert("Atualizado", "Configurações da comunidade atualizadas!", "success");
+    } catch (error: any) {
+      console.error(error);
+      showAlert("Erro", "Erro ao atualizar Configurações da Comunidade: " + error.message, "error");
+    } finally {
+      setCarregando(false);
+    }
   };
 
   const handleResponderJovem = async (uid: string, status: "aprovado" | "recusado") => {
