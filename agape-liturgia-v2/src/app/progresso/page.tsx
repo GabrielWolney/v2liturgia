@@ -108,7 +108,7 @@ export default function ProgressoPage() {
 
       <header 
         className={`sticky top-0 z-50 backdrop-blur-md border-b px-4 sm:px-6 py-4 flex items-center justify-between max-w-[800px] mx-auto w-full transition-colors duration-300 bg-background/90 border-border`}
-        style={{ paddingTop: 'max(env(safe-area-inset-top), 1rem)' }}
+        style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}
       >
         <button onClick={() => { playPop(); triggerHaptic('light'); router.back(); }} className="flex items-center justify-center w-10 h-10 rounded-full active:scale-95 shrink-0 transition-colors text-muted hover:bg-muted/20 hover:text-foreground">
           <span className="material-symbols-rounded text-[26px]">arrow_back</span>

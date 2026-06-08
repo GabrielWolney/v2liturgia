@@ -30,7 +30,7 @@ export default function TercoPage() {
 
       <header 
         className="sticky top-0 z-50 backdrop-blur-md border-b px-3 sm:px-6 pb-3 sm:pb-4 flex items-center justify-between w-full transition-colors duration-300 bg-background/90 border-border gap-2"
-        style={{ paddingTop: 'max(env(safe-area-inset-top), 16px)' }}
+        style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}
       >
         <div className="flex items-center gap-2 sm:gap-4 min-w-0">
           <Link
