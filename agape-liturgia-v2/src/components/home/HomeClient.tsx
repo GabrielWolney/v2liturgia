@@ -224,7 +224,7 @@ export function HomeClient({ liturgiaServer }: HomeClientProps) {
             >
               <div className="flex items-center justify-center gap-1.5 pointer-events-none">
                 <span className="material-symbols-rounded text-[18px]">local_fire_department</span>
-                <span className="font-extrabold text-sm">{streak}</span>
+                <span className="font-extrabold text-sm">{streak} 🔥🔥</span>
               </div>
             </Link>
             <Link 
