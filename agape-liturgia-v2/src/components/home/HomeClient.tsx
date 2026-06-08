@@ -207,7 +207,7 @@ export function HomeClient({ liturgiaServer }: HomeClientProps) {
       )}
 
       <header 
-        className="flex items-center justify-between transition-colors duration-300 px-4 sm:px-5 pt-14 pb-4 sm:pb-5 max-w-[600px] mx-auto w-full relative z-20"
+        className="flex items-center justify-between transition-colors duration-300 px-4 sm:px-5 pb-4 sm:pb-5 max-w-[600px] mx-auto w-full relative z-20"
       >
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-3">
