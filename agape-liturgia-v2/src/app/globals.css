@@ -81,8 +81,7 @@
  
   
   header {
-    padding-top: max(env(safe-area-inset-top), 47px) !important;
-    margin-top: 20px !important;
+    padding-top: calc(max(env(safe-area-inset-top), 47px) + 8px) !important;
     margin-bottom: 12px !important;
     margin-left: auto !important;
     margin-right: auto !important;
