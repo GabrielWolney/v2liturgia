@@ -6,7 +6,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: 'Ágape Liturgia V2',
     short_name: 'Ágape',
     description: 'Liturgia Diária, Bíblia e Vida de Oração para jovens Católicos',
-    start_url: '/?v=8',
+    start_url: '/?v=9',
     display: 'standalone',
     display_override: ['window-controls-overlay', 'standalone'],
     background_color: '#f1f5f9',
