@@ -56,7 +56,6 @@ export default function TercoPage() {
               role="button"
               tabIndex={0}
               onClick={(e) => { e.preventDefault(); playPop(); triggerHaptic('light'); actions.handleSkip(); }}
-              onTouchEnd={(e) => { e.preventDefault(); playPop(); triggerHaptic('light'); actions.handleSkip(); }}
               className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 flex items-center justify-center rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 transition-colors active:scale-95 cursor-pointer"
             >
               <span className="material-symbols-rounded text-base sm:text-lg pointer-events-none">check_circle</span>
@@ -66,7 +65,6 @@ export default function TercoPage() {
             role="button"
             tabIndex={0}
             onClick={(e) => { e.preventDefault(); playPop(); triggerHaptic('light'); actions.resetTerco(); }}
-            onTouchEnd={(e) => { e.preventDefault(); playPop(); triggerHaptic('light'); actions.resetTerco(); }}
             className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 flex items-center justify-center rounded-2xl bg-card border border-border text-muted hover:text-foreground transition-colors active:scale-95 cursor-pointer"
           >
             <span className="material-symbols-rounded text-base sm:text-lg pointer-events-none">refresh</span>

@@ -218,28 +218,25 @@ export function HomeClient({ liturgiaServer }: HomeClientProps) {
             </div>
           </div>
           <div className="flex items-center gap-1 sm:gap-3">
-            <div 
-              role="button"
-              tabIndex={0}
-              onClick={(e) => { e.preventDefault(); playPop(); triggerHaptic('light'); router.push('/progresso'); }} 
-              onTouchEnd={(e) => { e.preventDefault(); playPop(); triggerHaptic('light'); router.push('/progresso'); }} 
+            <Link 
+              href="/progresso"
+              onClick={() => { playPop(); triggerHaptic('light'); }} 
               className={`block px-3 py-1.5 rounded-full border shadow-sm transition-all active:bg-black/5 cursor-pointer ${foguinhoClass}`}
             >
               <div className="flex items-center justify-center gap-1.5 pointer-events-none">
                 <span className="material-symbols-rounded text-[18px]">local_fire_department</span>
                 <span className="font-extrabold text-sm">{streak}</span>
               </div>
-            </div>
-            <div 
-              role="button"
-              tabIndex={0}
-              onClick={() => { playPop(); triggerHaptic('light'); router.push('/menu'); }} 
+            </Link>
+            <Link 
+              href="/menu"
+              onClick={() => { playPop(); triggerHaptic('light'); }} 
               className={`block w-9 h-9 rounded-full transition-colors hover:bg-black/5 active:bg-black/10 text-muted hover:text-foreground cursor-pointer`}
             >
               <div className="flex items-center justify-center w-full h-full pointer-events-none">
                 <span className="material-symbols-rounded text-[24px]">settings</span>
               </div>
-            </div>
+            </Link>
           </div>
         </div>
       </header>
