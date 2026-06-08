@@ -206,7 +206,10 @@ export function HomeClient({ liturgiaServer }: HomeClientProps) {
         </div>
       )}
 
-      <header className="flex items-center justify-between transition-colors duration-300 p-4 sm:p-5 max-w-[600px] mx-auto w-full relative z-20">
+      <header 
+        className="flex items-center justify-between transition-colors duration-300 px-4 sm:px-5 pb-4 sm:pb-5 max-w-[600px] mx-auto w-full relative z-20"
+        style={{ paddingTop: 'max(env(safe-area-inset-top), 16px)' }}
+      >
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-3">
             <Image src="/icon-192x192.png" alt="Logo" width={40} height={40} className="w-10 h-10 rounded-xl border shadow-sm" priority />

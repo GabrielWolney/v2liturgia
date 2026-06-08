@@ -106,7 +106,10 @@ export default function ProgressoPage() {
   return (
     <div className={`min-h-[100dvh] flex flex-col font-sans pb-32 transition-colors duration-300 selection:bg-primary/30 bg-background`}>
 
-      <header className={`sticky top-0 z-50 backdrop-blur-md border-b px-4 sm:px-6 py-4 flex items-center justify-between max-w-[800px] mx-auto w-full transition-colors duration-300 bg-background/90 border-border`}>
+      <header 
+        className={`sticky top-0 z-50 backdrop-blur-md border-b px-4 sm:px-6 py-4 flex items-center justify-between max-w-[800px] mx-auto w-full transition-colors duration-300 bg-background/90 border-border`}
+        style={{ paddingTop: 'max(env(safe-area-inset-top), 1rem)' }}
+      >
         <button onClick={() => { playPop(); triggerHaptic('light'); router.back(); }} className="flex items-center justify-center w-10 h-10 rounded-full active:scale-95 shrink-0 transition-colors text-muted hover:bg-muted/20 hover:text-foreground">
           <span className="material-symbols-rounded text-[26px]">arrow_back</span>
         </button>
@@ -198,7 +201,7 @@ export default function ProgressoPage() {
         </div>
 
         {/* === ESTATÍSTICAS DA COMUNIDADE === */}
-        <h3 className="font-bold text-sm uppercase tracking-widest mb-3 pl-2 mt-8 text-muted">A comunidade hoje</h3>
+        <h3 className="font-bold text-sm uppercase tracking-widest mb-3 pl-2 mt-8 text-muted">O Ágape hoje</h3>
         <div className="grid grid-cols-3 gap-3 mb-8">
           <div className="bg-card border border-border p-4 rounded-[1.5rem] flex flex-col items-center text-center shadow-sm relative overflow-hidden">
             <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>

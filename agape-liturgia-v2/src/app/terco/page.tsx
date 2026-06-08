@@ -28,7 +28,10 @@ export default function TercoPage() {
       />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(47,107,255,0.05)_2px,_transparent_2px)] bg-[length:24px_24px] pointer-events-none"></div>
 
-      <header className="sticky top-0 z-50 backdrop-blur-md border-b px-3 sm:px-6 py-3 sm:py-4 flex items-center justify-between w-full transition-colors duration-300 bg-background/90 border-border gap-2">
+      <header 
+        className="sticky top-0 z-50 backdrop-blur-md border-b px-3 sm:px-6 pb-3 sm:pb-4 flex items-center justify-between w-full transition-colors duration-300 bg-background/90 border-border gap-2"
+        style={{ paddingTop: 'max(env(safe-area-inset-top), 16px)' }}
+      >
         <div className="flex items-center gap-2 sm:gap-4 min-w-0">
           <Link
             href="/jornada"
