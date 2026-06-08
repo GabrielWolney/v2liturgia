@@ -180,22 +180,25 @@ export async function getEstatisticasComunidade(comunidade: string): Promise<Est
   seteDiasAtras.setDate(seteDiasAtras.getDate() - 7);
   const dataLimiteStr = seteDiasAtras.toISOString().split('T')[0];
 
+  // Obtém a data de hoje no formato YYYY-MM-DD para comparar
+  const hoje = new Date().toLocaleDateString("en-CA");
+
   snapshot.docs.forEach(doc => {
     const data = doc.data();
     
-    // Contagem de Terços
-    if (data.tercosConcluidos && typeof data.tercosConcluidos === 'object') {
-      totalTercos += Object.keys(data.tercosConcluidos).length;
-    }
-
-    // Contagem de Leituras
-    if (data.leiturasConcluidas && typeof data.leiturasConcluidas === 'object') {
-      totalLeituras += Object.keys(data.leiturasConcluidas).length;
+    // Contagem de Terços (Pessoas que rezaram hoje)
+    if (data.tercosConcluidos && data.tercosConcluidos[hoje]) {
+      totalTercos++;
     }
     
-    // Contagem de Ofícios
-    if (data.oficiosConcluidos && typeof data.oficiosConcluidos === 'object') {
-      totalOficios += Object.keys(data.oficiosConcluidos).length;
+    // Contagem de Leituras (Pessoas que leram hoje)
+    if (data.leiturasConcluidas && data.leiturasConcluidas[hoje]) {
+      totalLeituras++;
+    }
+
+    // Contagem de Ofícios (Pessoas que rezaram o ofício hoje)
+    if (data.oficiosConcluidos && data.oficiosConcluidos[hoje]) {
+      totalOficios++;
     }
     
     // Contagem de Ativos

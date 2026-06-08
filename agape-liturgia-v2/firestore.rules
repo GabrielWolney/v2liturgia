@@ -6,8 +6,8 @@ service cloud.firestore {
     // FUNÇÕES DE UTILIDADE E RBAC
     // ==========================================
     function isSignedIn() {
-      // Exige que o usuário esteja logado E que o request venha de um app verificado (App Check)
-      return request.auth != null && request.app != null;
+      // Exige que o usuário esteja logado (removido AppCheck temporariamente pois quebra PWA no iOS)
+      return request.auth != null;
     }
     
     function isOwner(userId) {
@@ -149,6 +149,11 @@ service cloud.firestore {
     // ==========================================
     // COMUNIDADES E SEUS AVISOS (/comunidades/{comunidadeId}/...)
     // ==========================================
+    match /comunidades/{comunidadeId} {
+      allow read: if true;
+      allow write: if isSignedIn() && (isMasterAdmin() || isCoordenadorComunidade(comunidadeId));
+    }
+
     match /comunidades/{comunidadeId}/{collection}/{docId} {
       allow read: if true;
       allow write: if isSignedIn() && (isMasterAdmin() || isCoordenadorComunidade(comunidadeId));
