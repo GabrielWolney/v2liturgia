@@ -30,6 +30,7 @@ export default function TercoPage() {
 
       <header 
         className="sticky top-0 z-50 backdrop-blur-md border-b px-3 sm:px-6 pb-3 sm:pb-4 flex items-center justify-between w-full transition-colors duration-300 bg-background/90 border-border gap-2"
+        style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
       >
         <div className="flex items-center gap-2 sm:gap-4 min-w-0">
           <Link
@@ -52,35 +53,27 @@ export default function TercoPage() {
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {flux < 11 && (
             <button
-              onClick={(e) => { e.preventDefault(); playPop(); triggerHaptic('light'); actions.handleSkip(); }}
-              onTouchEnd={(e) => { e.preventDefault(); playPop(); triggerHaptic('light'); actions.handleSkip(); }}
-              className="block w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 transition-all active:bg-emerald-500/20"
+              onClick={() => { playPop(); triggerHaptic('light'); actions.handleSkip(); }}
+              className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 flex items-center justify-center rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 transition-colors active:scale-95"
             >
-              <div className="flex items-center justify-center w-full h-full pointer-events-none">
-                <span className="material-symbols-rounded text-base sm:text-lg">check_circle</span>
-              </div>
+              <span className="material-symbols-rounded text-base sm:text-lg">check_circle</span>
             </button>
           )}
           <button
-            onClick={(e) => { e.preventDefault(); playPop(); triggerHaptic('light'); actions.resetTerco(); }}
-            onTouchEnd={(e) => { e.preventDefault(); playPop(); triggerHaptic('light'); actions.resetTerco(); }}
-            className="block w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-2xl bg-card border border-border text-muted hover:text-foreground transition-all active:bg-black/5"
+            onClick={() => { playPop(); triggerHaptic('light'); actions.resetTerco(); }}
+            className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 flex items-center justify-center rounded-2xl bg-card border border-border text-muted hover:text-foreground transition-colors active:scale-95"
           >
-            <div className="flex items-center justify-center w-full h-full pointer-events-none">
-              <span className="material-symbols-rounded text-base sm:text-lg">refresh</span>
-            </div>
+            <span className="material-symbols-rounded text-base sm:text-lg">refresh</span>
           </button>
           <button
             onClick={() => { playClick(); actions.setIsLatin(!isLatin); }}
-            className={`block px-2 sm:px-3 py-2 sm:py-2.5 rounded-2xl border transition-all active:scale-95 shrink-0 ${
+            className={`px-2 sm:px-3 py-2 sm:py-2.5 rounded-2xl border text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-colors active:scale-95 shrink-0 ${
               isLatin
                 ? "bg-primary border-primary text-white shadow-md shadow-primary/20"
                 : "bg-card border-border text-muted"
             }`}
           >
-            <div className="flex items-center justify-center w-full h-full pointer-events-none text-[9px] sm:text-[10px] font-black uppercase tracking-widest">
-              {isLatin ? "LATIN" : "PT-BR"}
-            </div>
+            {isLatin ? "LATIN" : "PT-BR"}
           </button>
         </div>
       </header>

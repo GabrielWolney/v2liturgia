@@ -80,38 +80,9 @@
  
  
   
-  header {
-    margin-top: calc(env(safe-area-inset-top, 0px) + 10px) !important;
-    margin-bottom: 12px !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    width: calc(100% - 32px) !important;
-    padding: 12px 16px !important;
-    border-radius: 20px !important;
-    position: relative !important;
-    z-index: 50;
-    display: flex !important;
-    align-items: center !important;
-  }
-
-  header::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    border-radius: 20px;
-    background-color: var(--card-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.1);
-    border: 1px solid var(--border);
-    pointer-events: none;
-  }
-
- 
-  header.cabecalho-fixo {
-    position: sticky !important;
-    top: calc(env(safe-area-inset-top, 0px) + 10px) !important;
+  .material-symbols-rounded {
+    font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24 !important;
+    pointer-events: none !important;
   }
 
  

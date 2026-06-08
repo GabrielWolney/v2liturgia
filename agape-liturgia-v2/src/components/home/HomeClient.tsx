@@ -207,7 +207,8 @@ export function HomeClient({ liturgiaServer }: HomeClientProps) {
       )}
 
       <header 
-        className="flex items-center justify-between transition-colors duration-300 px-4 sm:px-5 pb-4 sm:pb-5 max-w-[600px] mx-auto w-full relative z-20"
+        className="flex items-center justify-between w-full max-w-[600px] mx-auto px-4 py-3 bg-card/80 backdrop-blur-xl border border-border shadow-sm rounded-[24px] relative z-20 transition-all duration-300"
+        style={{ marginTop: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}
       >
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-3">
@@ -217,24 +218,19 @@ export function HomeClient({ liturgiaServer }: HomeClientProps) {
               <span className={`text-[8px] font-black uppercase tracking-widest mt-0.5 opacity-90 ${textMuted}`}>Ágape de jovens</span>
             </div>
           </div>
-          <div className="flex items-center gap-1 sm:gap-3">
+          <div className="flex items-center gap-1 sm:gap-3 cursor-pointer">
             <button 
-              onClick={(e) => { e.preventDefault(); playPop(); triggerHaptic('light'); router.push('/progresso'); }} 
-              onTouchEnd={(e) => { e.preventDefault(); playPop(); triggerHaptic('light'); router.push('/progresso'); }} 
-              className={`block px-3 py-1.5 rounded-full border shadow-sm transition-all active:bg-black/5 ${foguinhoClass}`}
+              onClick={() => { playPop(); triggerHaptic('light'); router.push('/progresso'); }} 
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border shadow-sm transition-colors active:scale-95 ${foguinhoClass}`}
             >
-              <div className="flex items-center justify-center gap-1.5 pointer-events-none">
-                <span className="material-symbols-rounded text-[18px]">local_fire_department</span>
-                <span className="font-extrabold text-sm">{streak}</span>
-              </div>
+              <span className="material-symbols-rounded text-[18px]">local_fire_department</span>
+              <span className="font-extrabold text-sm">{streak}</span>
             </button>
             <button 
               onClick={() => { playPop(); triggerHaptic('light'); router.push('/menu'); }} 
-              className={`block w-9 h-9 rounded-full transition-colors hover:bg-black/5 active:bg-black/10 text-muted hover:text-foreground`}
+              className="w-9 h-9 flex items-center justify-center rounded-full transition-colors hover:bg-black/5 active:bg-black/10 text-muted hover:text-foreground"
             >
-              <div className="flex items-center justify-center w-full h-full pointer-events-none">
-                <span className="material-symbols-rounded text-[24px]">settings</span>
-              </div>
+              <span className="material-symbols-rounded text-[24px]">settings</span>
             </button>
           </div>
         </div>
