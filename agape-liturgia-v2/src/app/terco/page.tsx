@@ -52,29 +52,37 @@ export default function TercoPage() {
 
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {flux < 11 && (
-            <button
-              onClick={() => { playPop(); triggerHaptic('light'); actions.handleSkip(); }}
-              className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 flex items-center justify-center rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 transition-colors active:scale-95"
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={(e) => { e.preventDefault(); playPop(); triggerHaptic('light'); actions.handleSkip(); }}
+              onTouchEnd={(e) => { e.preventDefault(); playPop(); triggerHaptic('light'); actions.handleSkip(); }}
+              className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 flex items-center justify-center rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 transition-colors active:scale-95 cursor-pointer"
             >
-              <span className="material-symbols-rounded text-base sm:text-lg">check_circle</span>
-            </button>
+              <span className="material-symbols-rounded text-base sm:text-lg pointer-events-none">check_circle</span>
+            </div>
           )}
-          <button
-            onClick={() => { playPop(); triggerHaptic('light'); actions.resetTerco(); }}
-            className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 flex items-center justify-center rounded-2xl bg-card border border-border text-muted hover:text-foreground transition-colors active:scale-95"
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={(e) => { e.preventDefault(); playPop(); triggerHaptic('light'); actions.resetTerco(); }}
+            onTouchEnd={(e) => { e.preventDefault(); playPop(); triggerHaptic('light'); actions.resetTerco(); }}
+            className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 flex items-center justify-center rounded-2xl bg-card border border-border text-muted hover:text-foreground transition-colors active:scale-95 cursor-pointer"
           >
-            <span className="material-symbols-rounded text-base sm:text-lg">refresh</span>
-          </button>
-          <button
+            <span className="material-symbols-rounded text-base sm:text-lg pointer-events-none">refresh</span>
+          </div>
+          <div
+            role="button"
+            tabIndex={0}
             onClick={() => { playClick(); actions.setIsLatin(!isLatin); }}
-            className={`px-2 sm:px-3 py-2 sm:py-2.5 rounded-2xl border text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-colors active:scale-95 shrink-0 ${
+            className={`px-2 sm:px-3 py-2 sm:py-2.5 rounded-2xl border transition-colors active:scale-95 shrink-0 cursor-pointer ${
               isLatin
                 ? "bg-primary border-primary text-white shadow-md shadow-primary/20"
                 : "bg-card border-border text-muted"
             }`}
           >
-            {isLatin ? "LATIN" : "PT-BR"}
-          </button>
+            <span className="pointer-events-none text-[9px] sm:text-[10px] font-black uppercase tracking-widest">{isLatin ? "LATIN" : "PT-BR"}</span>
+          </div>
         </div>
       </header>
 
