@@ -92,6 +92,7 @@
    
     position: relative !important;
     z-index: 50;
+    transform: translateZ(0) !important;
     
     background-color: var(--card-bg) !important;
     backdrop-filter: blur(12px) !important;
