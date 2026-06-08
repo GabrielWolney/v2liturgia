@@ -53,20 +53,20 @@ export default function TercoPage() {
           {flux < 11 && (
             <button
               onClick={() => { playPop(); triggerHaptic('light'); actions.handleSkip(); }}
-              className="hitbox-down w-9 h-9 sm:w-10 sm:h-10 shrink-0 flex items-center justify-center rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 transition-all active:bg-emerald-500/20"
+              className="relative z-50 hitbox-down w-9 h-9 sm:w-10 sm:h-10 shrink-0 flex items-center justify-center rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 transition-all active:bg-emerald-500/20"
             >
               <span className="material-symbols-rounded text-base sm:text-lg">check_circle</span>
             </button>
           )}
           <button
             onClick={() => { playPop(); triggerHaptic('light'); actions.resetTerco(); }}
-            className="hitbox-down w-9 h-9 sm:w-10 sm:h-10 shrink-0 flex items-center justify-center rounded-2xl bg-card border border-border text-muted hover:text-foreground transition-all active:bg-black/5"
+            className="relative z-50 hitbox-down w-9 h-9 sm:w-10 sm:h-10 shrink-0 flex items-center justify-center rounded-2xl bg-card border border-border text-muted hover:text-foreground transition-all active:bg-black/5"
           >
             <span className="material-symbols-rounded text-base sm:text-lg">refresh</span>
           </button>
           <button
             onClick={() => { playClick(); actions.setIsLatin(!isLatin); }}
-            className={`px-2 sm:px-3 py-2 sm:py-2.5 rounded-2xl border text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shrink-0 ${
+            className={`relative z-50 px-2 sm:px-3 py-2 sm:py-2.5 rounded-2xl border text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shrink-0 ${
               isLatin
                 ? "bg-primary border-primary text-white shadow-md shadow-primary/20"
                 : "bg-card border-border text-muted"
