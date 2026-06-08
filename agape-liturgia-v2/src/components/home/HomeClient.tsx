@@ -218,7 +218,7 @@ export function HomeClient({ liturgiaServer }: HomeClientProps) {
             </div>
           </div>
           <div className="flex items-center gap-1 sm:gap-3 cursor-pointer">
-            <button onClick={() => { playPop(); triggerHaptic('light'); router.push('/progresso'); }} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border shadow-sm transition-colors active:scale-95 ${foguinhoClass}`}>
+            <button onClick={() => { playPop(); triggerHaptic('light'); router.push('/progresso'); }} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border shadow-sm transition-all active:opacity-70 ${foguinhoClass}`}>
               <span className="material-symbols-rounded text-[18px]">local_fire_department</span>
               <span className="font-extrabold text-sm">{streak}</span>
             </button>
