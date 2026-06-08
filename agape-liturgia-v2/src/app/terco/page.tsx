@@ -52,14 +52,16 @@ export default function TercoPage() {
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {flux < 11 && (
             <button
-              onClick={() => { playPop(); triggerHaptic('light'); actions.handleSkip(); }}
+              onClick={(e) => { e.preventDefault(); playPop(); triggerHaptic('light'); actions.handleSkip(); }}
+              onTouchEnd={(e) => { e.preventDefault(); playPop(); triggerHaptic('light'); actions.handleSkip(); }}
               className="relative z-50 hitbox-down w-9 h-9 sm:w-10 sm:h-10 shrink-0 flex items-center justify-center rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 transition-all active:bg-emerald-500/20"
             >
               <span className="material-symbols-rounded text-base sm:text-lg">check_circle</span>
             </button>
           )}
           <button
-            onClick={() => { playPop(); triggerHaptic('light'); actions.resetTerco(); }}
+            onClick={(e) => { e.preventDefault(); playPop(); triggerHaptic('light'); actions.resetTerco(); }}
+            onTouchEnd={(e) => { e.preventDefault(); playPop(); triggerHaptic('light'); actions.resetTerco(); }}
             className="relative z-50 hitbox-down w-9 h-9 sm:w-10 sm:h-10 shrink-0 flex items-center justify-center rounded-2xl bg-card border border-border text-muted hover:text-foreground transition-all active:bg-black/5"
           >
             <span className="material-symbols-rounded text-base sm:text-lg">refresh</span>
