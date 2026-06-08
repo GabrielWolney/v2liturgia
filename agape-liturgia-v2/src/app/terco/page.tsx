@@ -55,14 +55,14 @@ export default function TercoPage() {
               onClick={() => { playPop(); triggerHaptic('light'); actions.handleSkip(); }}
               className="relative before:absolute before:-inset-y-6 before:-inset-x-4 w-9 h-9 sm:w-10 sm:h-10 shrink-0 flex items-center justify-center rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 transition-all active:bg-emerald-500/20"
             >
-              <span className="material-symbols-rounded text-base sm:text-lg relative z-10">check_circle</span>
+              <span className="material-symbols-rounded text-base sm:text-lg">check_circle</span>
             </button>
           )}
           <button
             onClick={() => { playPop(); triggerHaptic('light'); actions.resetTerco(); }}
             className="relative before:absolute before:-inset-y-6 before:-inset-x-4 w-9 h-9 sm:w-10 sm:h-10 shrink-0 flex items-center justify-center rounded-2xl bg-card border border-border text-muted hover:text-foreground transition-all active:bg-black/5"
           >
-            <span className="material-symbols-rounded text-base sm:text-lg relative z-10">refresh</span>
+            <span className="material-symbols-rounded text-base sm:text-lg">refresh</span>
           </button>
           <button
             onClick={() => { playClick(); actions.setIsLatin(!isLatin); }}
