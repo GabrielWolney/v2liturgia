@@ -171,8 +171,7 @@ export function JornadaClient({ liturgiaServer }: { liturgiaServer: LiturgiaDiar
     <div className={`min-h-screen flex flex-col font-sans pb-32 transition-colors duration-300 bg-background bg-[radial-gradient(circle_at_center,_rgba(47,107,255,0.08)_3px,_transparent_3px)] bg-[length:28px_28px]`}>
       
       <header 
-        className="flex items-center justify-between transition-colors duration-300 px-4 sm:px-5 pb-4 sm:pb-5 max-w-[600px] mx-auto w-full relative z-20"
-        style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}
+        className="flex items-center justify-between transition-colors duration-300 px-4 sm:px-5 pt-14 pb-4 sm:pb-5 max-w-[600px] mx-auto w-full relative z-20"
       >
         <div className="flex items-center gap-3">
           <Link href="/" className={`w-9 h-9 flex items-center justify-center rounded-full transition-colors ${arrowHover}`}>
