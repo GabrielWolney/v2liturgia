@@ -28,10 +28,12 @@ export default function TercoPage() {
       />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(47,107,255,0.05)_2px,_transparent_2px)] bg-[length:24px_24px] pointer-events-none"></div>
 
-      <header className="sticky top-0 z-50 flex flex-col w-full transition-colors duration-300 bg-background/90 backdrop-blur-md border-b border-border">
-        <div className="w-full shrink-0" style={{ height: 'env(safe-area-inset-top)', minHeight: '52px' }} />
-        <div className="flex items-center justify-between px-3 sm:px-6 pb-3 sm:pb-4 pt-2 gap-2 w-full">
-        <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+      <div className="sticky top-0 z-50 w-full">
+        <div className="w-full shrink-0" style={{ height: 'env(safe-area-inset-top)', minHeight: '47px' }} />
+        <header 
+          className="backdrop-blur-md border-b px-3 sm:px-6 pb-3 sm:pb-4 flex items-center justify-between w-full transition-colors duration-300 bg-background/90 border-border gap-2"
+        >
+          <div className="flex items-center gap-2 sm:gap-4 min-w-0">
           <Link
             href="/jornada"
             onClick={() => playClick()}
@@ -81,8 +83,8 @@ export default function TercoPage() {
             <span className="pointer-events-none text-[9px] sm:text-[10px] font-black uppercase tracking-widest">{isLatin ? "LATIN" : "PT-BR"}</span>
           </div>
           </div>
-        </div>
-      </header>
+        </header>
+      </div>
 
       <div className="flex-1 overflow-y-auto no-scrollbar pt-8 pb-4">
         <div className="px-6 flex flex-col items-center justify-start pb-8">

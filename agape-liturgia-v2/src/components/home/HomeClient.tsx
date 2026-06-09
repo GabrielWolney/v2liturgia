@@ -207,7 +207,7 @@ export function HomeClient({ liturgiaServer }: HomeClientProps) {
       )}
 
       <div className="w-full shrink-0" style={{ height: 'env(safe-area-inset-top)', minHeight: '47px' }} />
-      <header className="flex items-center justify-between transition-colors duration-300 px-4 sm:px-5 pb-4 pt-2 max-w-[600px] mx-auto w-full relative z-20">
+      <header className="flex items-center justify-between transition-colors duration-300 p-4 sm:p-5 max-w-[600px] mx-auto w-full relative z-20">
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-3">
             <Image src="/icon-192x192.png" alt="Logo" width={40} height={40} className="w-10 h-10 rounded-xl border shadow-sm" priority />
@@ -224,7 +224,7 @@ export function HomeClient({ liturgiaServer }: HomeClientProps) {
             >
               <div className="flex items-center justify-center gap-1.5 pointer-events-none">
                 <span className="material-symbols-rounded text-[18px]">local_fire_department</span>
-                <span className="font-extrabold text-sm">{streak} 🔥🔥</span>
+                <span className="font-extrabold text-sm">{streak}</span>
               </div>
             </Link>
             <Link 
