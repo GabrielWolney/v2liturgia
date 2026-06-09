@@ -81,6 +81,7 @@ export default function TercoPage() {
             <span className="pointer-events-none text-[9px] sm:text-[10px] font-black uppercase tracking-widest">{isLatin ? "LATIN" : "PT-BR"}</span>
           </div>
         </div>
+        </div>
       </header>
 
       <div className="flex-1 overflow-y-auto no-scrollbar pt-8 pb-4">
