@@ -206,9 +206,8 @@ export function HomeClient({ liturgiaServer }: HomeClientProps) {
         </div>
       )}
 
-      <header className="flex flex-col transition-colors duration-300 w-full relative z-20">
-        <div className="w-full shrink-0" style={{ height: 'env(safe-area-inset-top)', minHeight: '52px' }} />
-        <div className="flex items-center justify-between w-full max-w-[600px] mx-auto px-4 sm:px-5 pb-4 pt-2">
+      <div className="w-full shrink-0" style={{ height: 'env(safe-area-inset-top)', minHeight: '47px' }} />
+      <header className="floating-header transition-colors duration-300">
           <div className="flex items-center gap-3">
             <Image src="/icon-192x192.png" alt="Logo" width={40} height={40} className="w-10 h-10 rounded-xl border shadow-sm" priority />
             <div className="flex flex-col justify-center">
@@ -237,7 +236,6 @@ export function HomeClient({ liturgiaServer }: HomeClientProps) {
               </div>
             </Link>
           </div>
-        </div>
       </header>
 
       <main className="relative z-10 flex-1 flex flex-col px-6 max-w-[600px] mx-auto w-full pt-4 sm:pt-6">
